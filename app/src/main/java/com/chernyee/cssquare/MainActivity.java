@@ -1,11 +1,17 @@
 package com.chernyee.cssquare;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
+import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,9 +21,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.support.v7.widget.SearchView;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, HomeFragment.OnFragmentInteractionListener {
+
+    private Cursor employees;
+    private DatabaseHelper db;
+
+    private ListView lvUsers;
+    private ListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +63,42 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+        db = new DatabaseHelper(this);
+        db.setForcedUpgrade();
+
+        employees = db.getEmployees();
+
+        List<String> listUser = new ArrayList<>();
+
+        while(employees.moveToNext()){
+            if(employees.getString(1) != null){
+
+                Log.v("YESSSS",employees.getString(1));
+                listUser.add(employees.getString(1));
+            }
+
+        }
+
+        lvUsers = (ListView) findViewById(R.id.list);
+
+        adapter = new ArrayAdapter<String>(getApplicationContext(),
+                android.R.layout.simple_list_item_1, android.R.id.text1,
+                listUser);
+        lvUsers.setAdapter(adapter);
+
+
+
+//        DatabaseAccess mDbHelper = new DatabaseAccess(this);
+//        mDbHelper.createDatabase();
+//        mDbHelper.open();
+//
+//        Cursor testdata = mDbHelper.getTestData();
+//
+//        mDbHelper.close();
+
+
 
 
 
