@@ -30,13 +30,18 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, HomeFragment.OnFragmentInteractionListener {
 
-    private String [] snackBarChoices = {"Have you tried it yourself yet?", "I am sure you can do better!",
+    public static String [] snackBarChoices = {"Have you tried it yourself yet?", "I am sure you can do better!",
         "Just give it some time!" , "Don't give up, keep on trying!"};
+
+    public static String [] code_tag = {"All", "Array", "String", "Linked List", "Tree" , "DP" , "DFS", "BFS", "Greedy"};
+
+
 
 
     private Cursor codingQuestionsCursor;
@@ -45,16 +50,35 @@ public class MainActivity extends AppCompatActivity
     private ListView lvUsers;
     private ListAdapter adapter;
 
-    private List<String> listId = new ArrayList<>();
-    private List<String> listTitle = new ArrayList<>();
-    private List<String> listDescription = new ArrayList<>();
-    private List<String> listCode = new ArrayList<>();
-    private List<String> listAnswer = new ArrayList<>();
-    private List<String> listHint = new ArrayList<>();
-    private List<String> listTag = new ArrayList<>();
-    private List<String> listCategory = new ArrayList<>();
-    private List<String> listDifficulty = new ArrayList<>();
-    private List<String> listAdditional = new ArrayList<>();
+    public static HashMap<Integer, List<String>> populateList = new HashMap<>();
+
+    public static List<String> listId = new ArrayList<>();
+    public static List<String> listTitle = new ArrayList<>();
+    public static List<String> listDescription = new ArrayList<>();
+    public static List<String> listCode = new ArrayList<>();
+    public static List<String> listAnswer = new ArrayList<>();
+    public static List<String> listHint = new ArrayList<>();
+    public static List<String> listTag = new ArrayList<>();
+    public static List<String> listCategory = new ArrayList<>();
+    public static List<String> listDifficulty = new ArrayList<>();
+    public static List<String> listAdditional = new ArrayList<>();
+
+    public static void setPopulateList(){
+
+        for(int i = 0; i < code_tag.length; i++){
+
+            List<String> tempList = new ArrayList<>();
+            for(int j = 0; j < listId.size(); j++){
+                if(i == 0) tempList.add(listTitle.get(j));
+                else if(listTag.get(j).contains(code_tag[i]))
+                    tempList.add(listTitle.get(j));
+
+            }
+            populateList.put(i,tempList);
+        }
+
+
+    }
 
 
 
@@ -106,6 +130,8 @@ public class MainActivity extends AppCompatActivity
             listAdditional.add(codingQuestionsCursor.getString(9));
 
         }while(codingQuestionsCursor.moveToNext());
+
+        setPopulateList();
 
 
 

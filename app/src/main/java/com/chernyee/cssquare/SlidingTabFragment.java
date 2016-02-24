@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,16 +24,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.SearchView;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class SlidingTabFragment extends Fragment {
 
     static final String LOG_TAG = "SlidingTabsBasicFragment";
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
-    private String [] code_tag = {"All", "Array", "String", "Linked List", "Tree" , "DP" , "DFS", "BFS", "Greedy"};
+    private ListAdapter adapter;
+    private ListView lv;
 
     private SearchView searchView;
     private void handleIntent(Intent intent) {
@@ -114,7 +121,7 @@ public class SlidingTabFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return code_tag.length;
+            return MainActivity.code_tag.length;
         }
 
         @Override
@@ -125,7 +132,7 @@ public class SlidingTabFragment extends Fragment {
         @Override
         public CharSequence getPageTitle(int position) {
            // return "Item " + (position + 1);
-            return code_tag[position];
+            return MainActivity.code_tag[position];
         }
 
         @Override
@@ -135,13 +142,13 @@ public class SlidingTabFragment extends Fragment {
                     container, false);
             container.addView(view);
 
-            ListView lv = (ListView) view.findViewById(R.id.questionlist);
+            lv = (ListView) view.findViewById(R.id.questionlist);
 
-//
-//            adapter = new ArrayAdapter<String>(getApplicationContext(),
-//                    android.R.layout.simple_list_item_1, android.R.id.text1,
-//                    listUser);
-//            lvUsers.setAdapter(adapter);
+
+            adapter = new ArrayAdapter<String>(getActivity(),
+                    android.R.layout.simple_list_item_1, android.R.id.text1,
+                    MainActivity.populateList.get(position));
+            lv.setAdapter(adapter);
 
 
 
