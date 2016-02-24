@@ -39,12 +39,24 @@ public class MainActivity extends AppCompatActivity
         "Just give it some time!" , "Don't give up, keep on trying!"};
 
 
-
-    private Cursor employees;
+    private Cursor codingQuestionsCursor;
     private DatabaseHelper db;
 
     private ListView lvUsers;
     private ListAdapter adapter;
+
+    private List<String> listId = new ArrayList<>();
+    private List<String> listTitle = new ArrayList<>();
+    private List<String> listDescription = new ArrayList<>();
+    private List<String> listCode = new ArrayList<>();
+    private List<String> listAnswer = new ArrayList<>();
+    private List<String> listHint = new ArrayList<>();
+    private List<String> listTag = new ArrayList<>();
+    private List<String> listCategory = new ArrayList<>();
+    private List<String> listDifficulty = new ArrayList<>();
+    private List<String> listAdditional = new ArrayList<>();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,17 +65,17 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-
-                Snackbar.make(view, snackBarChoices[(int)(Math.random()*100)%4 ], Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//
+//                Snackbar.make(view, snackBarChoices[(int) (Math.random() * 100) % 4], Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//
+//            }
+//        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -78,45 +90,45 @@ public class MainActivity extends AppCompatActivity
         db = new DatabaseHelper(this);
         db.setForcedUpgrade();
 
-        employees = db.getEmployees();
+        codingQuestionsCursor = db.getEmployees();
 
-        List<String> listUser = new ArrayList<>();
-        listUser.add(employees.getString(3));
 
-        while(employees.moveToNext()){
-            if(employees.getString(1) != null){
+        do{
+            listId.add(codingQuestionsCursor.getString(0));
+            listTitle.add(codingQuestionsCursor.getString(1));
+            listDescription.add(codingQuestionsCursor.getString(2));
+            listCode.add(codingQuestionsCursor.getString(3));
+            listAnswer.add(new String(codingQuestionsCursor.getBlob(4)));
+            listHint.add(codingQuestionsCursor.getString(5));
+            listTag.add(codingQuestionsCursor.getString(6));
+            listCategory.add(codingQuestionsCursor.getString(7));
+            listDifficulty.add(codingQuestionsCursor.getString(8));
+            listAdditional.add(codingQuestionsCursor.getString(9));
 
-                Log.v("YESSSS",employees.getString(1));
-                listUser.add(employees.getString(3));
-            }
+        }while(codingQuestionsCursor.moveToNext());
 
-        }
 
-        String highlighted = listUser.get(3);
+
+
+        String highlighted = listAnswer.get(20);
 
         SyntaxHighlighter shl = new SyntaxHighlighter(highlighted);
-
-
-        TextView text1 = (TextView) findViewById(R.id.text1);
-     //   text1.setText(Html.fromHtml(highlighted));
-
-
+        TextView text1 = (TextView) findViewById(R.id.code);
         text1.setText(shl.formatToHtml());
 
+        int lineNumber = countLines(highlighted);
+        String printLineNumber= "";
+        for(int i = 1; i <= lineNumber; i++){
+            if(i < lineNumber)
+                printLineNumber += (i < 10) ? " " + i + "\n" : "" + i + "\n" ;
+            else printLineNumber += (i < 10) ? " " + i : "" + i;
+        }
+
+        TextView text2 = (TextView) findViewById(R.id.codeNumber);
+        text2.setText(printLineNumber);
 
 
 
-
-
-
-
-
-        lvUsers = (ListView) findViewById(R.id.list);
-
-        adapter = new ArrayAdapter<String>(getApplicationContext(),
-                android.R.layout.simple_list_item_1, android.R.id.text1,
-                listUser);
-        lvUsers.setAdapter(adapter);
 
 
 
@@ -206,5 +218,51 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    public List<String> getListId() {
+        return listId;
+    }
+
+    public List<String> getListTitle() {
+        return listTitle;
+    }
+
+    public List<String> getListDescription(){
+        return listDescription;
+    }
+
+    public List<String> getListCode(){
+        return listCode;
+    }
+
+    public List<String> getListHint(){
+        return listHint;
+    }
+
+    public List<String> getListAnswer(){
+        return listAnswer;
+    }
+
+    public List<String> getListTag(){
+        return listTag;
+    }
+
+    public List<String> getListCategory(){
+        return listCategory;
+    }
+
+
+    public List<String> getListDifficulty(){
+        return listDifficulty;
+    }
+
+    public List<String> getListAdditional(){
+        return listAdditional;
+    }
+
+    public static int countLines(String str){
+        String[] lines = str.split("\r\n|\r|\n");
+        return  lines.length;
     }
 }

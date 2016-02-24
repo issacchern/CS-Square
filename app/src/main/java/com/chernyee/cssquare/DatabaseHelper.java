@@ -34,7 +34,7 @@ public class DatabaseHelper extends SQLiteAssetHelper {
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
-        String [] sqlSelect = {"Id", "Title", "Description", "Code", "Answer", "Hint"};
+        String [] sqlSelect = {"Id", "Title", "Description", "Code", "Answer", "Hint", "Tags", "Category", "Difficulty", "Additional"};
         String sqlTables = "CodingQuestions";
 
         qb.setTables(sqlTables);

@@ -6,6 +6,18 @@
     android:orientation="vertical"
     android:gravity="center">
 
+
+    <ListView
+        android:id="@+id/questionlist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+    </ListView>
+
+
+
+<!--
     <TextView
         android:id="@+id/dummy"
         android:layout_margin="10dp"
@@ -25,5 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="80sp" />
+
+        -->
 
 </LinearLayout>

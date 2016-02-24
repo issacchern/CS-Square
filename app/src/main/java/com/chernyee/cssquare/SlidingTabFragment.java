@@ -22,6 +22,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.SearchView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,7 +34,6 @@ public class SlidingTabFragment extends Fragment {
     private ViewPager mViewPager;
     private String [] code_tag = {"All", "Array", "String", "Linked List", "Tree" , "DP" , "DFS", "BFS", "Greedy"};
 
-    private TextView dummy;
     private SearchView searchView;
     private void handleIntent(Intent intent) {
 
@@ -75,7 +76,7 @@ public class SlidingTabFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                dummy.setText(newText);
+
 
 
 
@@ -133,10 +134,24 @@ public class SlidingTabFragment extends Fragment {
             View view = getActivity().getLayoutInflater().inflate(R.layout.pager_item,
                     container, false);
             container.addView(view);
-            TextView title = (TextView) view.findViewById(R.id.item_title);
-            title.setText(String.valueOf(position + 1));
 
-            dummy = (TextView) view.findViewById(R.id.dummy);
+            ListView lv = (ListView) view.findViewById(R.id.questionlist);
+
+//
+//            adapter = new ArrayAdapter<String>(getApplicationContext(),
+//                    android.R.layout.simple_list_item_1, android.R.id.text1,
+//                    listUser);
+//            lvUsers.setAdapter(adapter);
+
+
+
+
+
+
+     //       TextView title = (TextView) view.findViewById(R.id.item_title);
+     //       title.setText(String.valueOf(position + 1));
+
+
 
 
             // Log.i(LOG_TAG, "instantiateItem() [position: " + position + "]");
