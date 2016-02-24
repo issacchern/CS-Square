@@ -20,7 +20,7 @@ import java.io.OutputStream;
 public class DatabaseHelper extends SQLiteAssetHelper {
 
     private static final String DATABASE_NAME = "Questions.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
 
     public DatabaseHelper(Context context) {
 
@@ -34,7 +34,7 @@ public class DatabaseHelper extends SQLiteAssetHelper {
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
-        String [] sqlSelect = {"Id", "Title", "Description"};
+        String [] sqlSelect = {"Id", "Title", "Description", "Code", "Answer", "Hint"};
         String sqlTables = "CodingQuestions";
 
         qb.setTables(sqlTables);

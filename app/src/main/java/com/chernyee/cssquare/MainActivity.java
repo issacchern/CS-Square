@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
+import android.text.Html;
 import android.util.Log;
 import android.view.MenuInflater;
 import android.view.View;
@@ -25,6 +26,7 @@ import android.support.v7.widget.SearchView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +34,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, HomeFragment.OnFragmentInteractionListener {
+
+    private String [] snackBarChoices = {"Have you tried it yourself yet?", "I am sure you can do better!",
+        "Just give it some time!" , "Don't give up, keep on trying!"};
+
+
 
     private Cursor employees;
     private DatabaseHelper db;
@@ -50,8 +57,11 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+
+
+                Snackbar.make(view, snackBarChoices[(int)(Math.random()*100)%4 ], Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
             }
         });
 
@@ -71,15 +81,35 @@ public class MainActivity extends AppCompatActivity
         employees = db.getEmployees();
 
         List<String> listUser = new ArrayList<>();
+        listUser.add(employees.getString(3));
 
         while(employees.moveToNext()){
             if(employees.getString(1) != null){
 
                 Log.v("YESSSS",employees.getString(1));
-                listUser.add(employees.getString(1));
+                listUser.add(employees.getString(3));
             }
 
         }
+
+        String highlighted = listUser.get(3);
+
+        SyntaxHighlighter shl = new SyntaxHighlighter(highlighted);
+
+
+        TextView text1 = (TextView) findViewById(R.id.text1);
+     //   text1.setText(Html.fromHtml(highlighted));
+
+
+        text1.setText(shl.formatToHtml());
+
+
+
+
+
+
+
+
 
         lvUsers = (ListView) findViewById(R.id.list);
 
