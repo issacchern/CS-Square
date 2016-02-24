@@ -5,6 +5,7 @@ package com.chernyee.cssquare;
  */
 
 import com.chernyee.cssquare.UI.SlidingTabLayout;
+import com.chernyee.cssquare.CustomAdapter;
 
 import android.app.SearchManager;
 import android.content.ComponentName;
@@ -24,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.SearchView;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,7 +38,7 @@ public class SlidingTabFragment extends Fragment {
     static final String LOG_TAG = "SlidingTabsBasicFragment";
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
-    private ListAdapter adapter;
+    private CustomAdapter adapter;
     private ListView lv;
 
     private SearchView searchView;
@@ -145,23 +145,13 @@ public class SlidingTabFragment extends Fragment {
             lv = (ListView) view.findViewById(R.id.questionlist);
 
 
-            adapter = new ArrayAdapter<String>(getActivity(),
-                    android.R.layout.simple_list_item_1, android.R.id.text1,
+
+            CustomAdapter customAdapter = new CustomAdapter(getActivity(), R.layout.list_item,
                     MainActivity.populateList.get(position));
-            lv.setAdapter(adapter);
+            lv.setAdapter(customAdapter);
 
 
 
-
-
-
-     //       TextView title = (TextView) view.findViewById(R.id.item_title);
-     //       title.setText(String.valueOf(position + 1));
-
-
-
-
-            // Log.i(LOG_TAG, "instantiateItem() [position: " + position + "]");
 
             return view;
         }

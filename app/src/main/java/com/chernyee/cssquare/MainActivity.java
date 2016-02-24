@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity
     private ListView lvUsers;
     private ListAdapter adapter;
 
-    public static HashMap<Integer, List<String>> populateList = new HashMap<>();
+    public static HashMap<Integer, List<List<String>>> populateList = new HashMap<>();
 
     public static List<String> listId = new ArrayList<>();
     public static List<String> listTitle = new ArrayList<>();
@@ -67,14 +67,27 @@ public class MainActivity extends AppCompatActivity
 
         for(int i = 0; i < code_tag.length; i++){
 
-            List<String> tempList = new ArrayList<>();
+            List<List<String>> tempListList = new ArrayList<>();
             for(int j = 0; j < listId.size(); j++){
-                if(i == 0) tempList.add(listTitle.get(j));
-                else if(listTag.get(j).contains(code_tag[i]))
+
+                if(i == 0){
+                    List<String> tempList = new ArrayList<>();
                     tempList.add(listTitle.get(j));
+                    tempList.add(listTag.get(j));
+                    tempList.add(listDifficulty.get(j));
+                    tempListList.add(tempList);
+                }
+                else if(listTag.get(j).contains(code_tag[i])){
+                    List<String> tempList = new ArrayList<>();
+                    tempList.add(listTitle.get(j));
+                    tempList.add(listTag.get(j));
+                    tempList.add(listDifficulty.get(j));
+                    tempListList.add(tempList);
+                }
+
 
             }
-            populateList.put(i,tempList);
+            populateList.put(i,tempListList);
         }
 
 
@@ -130,6 +143,8 @@ public class MainActivity extends AppCompatActivity
             listAdditional.add(codingQuestionsCursor.getString(9));
 
         }while(codingQuestionsCursor.moveToNext());
+
+
 
         setPopulateList();
 
