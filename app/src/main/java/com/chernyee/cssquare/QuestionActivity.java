@@ -1,9 +1,16 @@
 package com.chernyee.cssquare;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,13 +19,68 @@ import android.widget.Toast;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class QuestionActivity extends AppCompatActivity {
 
+    private List<String> info;
     private Button codeButton;
     private int hintCount = 0;
+
+    private SharedPreferences sharedPref;
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.bookmark_item) {
+            String markString = "cs"+info.get(0);
+            int markScore = sharedPref.getInt(markString, 0);
+            if(markScore == 0){
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putInt(markString, 1);
+                editor.commit();
+                item.setIcon(getResources().getDrawable(R.drawable.star));
+                Toast.makeText(this, "Bookmarked!", Toast.LENGTH_SHORT).show();
+            } else{
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putInt(markString,0);
+                editor.commit();
+                item.setIcon(getResources().getDrawable(R.drawable.star_outline));
+                Toast.makeText(this, "Remove bookmarked!", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        }
+
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.bookmark, menu);
+
+        sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        MenuItem bedMenuItem = menu.findItem(R.id.bookmark_item);
+        String markString = "cs"+info.get(0);
+        int markScore = sharedPref.getInt(markString, 0);
+        if(markScore == 0){
+            bedMenuItem.setIcon(getResources().getDrawable(R.drawable.star_outline));
+        } else{
+            bedMenuItem.setIcon(getResources().getDrawable(R.drawable.star));
+        }
+
+
+        return super.onCreateOptionsMenu(menu);
+    }
 
 
     @Override
@@ -26,12 +88,24 @@ public class QuestionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Bundle extras = getIntent().getExtras();
-        final List<String> info = extras.getStringArrayList("information");
+        info = extras.getStringArrayList("information");
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         final String [] split = info.get(5).split("\n");
 
@@ -68,8 +142,6 @@ public class QuestionActivity extends AppCompatActivity {
 
 
 
-
-
 //        final FloatingActionsMenu menuMultipleActions = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
 //        menuMultipleActions.addButton(actionC);
 
@@ -90,21 +162,6 @@ public class QuestionActivity extends AppCompatActivity {
             }
         });
 
-
-        final FloatingActionButton actionC = (FloatingActionButton) findViewById(R.id.action_c);
-        actionC.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(actionC.getTitle().equals("Bookmarked!")){
-                    actionC.setTitle("Unbookmarked!");
-                    // TODO : remove bookmark
-                } else{
-                    actionC.setTitle("Bookmarked!");
-                    // TODO : add bookmark
-                }
-
-            }
-        });
 
         final FloatingActionButton actionD = (FloatingActionButton) findViewById(R.id.action_d);
         actionD.setOnClickListener(new View.OnClickListener() {

@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class SearchableActivity extends ListActivity {
 
     private CustomAdapter customAdapter;
     private TextView textView;
+    private List<List<String>> customList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,12 +44,23 @@ public class SearchableActivity extends ListActivity {
         handleIntent(intent);
     }
 
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        Intent i = new Intent(this, QuestionActivity.class);
+        i.putStringArrayListExtra("information", new ArrayList<>(customList.get(position)));
+        startActivity(i);
+
+
+
+        super.onListItemClick(l, v, position, id);
+    }
+
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             Log.v("searcch", query);
 
-            List<List<String>> customList = new ArrayList<List<String>>();
+            customList = new ArrayList<List<String>>();
 
             for(int i = 0 ; i < MainActivity.populateList.get(0).size(); i++){
 
