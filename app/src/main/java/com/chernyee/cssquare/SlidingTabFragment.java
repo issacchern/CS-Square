@@ -45,6 +45,7 @@ public class SlidingTabFragment extends Fragment {
     private ListView lv;
 
     private SearchView searchView;
+
     private void handleIntent(Intent intent) {
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {

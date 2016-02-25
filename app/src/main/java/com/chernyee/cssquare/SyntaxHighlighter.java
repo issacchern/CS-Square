@@ -60,16 +60,4 @@ public class SyntaxHighlighter {
         content = content.replaceAll("//[^\n]*?\n", "<font color=\"navy\">$0</font>");
     }
 
-//    public void markupReferences(ArrayList<CscopeEntry> references) {
-//        StringBuilder result = new StringBuilder(content);
-//        for(CscopeEntry entry: references) {
-//            Matcher matcher = Pattern.compile("(" + Pattern.quote(entry.actualName) + ")(?:\\s?\\()").matcher(result);
-//
-//            if(matcher.find()) {
-//                result.insert(matcher.end(1), "</a>");
-//                result.insert(matcher.start(1), "<a href=\"" + entry.actualName + "\">");
-//            }
-//        }
-//        content = result.toString();
-//    }
 }
