@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.text.Html;
@@ -33,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, HomeFragment.OnFragmentInteractionListener {
 
@@ -41,14 +41,9 @@ public class MainActivity extends AppCompatActivity
 
     public static String [] code_tag = {"All", "Array", "String", "Linked List", "Tree" , "DP" , "DFS", "BFS", "Greedy"};
 
-
-
-
     private Cursor codingQuestionsCursor;
     private DatabaseHelper db;
 
-    private ListView lvUsers;
-    private ListAdapter adapter;
 
     public static HashMap<Integer, List<List<String>>> populateList = new HashMap<>();
 
@@ -62,48 +57,6 @@ public class MainActivity extends AppCompatActivity
     public static List<String> listCategory = new ArrayList<>();
     public static List<String> listDifficulty = new ArrayList<>();
     public static List<String> listAdditional = new ArrayList<>();
-
-    public static void setPopulateList(){
-
-        for(int i = 0; i < code_tag.length; i++){
-
-            List<List<String>> tempListList = new ArrayList<>();
-            for(int j = 0; j < listId.size(); j++){
-
-                if(i == 0){
-                    List<String> tempList = new ArrayList<>();
-                    tempList.add(listId.get(j));
-                    tempList.add(listTitle.get(j));
-                    tempList.add(listDescription.get(j));
-                    tempList.add(listCode.get(j));
-                    tempList.add(listAnswer.get(j));
-                    tempList.add(listHint.get(j));
-                    tempList.add(listTag.get(j));
-                    tempList.add(listCategory.get(j));
-                    tempList.add(listDifficulty.get(j));
-                    tempList.add(listAdditional.get(j));
-                    tempListList.add(tempList);
-                }
-                else if(listTag.get(j).contains(code_tag[i])){
-                    List<String> tempList = new ArrayList<>();
-                    tempList.add(listId.get(j));
-                    tempList.add(listTitle.get(j));
-                    tempList.add(listDescription.get(j));
-                    tempList.add(listCode.get(j));
-                    tempList.add(listAnswer.get(j));
-                    tempList.add(listHint.get(j));
-                    tempList.add(listTag.get(j));
-                    tempList.add(listCategory.get(j));
-                    tempList.add(listDifficulty.get(j));
-                    tempList.add(listAdditional.get(j));
-                    tempListList.add(tempList);
-                }
-            }
-            populateList.put(i,tempListList);
-        }
-
-
-    }
 
 
 
@@ -123,6 +76,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.getMenu().getItem(0).setChecked(true);
 
 
         db = new DatabaseHelper(this);
@@ -151,23 +105,10 @@ public class MainActivity extends AppCompatActivity
 
 
 
-
-
-
-
-
-
-
-//        DatabaseAccess mDbHelper = new DatabaseAccess(this);
-//        mDbHelper.createDatabase();
-//        mDbHelper.open();
-//
-//        Cursor testdata = mDbHelper.getTestData();
-//
-//        mDbHelper.close();
-
-
-
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        HomeFragment fragment = new HomeFragment();
+        transaction.replace(R.id.main_fragment, fragment);
+        transaction.commit();
 
 
 
@@ -223,10 +164,6 @@ public class MainActivity extends AppCompatActivity
 
 
         } else if (id == R.id.coding) {
-//            Intent intent = new Intent(getApplicationContext(),CodeActivity.class);
-//            startActivity(intent);
-
-
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 SlidingTabFragment fragment = new SlidingTabFragment();
                 transaction.replace(R.id.main_fragment, fragment);
@@ -246,49 +183,53 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public List<String> getListId() {
-        return listId;
-    }
-
-    public List<String> getListTitle() {
-        return listTitle;
-    }
-
-    public List<String> getListDescription(){
-        return listDescription;
-    }
-
-    public List<String> getListCode(){
-        return listCode;
-    }
-
-    public List<String> getListHint(){
-        return listHint;
-    }
-
-    public List<String> getListAnswer(){
-        return listAnswer;
-    }
-
-    public List<String> getListTag(){
-        return listTag;
-    }
-
-    public List<String> getListCategory(){
-        return listCategory;
-    }
-
-
-    public List<String> getListDifficulty(){
-        return listDifficulty;
-    }
-
-    public List<String> getListAdditional(){
-        return listAdditional;
-    }
 
     public static int countLines(String str){
         String[] lines = str.split("\r\n|\r|\n");
         return  lines.length;
+    }
+
+
+
+    public static void setPopulateList(){
+
+        for(int i = 0; i < code_tag.length; i++){
+
+            List<List<String>> tempListList = new ArrayList<>();
+            for(int j = 0; j < listId.size(); j++){
+
+                if(i == 0){
+                    List<String> tempList = new ArrayList<>();
+                    tempList.add(listId.get(j));
+                    tempList.add(listTitle.get(j));
+                    tempList.add(listDescription.get(j));
+                    tempList.add(listCode.get(j));
+                    tempList.add(listAnswer.get(j));
+                    tempList.add(listHint.get(j));
+                    tempList.add(listTag.get(j));
+                    tempList.add(listCategory.get(j));
+                    tempList.add(listDifficulty.get(j));
+                    tempList.add(listAdditional.get(j));
+                    tempListList.add(tempList);
+                }
+                else if(listTag.get(j).contains(code_tag[i])){
+                    List<String> tempList = new ArrayList<>();
+                    tempList.add(listId.get(j));
+                    tempList.add(listTitle.get(j));
+                    tempList.add(listDescription.get(j));
+                    tempList.add(listCode.get(j));
+                    tempList.add(listAnswer.get(j));
+                    tempList.add(listHint.get(j));
+                    tempList.add(listTag.get(j));
+                    tempList.add(listCategory.get(j));
+                    tempList.add(listDifficulty.get(j));
+                    tempList.add(listAdditional.get(j));
+                    tempListList.add(tempList);
+                }
+            }
+            populateList.put(i,tempListList);
+        }
+
+
     }
 }

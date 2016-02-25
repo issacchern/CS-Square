@@ -56,8 +56,8 @@ public class SyntaxHighlighter {
     }
 
     private void highlightComments() {
-        content = content.replaceAll("/\\*.*?\\*/", "<font color=\"green\">$0</font>");
-        content = content.replaceAll("//[^\n]*?\n", "<font color=\"green\">$0</font>");
+        content = content.replaceAll("/\\*.*?\\*/", "<font color=\"navy\">$0</font>");
+        content = content.replaceAll("//[^\n]*?\n", "<font color=\"navy\">$0</font>");
     }
 
 //    public void markupReferences(ArrayList<CscopeEntry> references) {

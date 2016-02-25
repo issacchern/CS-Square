@@ -1,13 +1,16 @@
 package com.chernyee.cssquare;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +18,7 @@ import java.util.List;
 public class QuestionActivity extends AppCompatActivity {
 
     private Button codeButton;
+    private int hintCount = 0;
 
 
     @Override
@@ -22,23 +26,25 @@ public class QuestionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, MainActivity.snackBarChoices[(int) (Math.random() * 100) % 4], Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, MainActivity.snackBarChoices[(int) (Math.random() * 100) % 4], Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
         Bundle extras = getIntent().getExtras();
         final List<String> info = extras.getStringArrayList("information");
 
-
+        final String [] split = info.get(5).split("\n");
 
         TextView titleView = (TextView) findViewById(R.id.codeTitle);
         titleView.setText(info.get(1));
@@ -66,6 +72,64 @@ public class QuestionActivity extends AppCompatActivity {
 
             }
         });
+
+
+
+
+
+
+
+
+
+//        final FloatingActionsMenu menuMultipleActions = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
+//        menuMultipleActions.addButton(actionC);
+
+
+        final FloatingActionButton actionA = (FloatingActionButton) findViewById(R.id.action_a);
+        actionA.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                actionA.setTitle("Code copied!");
+            }
+        });
+
+        final FloatingActionButton actionB = (FloatingActionButton) findViewById(R.id.action_b);
+        actionB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+
+        final FloatingActionButton actionC = (FloatingActionButton) findViewById(R.id.action_c);
+        actionC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(actionC.getTitle().equals("Bookmarked!")){
+                    actionC.setTitle("Unbookmarked!");
+                    // TODO : remove bookmark
+                } else{
+                    actionC.setTitle("Bookmarked!");
+                    // TODO : add bookmark
+                }
+
+            }
+        });
+
+        final FloatingActionButton actionD = (FloatingActionButton) findViewById(R.id.action_d);
+        actionD.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(hintCount > split.length -1) hintCount = 0;
+
+                Snackbar.make(view, split[hintCount++], Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+            }
+        });
+
 
 
     }

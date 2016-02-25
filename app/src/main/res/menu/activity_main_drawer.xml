@@ -11,6 +11,7 @@
             android:icon="@drawable/code_tags"
             android:title="Coding Questions" />
         <item
+
             android:id="@+id/knowledge"
             android:icon="@drawable/alphabetical"
             android:title="Technical Terms" />

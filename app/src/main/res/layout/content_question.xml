@@ -34,16 +34,19 @@
 
 
         <ScrollView
+
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp">
 
             <TextView
-                android:layout_marginBottom="5dp"
+                android:fontFamily="monospace"
+
                 android:id="@+id/codeDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="HEELO"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textStyle="bold"
                 />
 
@@ -89,6 +92,7 @@
 
 
         <Button
+            android:textStyle="bold"
             android:id="@+id/codeButton"
             android:layout_margin="10dp"
             android:text="Show solution"
