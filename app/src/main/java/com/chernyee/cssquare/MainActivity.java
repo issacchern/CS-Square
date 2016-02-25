@@ -72,20 +72,32 @@ public class MainActivity extends AppCompatActivity
 
                 if(i == 0){
                     List<String> tempList = new ArrayList<>();
+                    tempList.add(listId.get(j));
                     tempList.add(listTitle.get(j));
+                    tempList.add(listDescription.get(j));
+                    tempList.add(listCode.get(j));
+                    tempList.add(listAnswer.get(j));
+                    tempList.add(listHint.get(j));
                     tempList.add(listTag.get(j));
+                    tempList.add(listCategory.get(j));
                     tempList.add(listDifficulty.get(j));
+                    tempList.add(listAdditional.get(j));
                     tempListList.add(tempList);
                 }
                 else if(listTag.get(j).contains(code_tag[i])){
                     List<String> tempList = new ArrayList<>();
+                    tempList.add(listId.get(j));
                     tempList.add(listTitle.get(j));
+                    tempList.add(listDescription.get(j));
+                    tempList.add(listCode.get(j));
+                    tempList.add(listAnswer.get(j));
+                    tempList.add(listHint.get(j));
                     tempList.add(listTag.get(j));
+                    tempList.add(listCategory.get(j));
                     tempList.add(listDifficulty.get(j));
+                    tempList.add(listAdditional.get(j));
                     tempListList.add(tempList);
                 }
-
-
             }
             populateList.put(i,tempListList);
         }
@@ -102,17 +114,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//
-//                Snackbar.make(view, snackBarChoices[(int) (Math.random() * 100) % 4], Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//
-//            }
-//        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -151,22 +152,6 @@ public class MainActivity extends AppCompatActivity
 
 
 
-        String highlighted = listAnswer.get(20);
-
-        SyntaxHighlighter shl = new SyntaxHighlighter(highlighted);
-        TextView text1 = (TextView) findViewById(R.id.code);
-        text1.setText(shl.formatToHtml());
-
-        int lineNumber = countLines(highlighted);
-        String printLineNumber= "";
-        for(int i = 1; i <= lineNumber; i++){
-            if(i < lineNumber)
-                printLineNumber += (i < 10) ? " " + i + "\n" : "" + i + "\n" ;
-            else printLineNumber += (i < 10) ? " " + i : "" + i;
-        }
-
-        TextView text2 = (TextView) findViewById(R.id.codeNumber);
-        text2.setText(printLineNumber);
 
 
 

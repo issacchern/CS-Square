@@ -40,6 +40,8 @@ public class SyntaxHighlighter {
     }
 
     private void formatNewline() {
+        content = content.replaceAll("<", "&lt;");
+        content = content.replaceAll(">", "&gt;");
         content = content.replaceAll("   ", "&nbsp;&nbsp;&nbsp;");
         content = content.replaceAll("\n\r", "<br />");
         content = content.replaceAll("\n", "<br />");

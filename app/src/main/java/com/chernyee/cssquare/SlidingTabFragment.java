@@ -12,6 +12,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.PagerAdapter;
@@ -24,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.SearchView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -136,7 +138,7 @@ public class SlidingTabFragment extends Fragment {
         }
 
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        public Object instantiateItem(ViewGroup container, final int position) {
 
             View view = getActivity().getLayoutInflater().inflate(R.layout.pager_item,
                     container, false);
@@ -149,6 +151,19 @@ public class SlidingTabFragment extends Fragment {
             CustomAdapter customAdapter = new CustomAdapter(getActivity(), R.layout.list_item,
                     MainActivity.populateList.get(position));
             lv.setAdapter(customAdapter);
+
+            final int final_position = position;
+
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    Intent i = new Intent(getActivity(), QuestionActivity.class);
+                    i.putStringArrayListExtra("information", new ArrayList<>(MainActivity.populateList.get(final_position).get(position)));
+                    startActivity(i);
+                }
+            });
+
 
 
 

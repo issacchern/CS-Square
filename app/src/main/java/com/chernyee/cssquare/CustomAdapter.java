@@ -42,16 +42,16 @@ public class CustomAdapter extends ArrayAdapter<List<String>> {
             TextView tt2 = (TextView) v.findViewById(R.id.item_tag);
             TextView tt3 = (TextView) v.findViewById(R.id.item_difficulty);
 
-            if (tt1 != null && p.get(0) != null) {
-                tt1.setText(p.get(0));
+            if (tt1 != null) {
+                tt1.setText(p.get(1));
             }
 
-            if (tt2 != null && p.get(1) != null) {
-                tt2.setText(p.get(1));
+            if (tt2 != null) {
+                tt2.setText(p.get(6));
             }
 
-            if (tt3 != null && p.get(2) != null) {
-                tt3.setText(p.get(2));
+            if (tt3 != null) {
+                tt3.setText(p.get(8));
             }
         }
 
