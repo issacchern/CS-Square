@@ -6,21 +6,38 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Issac on 2/24/2016.
  */
-public class CustomAdapter extends ArrayAdapter<List<String>> {
+public class CustomAdapter extends ArrayAdapter<List<String>> implements Filterable {
+
+    private List<List<String>> items;
 
     public CustomAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
     }
 
+    @Override
+    public int getCount() {
+        return items.size();
+    }
+
+    @Override
+    public List<String> getItem(int position) {
+        return items.get(position);
+    }
+
     public CustomAdapter(Context context, int resource, List<List<String>> items) {
         super(context, resource, items);
+        this.items = items;
+        this.items = items;
     }
 
     @Override
@@ -33,7 +50,7 @@ public class CustomAdapter extends ArrayAdapter<List<String>> {
             v = vi.inflate(R.layout.list_item, null);
         }
 
-        List<String> p = getItem(position);
+        List<String> p = items.get(position);
 
 
 

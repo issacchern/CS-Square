@@ -37,10 +37,11 @@ import java.util.List;
 
 public class SlidingTabFragment extends Fragment {
 
+    private int count;
     static final String LOG_TAG = "SlidingTabsBasicFragment";
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
-    private CustomAdapter adapter;
+    private CustomAdapter customAdapter;
     private ListView lv;
 
     private SearchView searchView;
@@ -78,13 +79,14 @@ public class SlidingTabFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // text changed, apply filter?
-                Toast.makeText(getContext(),query, Toast.LENGTH_SHORT).show();
 
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+
+                customAdapter.getFilter().filter(newText);
 
 
 
@@ -111,6 +113,7 @@ public class SlidingTabFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
         mViewPager.setAdapter(new SamplePagerAdapter());
+
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
 
@@ -138,6 +141,11 @@ public class SlidingTabFragment extends Fragment {
         }
 
         @Override
+        public int getItemPosition(Object object) {
+            return super.getItemPosition(object);
+        }
+
+        @Override
         public Object instantiateItem(ViewGroup container, final int position) {
 
             View view = getActivity().getLayoutInflater().inflate(R.layout.pager_item,
@@ -145,10 +153,7 @@ public class SlidingTabFragment extends Fragment {
             container.addView(view);
 
             lv = (ListView) view.findViewById(R.id.questionlist);
-
-
-
-            CustomAdapter customAdapter = new CustomAdapter(getActivity(), R.layout.list_item,
+            customAdapter = new CustomAdapter(getActivity(), R.layout.list_item,
                     MainActivity.populateList.get(position));
             lv.setAdapter(customAdapter);
 
@@ -159,14 +164,11 @@ public class SlidingTabFragment extends Fragment {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                     Intent i = new Intent(getActivity(), QuestionActivity.class);
-                    i.putStringArrayListExtra("information", new ArrayList<>(MainActivity.populateList.get(final_position).get(position)));
+                    i.putStringArrayListExtra("information", new ArrayList<>(MainActivity.populateList.
+                            get(final_position).get(position)));
                     startActivity(i);
                 }
             });
-
-
-
-
 
             return view;
         }
