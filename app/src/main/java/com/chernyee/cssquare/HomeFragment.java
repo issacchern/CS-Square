@@ -116,8 +116,9 @@ public class HomeFragment extends Fragment {
     }
 
     private SpannableString generateCenterText() {
-        SpannableString s = new SpannableString("CS\nSquare");
-        s.setSpan(new RelativeSizeSpan(2f), 0, 9, 0);
+        int count = MainActivity.listId.size();
+        SpannableString s = new SpannableString( count + "\nQuestions");
+        s.setSpan(new RelativeSizeSpan(2f), 0, 13, 0);
         return s;
     }
 
@@ -140,7 +141,7 @@ public class HomeFragment extends Fragment {
             entries1.add(new Entry((float) (Math.random() * 100)%4, i));
         }
 
-        PieDataSet ds1 = new PieDataSet(entries1, "All Questions");
+        PieDataSet ds1 = new PieDataSet(entries1, "CS-Square");
         ds1.setColors(ColorTemplate.COLORFUL_COLORS);
         ds1.setSliceSpace(2f);
         ds1.setValueTextColor(Color.WHITE);

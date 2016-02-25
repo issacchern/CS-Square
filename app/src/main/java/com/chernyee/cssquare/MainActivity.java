@@ -41,8 +41,7 @@ public class MainActivity extends AppCompatActivity
             AboutFragment.OnFragmentInteractionListener,BookmarkFragment.OnFragmentInteractionListener,
             ToolFragment.OnFragmentInteractionListener{
 
-    public static String [] snackBarChoices = {"Have you tried it yourself yet?", "I am sure you can do better!",
-        "Just give it some time!" , "Don't give up, keep on trying!"};
+    
 
     public static String [] code_tag = {"All", "Array", "String", "Linked List", "Tree" , "DP" , "DFS", "BFS", "Greedy"};
 

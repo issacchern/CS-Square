@@ -58,7 +58,6 @@ public class SearchableActivity extends ListActivity {
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            Log.v("searcch", query);
 
             customList = new ArrayList<List<String>>();
 

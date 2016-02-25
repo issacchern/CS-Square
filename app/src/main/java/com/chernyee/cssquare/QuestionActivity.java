@@ -67,7 +67,6 @@ public class QuestionActivity extends AppCompatActivity {
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.bookmark, menu);
-
         sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         MenuItem bedMenuItem = menu.findItem(R.id.bookmark_item);
         String markString = "cs"+info.get(0);
