@@ -35,7 +35,9 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, HomeFragment.OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener, HomeFragment.OnFragmentInteractionListener,
+            AboutFragment.OnFragmentInteractionListener,BookmarkFragment.OnFragmentInteractionListener,
+            ToolFragment.OnFragmentInteractionListener{
 
     public static String [] snackBarChoices = {"Have you tried it yourself yet?", "I am sure you can do better!",
         "Just give it some time!" , "Don't give up, keep on trying!"};
@@ -130,7 +132,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
         getMenuInflater().inflate(R.menu.search, menu);
 
         SearchManager searchManager =
@@ -166,7 +167,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.home) {
+        if (id == R.id.navi_home) {
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             HomeFragment fragment = new HomeFragment();
@@ -175,12 +176,39 @@ public class MainActivity extends AppCompatActivity
 
 
 
-        } else if (id == R.id.coding) {
+        } else if (id == R.id.navi_coding) {
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 SlidingTabFragment fragment = new SlidingTabFragment();
                 transaction.replace(R.id.main_fragment, fragment);
                 transaction.commit();
 
+        } else if(id == R.id.navi_bookmark){
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            BookmarkFragment fragment = new BookmarkFragment();
+            transaction.replace(R.id.main_fragment, fragment);
+            transaction.commit();
+
+
+        } else if(id == R.id.navi_tool){
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            ToolFragment fragment = new ToolFragment();
+            transaction.replace(R.id.main_fragment, fragment);
+            transaction.commit();
+
+        } else if(id == R.id.navi_setting){
+
+            Intent intent = new Intent(this, SettingsActivity.class);
+           startActivity(intent);
+
+
+
+        } else if(id == R.id.navi_about){
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            AboutFragment fragment = new AboutFragment();
+            transaction.replace(R.id.main_fragment, fragment);
+            transaction.commit();
 
 
         }

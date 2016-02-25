@@ -44,68 +44,16 @@ public class SlidingTabFragment extends Fragment {
     private CustomAdapter customAdapter;
     private ListView lv;
 
-    private SearchView searchView;
-
-    private void handleIntent(Intent intent) {
-
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            //use the query to search your data somehow
-        }
-    }
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        handleIntent(getActivity().getIntent());
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.search, menu);
-        MenuItem searchItem = menu.findItem(R.id.search);
-        searchView =(SearchView) MenuItemCompat.getActionView(searchItem);
-
-
-
-
-//        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-//        ComponentName componentName = new ComponentName(getContext(),MainActivity.class);
-//        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
-
-//
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                // text changed, apply filter?
-
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-
-                customAdapter.getFilter().filter(newText);
-
-
-
-
-                // perform final search
-                return false;
-            }
-        });
-
-
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.slidingtab_fragment, container, false);
-
 
         return view;
     }
