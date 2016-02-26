@@ -8,7 +8,9 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.text.SpannableString;
+import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
@@ -16,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -40,6 +43,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     private SharedPreferences sharedPreferences;
     private PieChart mChart;
     private TextView header;
+
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -155,6 +159,11 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         mChart.setOnChartValueSelectedListener(this);
 
         mChart.setData(generatePieData());
+
+
+
+
+
 
 
 

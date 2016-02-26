@@ -16,7 +16,8 @@
 
 
     <string name="preference_file_key">pref_file</string>
-    <string name="tes">Testing</string>
+    <string name="longlongString">Thanks for using this app! If you like, feel free to send me
+        an email regarding to what simple useful tool you wish to have in this app. </string>
 
 
 
