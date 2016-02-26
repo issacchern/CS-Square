@@ -93,9 +93,48 @@
             android:paddingRight="10dp"
             android:paddingBottom="10dp"
             android:text="Show some love to your developer "
+            android:textStyle="bold"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+
+                android:layout_margin="10dp"
+                android:src="@drawable/email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+
+            <ImageView
+
+
+                android:layout_margin="10dp"
+                android:src="@drawable/share_variant"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+
+            <ImageView
+
+
+                android:layout_margin="10dp"
+                android:src="@drawable/thumb_up"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+
+
+        </LinearLayout>
 
 
     </LinearLayout>
