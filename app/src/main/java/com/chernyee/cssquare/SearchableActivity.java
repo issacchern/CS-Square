@@ -26,6 +26,12 @@ public class SearchableActivity extends ListActivity {
     private List<List<String>> customList;
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if(customAdapter != null) customAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_item);
@@ -80,6 +86,33 @@ public class SearchableActivity extends ListActivity {
                 textView.setText("Your search \'" + query + "\' did not match any query data.");
 
             }
+
+        } else{
+            customList = new ArrayList<List<String>>();
+            String query = intent.getStringExtra("extraInfo");
+
+            if(query.equals("Completed")){
+                customList.addAll(MainActivity.listCompleted);
+            } else{
+
+                for(int i = 0 ; i < MainActivity.populateList.get(0).size(); i++){
+
+                    if(MainActivity.populateList.get(0).get(i).get(8).contains(query)){
+                        customList.add(MainActivity.populateList.get(0).get(i));
+                    }
+                }
+
+            }
+
+
+
+
+            customAdapter = new CustomAdapter(this, R.layout.list_item,
+                    customList);
+            setListAdapter(customAdapter);
+            customAdapter.notifyDataSetChanged();
+
+
 
         }
     }

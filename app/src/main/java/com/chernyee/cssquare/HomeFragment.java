@@ -1,6 +1,7 @@
 package com.chernyee.cssquare;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -187,8 +188,24 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     @Override
     public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
 
+
+
         if (e == null)
             return;
+
+        Intent intent = new Intent(getActivity(), SearchableActivity.class);
+        if(e.getXIndex() == 0){
+            intent.putExtra("extraInfo", "Hard");
+        } else if(e.getXIndex() == 1){
+            intent.putExtra("extraInfo", "Medium");
+        } else if(e.getXIndex() == 2){
+            intent.putExtra("extraInfo", "Easy");
+        } else{
+            intent.putExtra("extraInfo", "Completed");
+        }
+
+        startActivity(intent);
+
         Log.i("VAL SELECTED",
                 "Value: " + e.getVal() + ", xIndex: " + e.getXIndex()
                         + ", DataSet index: " + dataSetIndex);
@@ -233,7 +250,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
 
 
-        PieDataSet ds1 = new PieDataSet(entries1, "CS-Square");
+        PieDataSet ds1 = new PieDataSet(entries1, "www.chernyee.com");
         ds1.setColors(ColorTemplate.COLORFUL_COLORS);
         ds1.setValueFormatter(new PercentFormatter());
         ds1.setSliceSpace(2f);
