@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_margin="10dp"
     android:orientation="vertical" android:layout_width="match_parent"
+    android:id="@+id/item_list"
     android:layout_height="wrap_content">
 
     <TextView
@@ -40,12 +41,20 @@
 
         <TextView
             android:id="@+id/item_difficulty"
+            android:layout_gravity="center"
             android:gravity="right"
             android:padding="4dp"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Difficulty : medium"
+            android:text="medium"
             android:layout_weight="1"
             android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/item_star"
+            android:padding="4dp"
+            android:src="@drawable/star_outline"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
 

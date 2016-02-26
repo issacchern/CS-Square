@@ -1,6 +1,7 @@
 package com.chernyee.cssquare;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -34,6 +35,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private SharedPreferences sharedPreferences;
     private PieChart mChart;
     private Typeface tf;
 
@@ -59,6 +61,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -69,6 +72,29 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        MainActivity.listCompleted.clear();
+        MainActivity.listEasy.clear();
+        MainActivity.listMedium.clear();
+        MainActivity.listHard.clear();
+        for(int k = 0; k < MainActivity.populateList.get(0).size(); k++){
+
+            String markString = "cs"+ MainActivity.listId.get(k);
+            int markScore = sharedPreferences.getInt(markString, 0);
+            if(markScore == 1){
+                MainActivity.listCompleted.add(MainActivity.populateList.get(0).get(k));
+            } else{
+                if(MainActivity.populateList.get(0).get(k).get(8).contains("Easy")){
+                    MainActivity.listEasy.add(MainActivity.populateList.get(0).get(k));
+                } else if(MainActivity.populateList.get(0).get(k).get(8).contains("Medium")){
+                    MainActivity.listMedium.add(MainActivity.populateList.get(0).get(k));
+                } else if(MainActivity.populateList.get(0).get(k).get(8).contains("Hard")){
+                    MainActivity.listHard.add(MainActivity.populateList.get(0).get(k));
+                }
+            }
+        }
+
+
+
 
         View v = inflater.inflate(R.layout.fragment_home, container, false);
         mChart = (PieChart) v.findViewById(R.id.chart1);
@@ -155,7 +181,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         entries1.add(new Entry(MainActivity.listHard.size(), 0));
         entries1.add(new Entry(MainActivity.listMedium.size(), 1));
         entries1.add(new Entry(MainActivity.listEasy.size(), 2));
-        entries1.add(new Entry(0, 3));
+        entries1.add(new Entry(MainActivity.listCompleted.size(), 3));
 
 
 

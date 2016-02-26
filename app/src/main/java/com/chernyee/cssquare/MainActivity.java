@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity
     private Cursor codingQuestionsCursor;
     private DatabaseHelper db;
 
+    private SharedPreferences sharedPreferences;
 
     public static HashMap<Integer, List<List<String>>> populateList = new HashMap<>();
 
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity
     public static List<List<String>> listEasy = new ArrayList<List<String>>();
     public static List<List<String>> listMedium = new ArrayList<List<String>>();
     public static List<List<String>> listHard = new ArrayList<List<String>>();
+    public static List<List<String>> listCompleted = new ArrayList<List<String>>();
 
 
     @Override
@@ -74,6 +76,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -235,6 +238,7 @@ public class MainActivity extends AppCompatActivity
         listEasy.clear();
         listMedium.clear();
         listHard.clear();
+        listCompleted.clear();
 
         do{
             listId.add(codingQuestionsCursor.getString(0));
@@ -288,15 +292,21 @@ public class MainActivity extends AppCompatActivity
         }
 
         for(int k = 0; k < populateList.get(0).size(); k++){
-            if(populateList.get(0).get(k).get(8).contains("Easy")){
-                listEasy.add(populateList.get(0).get(k));
-            } else if(populateList.get(0).get(k).get(8).contains("Medium")){
-                listMedium.add(populateList.get(0).get(k));
-            } else if(populateList.get(0).get(k).get(8).contains("Hard")){
-                listHard.add(populateList.get(0).get(k));
+
+            String markString = "cs"+ listId.get(k);
+            int markScore = sharedPreferences.getInt(markString, 0);
+            if(markScore == 1){
+                listCompleted.add(populateList.get(0).get(k));
+            } else{
+                if(populateList.get(0).get(k).get(8).contains("Easy")){
+                    listEasy.add(populateList.get(0).get(k));
+                } else if(populateList.get(0).get(k).get(8).contains("Medium")){
+                    listMedium.add(populateList.get(0).get(k));
+                } else if(populateList.get(0).get(k).get(8).contains("Hard")){
+                    listHard.add(populateList.get(0).get(k));
+                }
+
             }
         }
-        Log.v("SIZE" , "---" + listEasy.size() + "---" + listMedium.size() + "---" + listHard.size());
-
     }
 }

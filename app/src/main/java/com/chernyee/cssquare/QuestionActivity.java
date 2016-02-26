@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +29,7 @@ public class QuestionActivity extends AppCompatActivity {
     private List<String> info;
     private Button codeButton;
     private int hintCount = 0;
+    private CheckBox codeCheck;
 
     private SharedPreferences sharedPref;
 
@@ -67,7 +69,6 @@ public class QuestionActivity extends AppCompatActivity {
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.bookmark, menu);
-        sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         MenuItem bedMenuItem = menu.findItem(R.id.bookmark_item);
         String markString = "cs"+info.get(0);
         int markScore = sharedPref.getInt(markString, 0);
@@ -92,19 +93,7 @@ public class QuestionActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         info = extras.getStringArrayList("information");
-
-
-
-
-
-
-
-
-
-
-
-
-
+        sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         final String [] split = info.get(5).split("\n");
 
@@ -124,16 +113,46 @@ public class QuestionActivity extends AppCompatActivity {
                 if(codeButton.getText().equals("Hide Solution")){
                     updateCodeAndNumber(info.get(3));
                     codeButton.setText("Show Solution");
+                    codeCheck.setVisibility(View.VISIBLE);
 
                 } else{
                     updateCodeAndNumber(info.get(4));
                     codeButton.setText("Hide Solution");
+                    codeCheck.setVisibility(View.VISIBLE);
 
                 }
 
 
             }
         });
+
+        codeCheck = (CheckBox) findViewById(R.id.codeCheckBox);
+        codeCheck.setVisibility(View.INVISIBLE);
+
+        codeCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String markString = "cse"+info.get(0);
+                int markScore = sharedPref.getInt(markString, 0);
+                if(markScore == 0){
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putInt(markString, 1);
+                    editor.commit();
+                } else{
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putInt(markString, 0);
+                    editor.commit();
+                }
+            }
+        });
+
+        String markString = "cse"+info.get(0);
+        int markScore = sharedPref.getInt(markString, 0);
+        if(markScore == 1){
+            codeCheck.setVisibility(View.VISIBLE);
+            codeCheck.setChecked(true);
+        }
 
 
 
