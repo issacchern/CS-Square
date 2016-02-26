@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
@@ -28,6 +29,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,6 +51,9 @@ public class MainActivity extends AppCompatActivity
     private DatabaseHelper db;
 
     private SharedPreferences sharedPreferences;
+
+    private boolean doubleBackToExitPressedOnce = false;
+
 
     public static HashMap<Integer, List<List<String>>> populateList = new HashMap<>();
 
@@ -118,7 +123,22 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if(doubleBackToExitPressedOnce){
+                super.onBackPressed();
+                return;
+            }
+            this.doubleBackToExitPressedOnce =true;
+            Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+            new Handler().postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    doubleBackToExitPressedOnce=false;
+                }
+            }, 2000);
+
+
+
         }
     }
 
