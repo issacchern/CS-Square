@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity
             AboutFragment.OnFragmentInteractionListener,BookmarkFragment.OnFragmentInteractionListener,
             ToolFragment.OnFragmentInteractionListener{
 
-    
+
 
     public static String [] code_tag = {"All", "Array", "String", "Linked List", "Tree" , "DP" , "DFS", "BFS", "Greedy"};
 
@@ -62,6 +62,9 @@ public class MainActivity extends AppCompatActivity
     public static List<String> listDifficulty = new ArrayList<>();
     public static List<String> listAdditional = new ArrayList<>();
 
+    public static List<List<String>> listEasy = new ArrayList<List<String>>();
+    public static List<List<String>> listMedium = new ArrayList<List<String>>();
+    public static List<List<String>> listHard = new ArrayList<List<String>>();
 
 
     @Override
@@ -89,28 +92,8 @@ public class MainActivity extends AppCompatActivity
         codingQuestionsCursor = db.getEmployees();
 
 
-        do{
-            listId.add(codingQuestionsCursor.getString(0));
-            listTitle.add(codingQuestionsCursor.getString(1));
-            listDescription.add(codingQuestionsCursor.getString(2));
-            listCode.add(codingQuestionsCursor.getString(3));
-            listAnswer.add(new String(codingQuestionsCursor.getBlob(4)));
-            listHint.add(codingQuestionsCursor.getString(5));
-            listTag.add(codingQuestionsCursor.getString(6));
-            listCategory.add(codingQuestionsCursor.getString(7));
-            listDifficulty.add(codingQuestionsCursor.getString(8));
-            listAdditional.add(codingQuestionsCursor.getString(9));
 
-        }while(codingQuestionsCursor.moveToNext());
-
-        setPopulateList();
-
-
-
-
-
-
-
+        initializeVariables();
 
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -123,6 +106,8 @@ public class MainActivity extends AppCompatActivity
 
 
     }
+
+
 
     @Override
     public void onBackPressed() {
@@ -234,9 +219,36 @@ public class MainActivity extends AppCompatActivity
         return  lines.length;
     }
 
+    public void initializeVariables(){
+        listId.clear();
+        listTitle.clear();
+        listDescription.clear();
+        listCode.clear();
+        listAnswer.clear();
+        listId.clear();
+        listHint.clear();
+        listTag.clear();
+        listCategory.clear();
+        listDifficulty.clear();
+        listAdditional.clear();
+        populateList.clear();
+        listEasy.clear();
+        listMedium.clear();
+        listHard.clear();
 
+        do{
+            listId.add(codingQuestionsCursor.getString(0));
+            listTitle.add(codingQuestionsCursor.getString(1));
+            listDescription.add(codingQuestionsCursor.getString(2));
+            listCode.add(codingQuestionsCursor.getString(3));
+            listAnswer.add(new String(codingQuestionsCursor.getBlob(4)));
+            listHint.add(codingQuestionsCursor.getString(5));
+            listTag.add(codingQuestionsCursor.getString(6));
+            listCategory.add(codingQuestionsCursor.getString(7));
+            listDifficulty.add(codingQuestionsCursor.getString(8));
+            listAdditional.add(codingQuestionsCursor.getString(9));
 
-    public static void setPopulateList(){
+        }while(codingQuestionsCursor.moveToNext());
 
         for(int i = 0; i < code_tag.length; i++){
 
@@ -275,6 +287,16 @@ public class MainActivity extends AppCompatActivity
             populateList.put(i,tempListList);
         }
 
+        for(int k = 0; k < populateList.get(0).size(); k++){
+            if(populateList.get(0).get(k).get(8).contains("Easy")){
+                listEasy.add(populateList.get(0).get(k));
+            } else if(populateList.get(0).get(k).get(8).contains("Medium")){
+                listMedium.add(populateList.get(0).get(k));
+            } else if(populateList.get(0).get(k).get(8).contains("Hard")){
+                listHard.add(populateList.get(0).get(k));
+            }
+        }
+        Log.v("SIZE" , "---" + listEasy.size() + "---" + listMedium.size() + "---" + listHard.size());
 
     }
 }

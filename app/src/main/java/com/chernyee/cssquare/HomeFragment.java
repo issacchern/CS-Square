@@ -10,6 +10,7 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,12 +22,14 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements OnChartValueSelectedListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -70,14 +73,14 @@ public class HomeFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_home, container, false);
         mChart = (PieChart) v.findViewById(R.id.chart1);
         mChart.setDescription("");
-
         mChart.setCenterText(generateCenterText());
         mChart.setCenterTextSize(10f);
+        mChart.setUsePercentValues(true);
 
         // radius of the center hole in percent of maximum radius
         mChart.setHoleRadius(45f);
         mChart.setTransparentCircleRadius(50f);
-
+        mChart.setOnChartValueSelectedListener(this);
 
         mChart.setData(generatePieData());
 
@@ -110,14 +113,30 @@ public class HomeFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+
+        if (e == null)
+            return;
+        Log.i("VAL SELECTED",
+                "Value: " + e.getVal() + ", xIndex: " + e.getXIndex()
+                        + ", DataSet index: " + dataSetIndex);
+
+    }
+
+    @Override
+    public void onNothingSelected() {
+        Log.i("PieChart", "nothing selected");
+    }
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 
     private SpannableString generateCenterText() {
-        int count = MainActivity.listId.size();
-        SpannableString s = new SpannableString( count + "\nQuestions");
+
+        SpannableString s = new SpannableString( MainActivity.listId.size() + "\nQuestions");
         s.setSpan(new RelativeSizeSpan(2f), 0, 13, 0);
         return s;
     }
@@ -129,20 +148,20 @@ public class HomeFragment extends Fragment {
         ArrayList<Entry> entries1 = new ArrayList<Entry>();
         ArrayList<String> xVals = new ArrayList<String>();
 
-        xVals.add("Easy");
-        xVals.add("Medium");
         xVals.add("Hard");
+        xVals.add("Medium");
+        xVals.add("Easy");
         xVals.add("Completed");
+        entries1.add(new Entry(MainActivity.listHard.size(), 0));
+        entries1.add(new Entry(MainActivity.listMedium.size(), 1));
+        entries1.add(new Entry(MainActivity.listEasy.size(), 2));
+        entries1.add(new Entry(0, 3));
 
 
-        for(int i = 0; i < count; i++) {
-            xVals.add("entry" + (i+1));
-
-            entries1.add(new Entry((float) (Math.random() * 100)%4, i));
-        }
 
         PieDataSet ds1 = new PieDataSet(entries1, "CS-Square");
         ds1.setColors(ColorTemplate.COLORFUL_COLORS);
+        ds1.setValueFormatter(new PercentFormatter());
         ds1.setSliceSpace(2f);
         ds1.setValueTextColor(Color.WHITE);
         ds1.setValueTextSize(12f);

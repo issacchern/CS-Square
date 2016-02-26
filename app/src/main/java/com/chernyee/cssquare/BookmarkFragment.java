@@ -15,6 +15,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,6 +92,13 @@ public class BookmarkFragment extends Fragment {
                 startActivity(i);
             }
         });
+
+
+        if(bookMarkList.size() < 1){
+            textView = (TextView) view.findViewById(R.id.bookmarkResult);
+            textView.setText("No bookmark question is found.");
+
+        }
 
 
         return view;
