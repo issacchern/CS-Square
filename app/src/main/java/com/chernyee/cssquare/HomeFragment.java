@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
@@ -37,7 +38,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     private static final String ARG_PARAM2 = "param2";
     private SharedPreferences sharedPreferences;
     private PieChart mChart;
-    private Typeface tf;
+    private TextView header;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -58,6 +59,42 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         return fragment;
     }
 
+    /**
+     * All the onResume() method being overriden is to make sure the data is accurate and up-to-date
+     */
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        MainActivity.listCompleted.clear();
+        MainActivity.listEasy.clear();
+        MainActivity.listMedium.clear();
+        MainActivity.listHard.clear();
+        for(int k = 0; k < MainActivity.populateList.get(0).size(); k++){
+
+            String markString = "cse"+ MainActivity.listId.get(k);
+            int markScore = sharedPreferences.getInt(markString, 0);
+            if(markScore == 1){
+                MainActivity.listCompleted.add(MainActivity.populateList.get(0).get(k));
+            } else{
+                if(MainActivity.populateList.get(0).get(k).get(8).contains("Easy")){
+                    MainActivity.listEasy.add(MainActivity.populateList.get(0).get(k));
+                } else if(MainActivity.populateList.get(0).get(k).get(8).contains("Medium")){
+                    MainActivity.listMedium.add(MainActivity.populateList.get(0).get(k));
+                } else if(MainActivity.populateList.get(0).get(k).get(8).contains("Hard")){
+                    MainActivity.listHard.add(MainActivity.populateList.get(0).get(k));
+                }
+            }
+        }
+
+
+        header.setText("Completed: " + MainActivity.listCompleted.size() + "/" + MainActivity.listId.size());
+        mChart.setCenterText(generateCenterText());
+        mChart.setData(generatePieData());
+
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,13 +109,14 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         MainActivity.listCompleted.clear();
         MainActivity.listEasy.clear();
         MainActivity.listMedium.clear();
         MainActivity.listHard.clear();
         for(int k = 0; k < MainActivity.populateList.get(0).size(); k++){
 
-            String markString = "cs"+ MainActivity.listId.get(k);
+            String markString = "cse"+ MainActivity.listId.get(k);
             int markScore = sharedPreferences.getInt(markString, 0);
             if(markScore == 1){
                 MainActivity.listCompleted.add(MainActivity.populateList.get(0).get(k));
@@ -96,7 +134,14 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
 
 
+
+
         View v = inflater.inflate(R.layout.fragment_home, container, false);
+
+
+        header = (TextView) v.findViewById(R.id.header1);
+        header.setText("Completed: " + MainActivity.listCompleted.size() + "/" + MainActivity.listId.size());
+
         mChart = (PieChart) v.findViewById(R.id.chart1);
         mChart.setDescription("");
         mChart.setCenterText(generateCenterText());
@@ -162,8 +207,11 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
     private SpannableString generateCenterText() {
 
-        SpannableString s = new SpannableString( MainActivity.listId.size() + "\nQuestions");
-        s.setSpan(new RelativeSizeSpan(2f), 0, 13, 0);
+        double percentage = MainActivity.listCompleted.size() * 1.0 / MainActivity.listId.size() * 100;
+        String pct = String.format("%.1f", percentage);
+
+        SpannableString s = new SpannableString( pct + "%\nCompleted");
+        s.setSpan(new RelativeSizeSpan(2f), 0, pct.length() + 1, 0);
         return s;
     }
 

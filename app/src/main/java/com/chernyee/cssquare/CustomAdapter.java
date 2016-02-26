@@ -80,7 +80,7 @@ public class CustomAdapter extends ArrayAdapter<List<String>>{
         }
 
         if(markScore2 == 1){
-            vh.holderLayout.setBackgroundResource(R.color.white_pressed);
+            vh.holderLayout.setBackgroundResource(R.color.background);
         } else{
             vh.holderLayout.setBackgroundResource(R.color.white);
         }

@@ -37,12 +37,19 @@ import java.util.List;
 
 public class SlidingTabFragment extends Fragment {
 
-    private int count;
-    static final String LOG_TAG = "SlidingTabsBasicFragment";
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private CustomAdapter customAdapter;
+
     private ListView lv;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(customAdapter != null)
+             customAdapter.notifyDataSetChanged();
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,12 +73,17 @@ public class SlidingTabFragment extends Fragment {
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
 
-
-
     }
 
 
     class SamplePagerAdapter extends PagerAdapter {
+
+        @Override
+        public void notifyDataSetChanged() {
+            super.notifyDataSetChanged();
+            customAdapter.notifyDataSetChanged();
+
+        }
 
         @Override
         public int getCount() {
