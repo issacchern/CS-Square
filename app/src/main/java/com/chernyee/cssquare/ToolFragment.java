@@ -1,5 +1,7 @@
 package com.chernyee.cssquare;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,14 +11,19 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 
 public class ToolFragment extends Fragment {
@@ -33,6 +40,9 @@ public class ToolFragment extends Fragment {
     private EditText binaryEdit;
     private EditText decimalEdit;
     private EditText hexaEdit;
+    private EditText hashEditText;
+    private TextView hashText;
+    private String output = "";
 
     private boolean parallelBin = false;
     private boolean parallelDec = false;
@@ -60,6 +70,8 @@ public class ToolFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        getActivity().getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
     }
 
     @Override
@@ -130,29 +142,27 @@ public class ToolFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
 
-                if(parallelBin){
+                if (parallelBin) {
                     binaryEdit.removeTextChangedListener(this);
                     decimalEdit.removeTextChangedListener(this);
                     hexaEdit.removeTextChangedListener(this);
 
-                    try{
+                    try {
 
-                        if(s.toString().length() == 0){
+                        if (s.toString().length() == 0) {
                             binaryEdit.setText("");
                             decimalEdit.setText("");
                             hexaEdit.setText("");
-                        }
-
-                        else if(s.toString().matches("[01]+")){
+                        } else if (s.toString().matches("[01]+")) {
 
                             BigInteger bi = new BigInteger(s.toString(), 2);
                             String decimalStr = bi.toString();
                             decimalEdit.setText(decimalStr);
                             BigInteger bi2 = new BigInteger(decimalStr);
                             String hexStr = bi2.toString(16);
-                            hexaEdit.setText(hexStr.toUpperCase() );
+                            hexaEdit.setText(hexStr.toUpperCase());
 
-                        } else{
+                        } else {
                             binaryEdit.setText("");
                             decimalEdit.setText("");
                             hexaEdit.setText("");
@@ -160,7 +170,7 @@ public class ToolFragment extends Fragment {
                         }
 
 
-                    } catch(Exception e){
+                    } catch (Exception e) {
                         Log.v("Exception from binary", e.toString());
                     }
 
@@ -298,6 +308,68 @@ public class ToolFragment extends Fragment {
                 }
             }
         });
+
+        hashEditText = (EditText) v.findViewById(R.id.hashEditText);
+        hashText = (TextView) v.findViewById(R.id.hashTextView);
+
+
+
+        hashText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("label", output);
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(getContext(), "String copied!", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        hashText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN)
+                    v.setBackgroundResource(R.color.half_black);
+                else if(event.getAction() == MotionEvent.ACTION_UP)
+                    v.setBackgroundResource(R.color.nice_green);
+                return false;
+            }
+        });
+
+
+        hashEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() > 0){
+                    byte[] bytesOfMessage = s.toString().getBytes();
+                    MessageDigest md = null;
+                    try {
+                        md = MessageDigest.getInstance("MD5");
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
+                    byte[] thedigest = md.digest(bytesOfMessage);
+                    output = String.format("%032X", new BigInteger(1, thedigest));
+                    hashText.setText(output);
+
+
+                }
+            }
+        });
+
+
+
 
         return v;
     }
