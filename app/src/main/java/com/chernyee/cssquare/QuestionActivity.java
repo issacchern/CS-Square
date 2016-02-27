@@ -1,8 +1,10 @@
 package com.chernyee.cssquare;
 
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -34,6 +36,11 @@ public class QuestionActivity extends AppCompatActivity {
     private int hintCount = 0;
     private CheckBox codeCheck;
     private String cliptoBoard;
+    private long tStart = 0;
+    private long tDelta = 0;
+    private long tEnd = 0;
+    private double elapsedSeconds = 0;
+    private boolean weirdToggle = false;
 
     private SharedPreferences sharedPref;
 
@@ -94,6 +101,7 @@ public class QuestionActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        tStart = System.currentTimeMillis();
 
         Bundle extras = getIntent().getExtras();
         info = extras.getStringArrayList("information");
@@ -115,17 +123,85 @@ public class QuestionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(codeButton.getText().equals("Hide Solution")){
-                    updateCodeAndNumber(info.get(3));
-                    cliptoBoard = info.get(3);
-                    codeButton.setText("Show Solution");
-                    codeCheck.setVisibility(View.VISIBLE);
+                String markString = "cse"+info.get(0);
+                int markScore = sharedPref.getInt(markString, 0);
+                if(markScore == 1 || weirdToggle){
+                    if(codeButton.getText().equals("Hide Solution")){
+                        updateCodeAndNumber(info.get(3));
+                        cliptoBoard = info.get(3);
+                        codeButton.setText("Show Solution");
+                        codeCheck.setVisibility(View.VISIBLE);
+
+                    } else{
+                        updateCodeAndNumber(info.get(4));
+                        cliptoBoard = info.get(4);
+                        codeButton.setText("Hide Solution");
+                        codeCheck.setVisibility(View.VISIBLE);
+
+                    }
 
                 } else{
-                    updateCodeAndNumber(info.get(4));
-                    cliptoBoard = info.get(4);
-                    codeButton.setText("Hide Solution");
-                    codeCheck.setVisibility(View.VISIBLE);
+
+                    tEnd = System.currentTimeMillis();
+                    tDelta = tEnd - tStart;
+                    elapsedSeconds = tDelta / 1000.0;
+
+                    if(elapsedSeconds < 120){
+                        Toast.makeText(QuestionActivity.this, "Really?" + elapsedSeconds, Toast.LENGTH_SHORT).show();
+
+
+                        AlertDialog.Builder builder1 = new AlertDialog.Builder(QuestionActivity.this);
+                        builder1.setTitle("Really? ");
+                        builder1.setMessage("You spent less than 2 minutes and you want to see the solution already? ");
+                        builder1.setCancelable(true);
+
+                        builder1.setPositiveButton(
+                                "Keep trying",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                        builder1.setNegativeButton(
+                                "Continue",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                        //TODO:show ads
+
+                                        weirdToggle = true;
+
+
+
+
+                                        dialog.cancel();
+                                    }
+                                });
+
+                        AlertDialog alert11 = builder1.create();
+                        alert11.show();
+
+
+                    } else{
+
+                        if(codeButton.getText().equals("Hide Solution")){
+                            updateCodeAndNumber(info.get(3));
+                            cliptoBoard = info.get(3);
+                            codeButton.setText("Show Solution");
+                            codeCheck.setVisibility(View.VISIBLE);
+
+                        } else{
+                            updateCodeAndNumber(info.get(4));
+                            cliptoBoard = info.get(4);
+                            codeButton.setText("Hide Solution");
+                            codeCheck.setVisibility(View.VISIBLE);
+
+                        }
+
+
+
+                    }
 
                 }
 
