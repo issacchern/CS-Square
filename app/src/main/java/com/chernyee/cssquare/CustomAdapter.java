@@ -2,6 +2,7 @@ package com.chernyee.cssquare;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +25,7 @@ public class CustomAdapter extends ArrayAdapter<List<String>>{
 
     private List<List<String>> items;
     private SharedPreferences sharedPreferences;
-    private Context context;
+    private static Context context;
 
     public CustomAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
@@ -85,12 +86,15 @@ public class CustomAdapter extends ArrayAdapter<List<String>>{
             vh.holderLayout.setBackgroundResource(R.color.white);
         }
 
+
+
         if (p != null && p.size() > 0) {
             vh.holderTitle = (TextView) v.findViewById(R.id.item_title);
             vh.holderTag = (TextView) v.findViewById(R.id.item_tag);
             vh.holderDifficulty = (TextView) v.findViewById(R.id.item_difficulty);
 
             if ( vh.holderTitle != null) {
+
                 vh.holderTitle.setText(p.get(1));
             }
 
@@ -100,6 +104,40 @@ public class CustomAdapter extends ArrayAdapter<List<String>>{
 
             if (vh.holderDifficulty != null) {
                 vh.holderDifficulty.setText(p.get(8));
+
+                if(p.get(8).contains("Easy")){
+                    vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+                }
+
+                else if(p.get(8).contains("Medium")){
+                    int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
+                    int sizemedium = sharedPreferences.getInt("csmedium", 0);
+
+                    int remaining = sizemedium - sizeComplete;
+                    if(remaining > 0){
+
+                        vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds( vh.holderImage, null, null, null);
+                    }else{
+                        vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+                    }
+
+
+                } else if(p.get(8).contains("Hard")){
+
+                    int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
+                    int sizeHard = sharedPreferences.getInt("cshard", 0);
+
+                    int remaining = sizeHard - sizeComplete;
+                    if(remaining > 0){
+                        vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds( vh.holderImage, null, null, null);
+                    }else{
+                        vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+                    }
+
+                }
+
+
+
             }
         }
         v.setTag(vh);
@@ -114,6 +152,11 @@ public class CustomAdapter extends ArrayAdapter<List<String>>{
         TextView holderDifficulty;
         ImageView holderStar;
         LinearLayout holderLayout;
+        Drawable holderImage;
+
+        ViewHolder(){
+            this.holderImage = context.getResources().getDrawable(R.drawable.lock);
+        }
     }
 
 }

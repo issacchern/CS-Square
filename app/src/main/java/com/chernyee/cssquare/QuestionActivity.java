@@ -146,9 +146,16 @@ public class QuestionActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putInt(markString, 1);
                     editor.commit();
+
+                    int ss = sharedPref.getInt("cscomplete",0) + 1;
+                    editor.putInt("cscomplete", ss);
+                    editor.commit();
                 } else{
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putInt(markString, 0);
+                    editor.commit();
+                    int ss = sharedPref.getInt("cscomplete",0) - 1;
+                    editor.putInt("cscomplete", ss);
                     editor.commit();
                 }
             }

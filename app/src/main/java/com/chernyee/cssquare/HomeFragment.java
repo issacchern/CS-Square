@@ -93,6 +93,10 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
             }
         }
 
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("cscomplete", MainActivity.listCompleted.size());
+        editor.commit();
+
 
         header.setText("Completed: " + MainActivity.listCompleted.size() + "/" + MainActivity.listId.size());
         mChart.setCenterText(generateCenterText());
@@ -136,10 +140,9 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
             }
         }
 
-
-
-
-
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("cscomplete", MainActivity.listCompleted.size());
+        editor.commit();
 
         View v = inflater.inflate(R.layout.fragment_home, container, false);
 

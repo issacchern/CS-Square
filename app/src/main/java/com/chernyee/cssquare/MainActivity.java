@@ -243,6 +243,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void initializeVariables(){
+
         listId.clear();
         listTitle.clear();
         listDescription.clear();
@@ -328,5 +329,13 @@ public class MainActivity extends AppCompatActivity
 
             }
         }
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("csmedium", 30);
+        editor.commit();
+        editor.putInt("cshard", 60);
+        editor.commit();
+        editor.putInt("cscomplete", listCompleted.size());
+        editor.commit();
     }
 }

@@ -11,6 +11,7 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -40,20 +41,25 @@ public class SlidingTabFragment extends Fragment {
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private CustomAdapter customAdapter;
+    private SharedPreferences sharedPreferences;
 
+    private List<List<String>> listOfListInFragment;
     private ListView lv;
 
     @Override
     public void onResume() {
         super.onResume();
-        if(customAdapter != null)
-             customAdapter.notifyDataSetChanged();
+
+        //TODO: check if this fixes your problem
+        mViewPager.setAdapter(new SamplePagerAdapter());
+
     }
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
+        sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         super.onCreate(savedInstanceState);
     }
 
@@ -114,8 +120,11 @@ public class SlidingTabFragment extends Fragment {
             container.addView(view);
 
             lv = (ListView) view.findViewById(R.id.questionlist);
+            listOfListInFragment = MainActivity.populateList.get(position);
+
+
             customAdapter = new CustomAdapter(getActivity(), R.layout.list_item,
-                    MainActivity.populateList.get(position));
+                    listOfListInFragment);
             lv.setAdapter(customAdapter);
 
             final int final_position = position;
@@ -124,10 +133,45 @@ public class SlidingTabFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    Intent i = new Intent(getActivity(), QuestionActivity.class);
-                    i.putStringArrayListExtra("information", new ArrayList<>(MainActivity.populateList.
-                            get(final_position).get(position)));
-                    startActivity(i);
+                    if(MainActivity.populateList.get(final_position).get(position).get(8).contains("Medium")){
+
+                        int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
+                        int sizemedium = sharedPreferences.getInt("csmedium", 0);
+
+                        int remaining = sizemedium - sizeComplete;
+
+                        if(remaining > 0){
+                            Toast.makeText(getContext(), "You need to at least complete " + remaining + " questions to unlock Medium level." , Toast.LENGTH_SHORT).show();
+                        } else{
+                            Intent i = new Intent(getActivity(), QuestionActivity.class);
+                            i.putStringArrayListExtra("information", new ArrayList<>(MainActivity.populateList.
+                                    get(final_position).get(position)));
+                            startActivity(i);
+                        }
+
+
+                    } else if(MainActivity.populateList.get(final_position).get(position).get(8).contains("Hard")) {
+
+                        int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
+                        int sizehard = sharedPreferences.getInt("cshard", 0);
+
+                        int remaining = sizehard - sizeComplete;
+
+                        if(remaining > 0){
+                            Toast.makeText(getContext(), "You need to at least complete " + remaining + " questions to unlock Hard level." , Toast.LENGTH_SHORT).show();
+                        } else{
+                            Intent i = new Intent(getActivity(), QuestionActivity.class);
+                            i.putStringArrayListExtra("information", new ArrayList<>(MainActivity.populateList.
+                                    get(final_position).get(position)));
+                            startActivity(i);
+                        }
+
+                    } else{
+                        Intent i = new Intent(getActivity(), QuestionActivity.class);
+                        i.putStringArrayListExtra("information", new ArrayList<>(MainActivity.populateList.
+                                get(final_position).get(position)));
+                        startActivity(i);
+                    }
                 }
             });
 
