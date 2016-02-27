@@ -4,6 +4,7 @@
     android:padding="10dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -13,10 +14,15 @@
 
 
 
+
+
+
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
+
 
 
 
@@ -72,7 +78,7 @@
 
             <HorizontalScrollView
                 android:background="@android:color/white"
-                android:layout_marginLeft="5dp"
+                android:paddingLeft="5dp"
                 android:layout_weight="17"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -108,7 +114,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
+
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            ads:adSize="BANNER"
+            ads:adUnitId="@string/banner_ad_unit_id">
+        </com.google.android.gms.ads.AdView>
+
     </LinearLayout>
+
+
 
 
 

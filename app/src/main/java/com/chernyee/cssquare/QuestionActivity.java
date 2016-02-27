@@ -24,12 +24,18 @@ import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class QuestionActivity extends AppCompatActivity {
+
+    InterstitialAd mInterstitialAd;
 
     private List<String> info;
     private Button codeButton;
@@ -93,6 +99,14 @@ public class QuestionActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("4F9BBB4D58E9E204C5EC4D011342A9DD")
+                .build();
+
+        mInterstitialAd.loadAd(adRequest);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +115,35 @@ public class QuestionActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+
+        AdRequest request = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)        // All emulators
+                .addTestDevice("4F9BBB4D58E9E204C5EC4D011342A9DD")  // An example device ID
+                .build();
+        mAdView.loadAd(request);
+
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+
+            }
+        });
+
+
+        requestNewInterstitial();
+
+
+
+
+
+
         tStart = System.currentTimeMillis();
 
         Bundle extras = getIntent().getExtras();
@@ -147,13 +190,13 @@ public class QuestionActivity extends AppCompatActivity {
                     elapsedSeconds = tDelta / 1000.0;
 
                     if(elapsedSeconds < 120){
-                        Toast.makeText(QuestionActivity.this, "Really?" + elapsedSeconds, Toast.LENGTH_SHORT).show();
 
 
                         AlertDialog.Builder builder1 = new AlertDialog.Builder(QuestionActivity.this);
-                        builder1.setTitle("Really? ");
-                        builder1.setMessage("You spent less than 2 minutes and you want to see the solution already? ");
+                        builder1.setTitle("Show Solution");
+                        builder1.setMessage("Really? You spent less than 2 minutes and you already give up? ");
                         builder1.setCancelable(true);
+
 
                         builder1.setPositiveButton(
                                 "Keep trying",
@@ -164,15 +207,17 @@ public class QuestionActivity extends AppCompatActivity {
                                 });
 
                         builder1.setNegativeButton(
-                                "Continue",
+                                "See answer",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
 
                                         //TODO:show ads
+                                        if (mInterstitialAd.isLoaded()) {
+                                            mInterstitialAd.show();
+                                        }
+
 
                                         weirdToggle = true;
-
-
 
 
                                         dialog.cancel();
