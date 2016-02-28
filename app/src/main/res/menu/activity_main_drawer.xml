@@ -17,7 +17,7 @@
             android:title="Bookmark Questions" />
         <item
             android:id="@+id/navi_tool"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/wrench"
             android:title="Useful Tools" />
     </group>
 

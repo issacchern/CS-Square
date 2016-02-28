@@ -29,6 +29,8 @@
 
     <!-- csunlock - set csmedium and cshard equal 0 -->
 
+    <!-- csnoads - no ads -->
+
     <!-- cscomplete - return the number of questions completed -->
 
     <!-- csmedium - minimum questions to get in medium -->
@@ -58,9 +60,9 @@
 
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
     <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
     </string-array>
     <string-array name="pref_example_list_values">
         <item>1</item>

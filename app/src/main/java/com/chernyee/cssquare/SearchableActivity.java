@@ -114,7 +114,13 @@ public class SearchableActivity extends ListActivity {
                 editor.putInt("cshard", 0);
                 editor.commit();
                 Toast.makeText(this, "You have gained access to all questions now!", Toast.LENGTH_SHORT).show();
-                return;
+                finish();
+            } else if(query.toLowerCase().equals("csnoads")){
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("csnoads", 1);
+                editor.commit();
+                Toast.makeText(this, "You have removed all ads!", Toast.LENGTH_SHORT).show();
+                finish();
             }
 
             customList = new ArrayList<List<String>>();

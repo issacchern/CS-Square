@@ -262,7 +262,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
 
 
-        PieDataSet ds1 = new PieDataSet(entries1, "www.chernyee.com");
+        PieDataSet ds1 = new PieDataSet(entries1, "CS Square 2016");
         ds1.setColors(ColorTemplate.COLORFUL_COLORS);
         ds1.setValueFormatter(new PercentFormatter());
         ds1.setSliceSpace(2f);

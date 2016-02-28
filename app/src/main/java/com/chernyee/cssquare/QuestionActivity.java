@@ -35,7 +35,9 @@ import java.util.List;
 
 public class QuestionActivity extends AppCompatActivity {
 
-    InterstitialAd mInterstitialAd;
+    private InterstitialAd mInterstitialAd;
+    private AdView adView;
+    private AdRequest adRequest;
 
     private List<String> info;
     private Button codeButton;
@@ -101,7 +103,7 @@ public class QuestionActivity extends AppCompatActivity {
 
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("4F9BBB4D58E9E204C5EC4D011342A9DD")
+  //              .addTestDevice("5F99E784008077D0C0404F50AF1A4B44")
                 .build();
 
         mInterstitialAd.loadAd(adRequest);
@@ -116,34 +118,6 @@ public class QuestionActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        AdView mAdView = (AdView) findViewById(R.id.adView);
-
-        AdRequest request = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)        // All emulators
-                .addTestDevice("4F9BBB4D58E9E204C5EC4D011342A9DD")  // An example device ID
-                .build();
-        mAdView.loadAd(request);
-
-
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
-
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                requestNewInterstitial();
-
-            }
-        });
-
-
-        requestNewInterstitial();
-
-
-
-
-
-
         tStart = System.currentTimeMillis();
 
         Bundle extras = getIntent().getExtras();
@@ -151,6 +125,36 @@ public class QuestionActivity extends AppCompatActivity {
         sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         final String [] split = info.get(5).split("\n");
+
+        int ads = sharedPref.getInt("csnoads",0);
+
+        if(ads == 0){
+            adView = (AdView) findViewById(R.id.adView);
+
+            adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)        // All emulators
+                .addTestDevice("5F99E784008077D0C0404F50AF1A4B44")  // An example device ID
+                    .build();
+            adView.loadAd(adRequest);
+
+            mInterstitialAd = new InterstitialAd(this);
+            mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+
+            mInterstitialAd.setAdListener(new AdListener() {
+                @Override
+                public void onAdClosed() {
+                    requestNewInterstitial();
+                }
+            });
+            requestNewInterstitial();
+        } else{
+            weirdToggle = true;
+        }
+
+
+
+
+
 
         TextView titleView = (TextView) findViewById(R.id.codeTitle);
         titleView.setText(info.get(1));
@@ -218,6 +222,22 @@ public class QuestionActivity extends AppCompatActivity {
 
 
                                         weirdToggle = true;
+
+                                        if(codeButton.getText().equals("Hide Solution")){
+                                            updateCodeAndNumber(info.get(3));
+                                            cliptoBoard = info.get(3);
+                                            codeButton.setText("Show Solution");
+                                            codeCheck.setVisibility(View.VISIBLE);
+
+                                        } else{
+                                            updateCodeAndNumber(info.get(4));
+                                            cliptoBoard = info.get(4);
+                                            codeButton.setText("Hide Solution");
+                                            codeCheck.setVisibility(View.VISIBLE);
+
+                                        }
+
+
 
 
                                         dialog.cancel();

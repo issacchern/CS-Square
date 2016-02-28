@@ -1,6 +1,9 @@
 package com.chernyee.cssquare;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.SearchManager;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +15,7 @@ import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.NotificationCompat;
 import android.text.Html;
 import android.util.Log;
 import android.view.MenuInflater;
@@ -34,6 +38,9 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,7 +52,8 @@ public class MainActivity extends AppCompatActivity
 
 
 
-    public static String [] code_tag = {"All", "Array", "String", "Linked List", "Tree" , "DP" , "DFS", "BFS", "Greedy"};
+    public static String [] code_tag = {"All", "Array","String", "Hash table" , "Linked List", "Stack",
+            "Tree" ,"Binary Search", "Backtracking", "DP" , "DFS", "BFS", "Greedy", "Design", "Math", "Bit Manipulation"};
 
     private Cursor codingQuestionsCursor;
     private DatabaseHelper db;
@@ -309,6 +317,14 @@ public class MainActivity extends AppCompatActivity
                     tempListList.add(tempList);
                 }
             }
+
+            Collections.sort(tempListList, new Comparator<List<String>>() {
+                @Override
+                public int compare(List<String> lhs, List<String> rhs) {
+                    return lhs.get(1).compareTo(rhs.get(1));
+                }
+            });
+
             populateList.put(i,tempListList);
         }
 
@@ -331,6 +347,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("csnoads", 0);
+        editor.commit();
         editor.putInt("csmedium", 30);
         editor.commit();
         editor.putInt("cshard", 60);
