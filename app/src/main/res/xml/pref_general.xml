@@ -2,7 +2,7 @@
 
     <SwitchPreference
 
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="friendly_reminder"
         android:summary="Enable CS Square to send notification"
         android:title="Reminder" />

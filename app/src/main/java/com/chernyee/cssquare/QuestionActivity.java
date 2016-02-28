@@ -132,13 +132,13 @@ public class QuestionActivity extends AppCompatActivity {
             adView = (AdView) findViewById(R.id.adView);
 
             adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)        // All emulators
-                .addTestDevice("5F99E784008077D0C0404F50AF1A4B44")  // An example device ID
+//                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)        // All emulators
+//                .addTestDevice("5F99E784008077D0C0404F50AF1A4B44")  // An example device ID
                     .build();
             adView.loadAd(adRequest);
 
             mInterstitialAd = new InterstitialAd(this);
-            mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+            mInterstitialAd.setAdUnitId("ca-app-pub-6737882167206424/5868773590");
 
             mInterstitialAd.setAdListener(new AdListener() {
                 @Override
@@ -275,7 +275,7 @@ public class QuestionActivity extends AppCompatActivity {
         });
 
         codeCheck = (CheckBox) findViewById(R.id.codeCheckBox);
-        codeCheck.setVisibility(View.INVISIBLE);
+        codeCheck.setVisibility(View.GONE);
 
         codeCheck.setOnClickListener(new View.OnClickListener() {
             @Override

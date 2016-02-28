@@ -125,6 +125,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         friendlyReminder.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
+
+                Toast.makeText(getApplication(), "Let me know what kind of notification you would like to receive!", Toast.LENGTH_LONG).show();
                 if (friendlyReminder.isChecked()) {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putInt("csswitch", 0);
@@ -139,13 +141,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
         });
 
-
-
-
-
-
-
-        value = sharedPreferences.getInt("csswitch", 1);
+        value = sharedPreferences.getInt("csswitch", 0);
 
         if(value == 1){
             friendlyReminder.setChecked(true);
