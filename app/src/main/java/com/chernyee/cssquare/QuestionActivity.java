@@ -282,15 +282,17 @@ public class QuestionActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 String markString = "cse"+info.get(0);
+                Log.v("check id", info.get(0) + " - " + info.get(1));
                 int markScore = sharedPref.getInt(markString, 0);
                 if(markScore == 0){
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putInt(markString, 1);
                     editor.commit();
-
                     int ss = sharedPref.getInt("cscomplete",0) + 1;
                     editor.putInt("cscomplete", ss);
                     editor.commit();
+
+
                 } else{
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putInt(markString, 0);
@@ -307,6 +309,9 @@ public class QuestionActivity extends AppCompatActivity {
         if(markScore == 1){
             codeCheck.setVisibility(View.VISIBLE);
             codeCheck.setChecked(true);
+        } else {
+            codeCheck.setVisibility(View.GONE);
+            codeCheck.setChecked(false);
         }
 
 

@@ -328,23 +328,7 @@ public class MainActivity extends AppCompatActivity
             populateList.put(i,tempListList);
         }
 
-        for(int k = 0; k < populateList.get(0).size(); k++){
 
-            String markString = "cs"+ listId.get(k);
-            int markScore = sharedPreferences.getInt(markString, 0);
-            if(markScore == 1){
-                listCompleted.add(populateList.get(0).get(k));
-            } else{
-                if(populateList.get(0).get(k).get(8).contains("Easy")){
-                    listEasy.add(populateList.get(0).get(k));
-                } else if(populateList.get(0).get(k).get(8).contains("Medium")){
-                    listMedium.add(populateList.get(0).get(k));
-                } else if(populateList.get(0).get(k).get(8).contains("Hard")){
-                    listHard.add(populateList.get(0).get(k));
-                }
-
-            }
-        }
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("csnoads", 0);

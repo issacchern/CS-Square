@@ -152,13 +152,26 @@ public class SearchableActivity extends ListActivity {
 
 
             if(query.equals("Completed")){
-                customList.addAll(MainActivity.listCompleted);
+
+                for(int i = 0 ; i < MainActivity.populateList.get(0).size(); i++) {
+
+                    //                   somethign to do with sorting????
+
+                    String markString = "cse" + MainActivity.populateList.get(0).get(i).get(0);
+                    if (sharedPreferences.getInt(markString, 0) == 1) {
+                        customList.add(MainActivity.populateList.get(0).get(i));
+                    }
+                }
+
             } else{
 
                 for(int i = 0 ; i < MainActivity.populateList.get(0).size(); i++){
 
                     if(MainActivity.populateList.get(0).get(i).get(8).contains(query)){
-                        customList.add(MainActivity.populateList.get(0).get(i));
+                        String markString = "cse"+MainActivity.populateList.get(0).get(i).get(0);
+                        if (sharedPreferences.getInt(markString, 0) == 0) { //because we only want the undone one
+                            customList.add(MainActivity.populateList.get(0).get(i));
+                        }
                     }
                 }
 
