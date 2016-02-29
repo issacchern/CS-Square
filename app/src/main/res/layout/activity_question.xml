@@ -62,6 +62,15 @@
             android:layout_height="wrap_content" />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
+            android:src="@drawable/comment_text_outline"
+            fab:fab_colorNormal="@color/colorAccent"
+            fab:fab_colorPressed="@color/white_pressed"
+            fab:fab_title="Add comment"
+            android:id="@+id/action_c"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
             android:src="@drawable/owl"
             fab:fab_colorNormal="@color/colorAccent"
             fab:fab_colorPressed="@color/white_pressed"

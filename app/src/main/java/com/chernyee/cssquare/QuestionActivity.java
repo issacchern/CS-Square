@@ -7,18 +7,27 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +58,8 @@ public class QuestionActivity extends AppCompatActivity {
     private long tEnd = 0;
     private double elapsedSeconds = 0;
     private boolean weirdToggle = false;
+    private TextView noteTitle;
+    private TextView note;
 
     private SharedPreferences sharedPref;
 
@@ -282,7 +293,6 @@ public class QuestionActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 String markString = "cse"+info.get(0);
-                Log.v("check id", info.get(0) + " - " + info.get(1));
                 int markScore = sharedPref.getInt(markString, 0);
                 if(markScore == 0){
                     SharedPreferences.Editor editor = sharedPref.edit();
@@ -354,6 +364,63 @@ public class QuestionActivity extends AppCompatActivity {
             }
         });
 
+        final FloatingActionButton actionC = (FloatingActionButton) findViewById(R.id.action_c);
+        actionC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                LayoutInflater inflater = getLayoutInflater();
+                View dialoglayout = inflater.inflate(R.layout.edit_text, null);
+                final EditText input = (EditText) dialoglayout.findViewById(R.id.edit);
+
+                String str = "csef" + info.get(0);
+                String none = sharedPref.getString(str,"None");
+                if(none.equals("None") || none.equals("")){
+
+                } else {
+                    input.setText(none);
+                }
+
+                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(QuestionActivity.this);
+                alertDialog.setView(dialoglayout);
+
+                alertDialog.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                        dialog.cancel();
+                    }
+                });
+
+                alertDialog.setNegativeButton("Confirm", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // do something with it()
+                        String str = "csef" + info.get(0);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString(str, input.getText().toString());
+                        editor.commit();
+
+
+                        if(input.getText().toString().equals("None") || input.getText().toString().equals("")){
+                            note.setVisibility(View.GONE);
+                            noteTitle.setVisibility(View.GONE);
+                        } else{
+                            noteTitle.setVisibility(View.VISIBLE);
+                            note.setVisibility(View.VISIBLE);
+                            note.setText(input.getText().toString());
+                        }
+
+
+
+
+                        dialog.cancel();
+                    }
+                });
+
+                alertDialog.show();
+
+            }
+        });
+
 
         final FloatingActionButton actionD = (FloatingActionButton) findViewById(R.id.action_d);
         actionD.setOnClickListener(new View.OnClickListener() {
@@ -368,8 +435,19 @@ public class QuestionActivity extends AppCompatActivity {
             }
         });
 
+        note = (TextView) findViewById(R.id.codeNotes);
+        String str = "csef" + info.get(0);
+        String none = sharedPref.getString(str,"None");
+
+        noteTitle = (TextView) findViewById(R.id.codeNotesTitle);
 
 
+        if(none.equals("None") || none.equals("")){
+            note.setVisibility(View.GONE);
+            noteTitle.setVisibility(View.GONE);
+        } else{
+            note.setText(none);
+        }
     }
 
 

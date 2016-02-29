@@ -74,8 +74,8 @@ public class BookmarkFragment extends Fragment {
         lv = (ListView) view.findViewById(R.id.bookmarkList);
         bookMarkList = new ArrayList<List<String>>();
 
-        for(int i = 0; i < MainActivity.listId.size(); i++){
-            String markString = "cs" + MainActivity.listId.get(i);
+        for(int i = 0; i < MainActivity.populateList.get(0).size(); i++){
+            String markString = "cs" + MainActivity.populateList.get(0).get(i).get(0);
             int markScore = sharedPreferences.getInt(markString, 0);
             if(markScore == 1){
                 bookMarkList.add(MainActivity.populateList.get(0).get(i));

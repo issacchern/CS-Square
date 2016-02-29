@@ -82,7 +82,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
             int markScore = sharedPreferences.getInt(markString, 0);
             if(markScore == 1){
                 MainActivity.listCompleted.add(MainActivity.populateList.get(0).get(k));
-                Log.v("is dickk", MainActivity.populateList.get(0).get(k).get(1) + "");
             } else{
                 if(MainActivity.populateList.get(0).get(k).get(8).contains("Easy")){
                     MainActivity.listEasy.add(MainActivity.populateList.get(0).get(k));
@@ -90,7 +89,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                     MainActivity.listMedium.add(MainActivity.populateList.get(0).get(k));
                 } else if(MainActivity.populateList.get(0).get(k).get(8).contains("Hard")){
                     MainActivity.listHard.add(MainActivity.populateList.get(0).get(k));
-                    Log.v("markk",  MainActivity.listHard.size() + "-- " + MainActivity.populateList.get(0).get(k).get(1));
             }
             }
         }
@@ -262,9 +260,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         entries1.add(new Entry(MainActivity.listMedium.size(), 1));
         entries1.add(new Entry(MainActivity.listEasy.size(), 2));
         entries1.add(new Entry(MainActivity.listCompleted.size(), 3));
-
-
-        Log.v("Oh yea?", "Oh yeah?");
 
 
 
