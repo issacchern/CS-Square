@@ -7,14 +7,19 @@ package com.chernyee.cssquare;
 import com.chernyee.cssquare.UI.SlidingTabLayout;
 import com.chernyee.cssquare.CustomAdapter;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -33,6 +38,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,9 +50,126 @@ public class SlidingTabFragment extends Fragment {
     private ViewPager mViewPager;
     private CustomAdapter customAdapter;
     private SharedPreferences sharedPreferences;
-
+    public static HashMap<Integer, List<List<String>>> populateListCopy;
     private List<List<String>> listOfListInFragment;
     private ListView lv;
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.filter, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.filter){
+
+            String levelstr = sharedPreferences.getString("cslevel", "All");
+            final ArrayList<Integer> selectedItems=new ArrayList<>();
+
+
+            CharSequence[] items = { "Easy","Medium","Hard"};
+            boolean[] checkedItems = {false, false, false};
+
+            if(!levelstr.equals("All")){
+                if(levelstr.contains("Easy")){
+                    checkedItems[0] = true;
+                    selectedItems.add(0);
+
+                }
+                if(levelstr.contains("Medium")){
+                    checkedItems[1] = true;
+                    selectedItems.add(1);
+                }
+                if(levelstr.contains("Hard")){
+                    checkedItems[2] = true;
+                    selectedItems.add(2);
+                }
+            } else{
+                checkedItems[0] = true;
+                checkedItems[1] = true;
+                checkedItems[2] = true;
+                selectedItems.add(0);
+                selectedItems.add(1);
+                selectedItems.add(2);
+            }
+
+
+
+
+            AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                    .setTitle("Select difficulty level")
+                    .setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int indexSelected, boolean isChecked) {
+
+                            if (isChecked) {
+                                selectedItems.add(indexSelected);
+                            } else if (selectedItems.contains(indexSelected)) {
+                                // Else, if the item is already in the array, remove it
+                                selectedItems.remove(Integer.valueOf(indexSelected));
+                            }
+                        }
+                    }).setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+
+
+                        }
+                    }).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+
+
+
+                            String level = "";
+                            if(selectedItems.size() > 0){
+                                for(int i = 0 ; i < selectedItems.size(); i++){
+                                    if(selectedItems.get(i) == 0){
+                                        level += "Easy";
+                                    } else if(selectedItems.get(i) == 1){
+                                        level += "Medium";
+                                    } else if(selectedItems.get(i) == 2){
+                                        level += "Hard";
+                                    }
+
+                                }
+
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("cslevel", level);
+                                editor.commit();
+
+
+
+                                new FragmentAsyncTask().execute();
+
+
+//                                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+//                                SlidingTabFragment fragment = new SlidingTabFragment();
+//                                transaction.replace(R.id.main_fragment, fragment);
+//                                transaction.commit();
+
+
+
+
+                                Toast.makeText(getContext(), "List has been refreshed!", Toast.LENGTH_LONG).show();
+
+                            } else{
+                                Toast.makeText(getContext(), "You must select either one of difficulty level!", Toast.LENGTH_LONG).show();
+                            }
+
+
+
+
+                        }
+                    }).create();
+            dialog.show();
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onResume() {
@@ -60,6 +185,11 @@ public class SlidingTabFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+
+
+        new FragmentAsyncTask().execute();
+
         super.onCreate(savedInstanceState);
     }
 
@@ -74,15 +204,12 @@ public class SlidingTabFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
-        mViewPager.setAdapter(new SamplePagerAdapter());
-
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
-        mSlidingTabLayout.setViewPager(mViewPager);
-
     }
 
 
     class SamplePagerAdapter extends PagerAdapter {
+
 
         @Override
         public void notifyDataSetChanged() {
@@ -120,11 +247,14 @@ public class SlidingTabFragment extends Fragment {
             container.addView(view);
 
             lv = (ListView) view.findViewById(R.id.questionlist);
-            listOfListInFragment = MainActivity.populateList.get(position);
+ //           listOfListInFragment = MainActivity.populateList.get(position);
+
+
+
 
 
             customAdapter = new CustomAdapter(getActivity(), R.layout.list_item,
-                    listOfListInFragment);
+                    populateListCopy.get(position));
             lv.setAdapter(customAdapter);
 
             final int final_position = position;
@@ -133,7 +263,7 @@ public class SlidingTabFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    if(MainActivity.populateList.get(final_position).get(position).get(8).contains("Medium")){
+                    if(populateListCopy.get(final_position).get(position).get(8).contains("Medium")){
 
                         int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
                         int sizemedium = sharedPreferences.getInt("csmedium", 0);
@@ -144,13 +274,12 @@ public class SlidingTabFragment extends Fragment {
                             Toast.makeText(getContext(), "You need to at least complete " + remaining + " questions to unlock Medium level." , Toast.LENGTH_SHORT).show();
                         } else{
                             Intent i = new Intent(getActivity(), QuestionActivity.class);
-                            i.putStringArrayListExtra("information", new ArrayList<>(MainActivity.populateList.
-                                    get(final_position).get(position)));
+                            i.putStringArrayListExtra("information", new ArrayList<>(populateListCopy.get(final_position).get(position)));
                             startActivity(i);
                         }
 
 
-                    } else if(MainActivity.populateList.get(final_position).get(position).get(8).contains("Hard")) {
+                    } else if(populateListCopy.get(final_position).get(position).get(8).contains("Hard")) {
 
                         int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
                         int sizehard = sharedPreferences.getInt("cshard", 0);
@@ -161,15 +290,13 @@ public class SlidingTabFragment extends Fragment {
                             Toast.makeText(getContext(), "You need to at least complete " + remaining + " questions to unlock Hard level." , Toast.LENGTH_SHORT).show();
                         } else{
                             Intent i = new Intent(getActivity(), QuestionActivity.class);
-                            i.putStringArrayListExtra("information", new ArrayList<>(MainActivity.populateList.
-                                    get(final_position).get(position)));
+                            i.putStringArrayListExtra("information", new ArrayList<>(populateListCopy.get(final_position).get(position)));
                             startActivity(i);
                         }
 
                     } else{
                         Intent i = new Intent(getActivity(), QuestionActivity.class);
-                        i.putStringArrayListExtra("information", new ArrayList<>(MainActivity.populateList.
-                                get(final_position).get(position)));
+                        i.putStringArrayListExtra("information", new ArrayList<>(populateListCopy.get(final_position).get(position)));
                         startActivity(i);
                     }
                 }
@@ -184,5 +311,95 @@ public class SlidingTabFragment extends Fragment {
         //    Log.i(LOG_TAG, "destroyItem() [position: " + position + "]");
         }
 
+    }
+
+
+    private class FragmentAsyncTask extends AsyncTask<Void, Void, Void> {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            mViewPager.setAdapter(new SamplePagerAdapter());
+            mSlidingTabLayout.setViewPager(mViewPager);
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            String levelstr = sharedPreferences.getString("cslevel", "All");
+
+
+
+            if(levelstr.equals("All") || levelstr.equals("EasyMediumHard") || levelstr.equals("EasyHardMedium") || levelstr.equals("MediumEasyHard")
+                    || levelstr.equals("MediumHardEasy") || levelstr.equals("HardEasyMedium") || levelstr.equals("HardMediumEasy")){
+
+                populateListCopy = new HashMap<>(MainActivity.populateList);
+
+
+            } else {
+
+                populateListCopy = new HashMap<>();
+
+                for (int i = 0; i < MainActivity.code_tag.length; i++) {
+
+                    List<List<String>> tempListList = new ArrayList<>();
+                    for (int j = 0; j < MainActivity.listId.size(); j++) {
+
+                        if (!levelstr.contains(MainActivity.listDifficulty.get(j))) continue;
+
+                        if (i == 0) {
+                            List<String> tempList = new ArrayList<>();
+                            tempList.add(MainActivity.listId.get(j));
+                            tempList.add(MainActivity.listTitle.get(j));
+                            tempList.add(MainActivity.listDescription.get(j));
+                            tempList.add(MainActivity.listCode.get(j));
+                            tempList.add(MainActivity.listAnswer.get(j));
+                            tempList.add(MainActivity.listHint.get(j));
+                            tempList.add(MainActivity.listTag.get(j));
+                            tempList.add(MainActivity.listCategory.get(j));
+                            tempList.add(MainActivity.listDifficulty.get(j));
+                            tempList.add(MainActivity.listAdditional.get(j));
+                            tempListList.add(tempList);
+                        } else if (MainActivity.listTag.get(j).contains(MainActivity.code_tag[i])) {
+                            List<String> tempList = new ArrayList<>();
+                            tempList.add(MainActivity.listId.get(j));
+                            tempList.add(MainActivity.listTitle.get(j));
+                            tempList.add(MainActivity.listDescription.get(j));
+                            tempList.add(MainActivity.listCode.get(j));
+                            tempList.add(MainActivity.listAnswer.get(j));
+                            tempList.add(MainActivity.listHint.get(j));
+                            tempList.add(MainActivity.listTag.get(j));
+                            tempList.add(MainActivity.listCategory.get(j));
+                            tempList.add(MainActivity.listDifficulty.get(j));
+                            tempList.add(MainActivity.listAdditional.get(j));
+                            tempListList.add(tempList);
+                        }
+                    }
+
+                    Collections.sort(tempListList, new Comparator<List<String>>() {
+                        @Override
+                        public int compare(List<String> lhs, List<String> rhs) {
+                            return lhs.get(1).compareTo(rhs.get(1));
+                        }
+                    });
+
+                    populateListCopy.put(i, tempListList);
+                }
+            }
+
+
+
+
+
+
+            return null;
+        }
     }
 }

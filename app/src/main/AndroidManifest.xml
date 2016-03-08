@@ -12,11 +12,23 @@
 
 
     <application
+        android:backupAgent="MyBackupAgent"
         android:allowBackup="true"
         android:icon="@drawable/app_logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAIjxshdAuhPumHZUMOCXvw3Y0_ga3def7skC8TPg" />
+
+
+        <!-- This is for paid version
+        <meta-data android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAILmzfmfDcZqz1fNQZg3Mw9pZa_sWdSVimE4As-A" />
+            -->
+
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"

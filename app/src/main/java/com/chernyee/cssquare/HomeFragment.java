@@ -117,33 +117,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-
-        MainActivity.listCompleted.clear();
-        MainActivity.listEasy.clear();
-        MainActivity.listMedium.clear();
-        MainActivity.listHard.clear();
-        for(int k = 0; k < MainActivity.populateList.get(0).size(); k++){
-
-            String markString = "cse"+ MainActivity.populateList.get(0).get(k).get(0);
-            int markScore = sharedPreferences.getInt(markString, 0);
-            if(markScore == 1){
-                MainActivity.listCompleted.add(MainActivity.populateList.get(0).get(k));
-            } else{
-                if(MainActivity.populateList.get(0).get(k).get(8).contains("Easy")){
-                    MainActivity.listEasy.add(MainActivity.populateList.get(0).get(k));
-                } else if(MainActivity.populateList.get(0).get(k).get(8).contains("Medium")){
-                    MainActivity.listMedium.add(MainActivity.populateList.get(0).get(k));
-                } else if(MainActivity.populateList.get(0).get(k).get(8).contains("Hard")){
-                    MainActivity.listHard.add(MainActivity.populateList.get(0).get(k));
-
-                }
-            }
-        }
-
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("cscomplete", MainActivity.listCompleted.size());
-        editor.commit();
 
         View v = inflater.inflate(R.layout.fragment_home, container, false);
 
@@ -163,11 +136,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         mChart.setOnChartValueSelectedListener(this);
 
         mChart.setData(generatePieData());
-
-
-
-
-
 
 
 

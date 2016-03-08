@@ -3,6 +3,7 @@ package com.chernyee.cssquare;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -150,9 +151,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             friendlyReminder.setChecked(false);
             //TODO: disable set notification
         }
-
-
-
 
 
     }

@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">CS Square FREE</string>
 
+    <string name="title_setting">Disable ads</string>
+    <string name = "desc_setting">Get rid of annoying ads by purchasing this app!</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -21,6 +24,9 @@
 
         </string>
 
+
+
+
     <!-- Strings related to Settings -->
 
     <!-- csxxx - bookmark question -->
@@ -36,7 +42,6 @@
     <!-- csmedium - minimum questions to get in medium -->
 
     <!-- cshard - minimum questions to get in hard -->
-
 
 
     <string name="preference_file_key">pref_file</string>

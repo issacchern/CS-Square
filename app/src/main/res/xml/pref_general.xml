@@ -7,17 +7,17 @@
         android:summary="Enable CS Square to send notification"
         android:title="Reminder" />
 
-
     <Preference
         android:key="reset_data"
         android:title="Reset data"
         android:summary="Wipe out all of your bookmarks and data"
         />
 
+
     <Preference
         android:key="disable_ads"
-        android:title="Disable ads"
-        android:summary="Get rid of annoying ads by purchasing this app "
+        android:title="@string/title_setting"
+        android:summary="@string/desc_setting"
         />
 
 

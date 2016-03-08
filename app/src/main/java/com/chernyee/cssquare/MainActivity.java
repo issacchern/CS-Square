@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.app.TaskStackBuilder;
+import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -44,16 +45,18 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import us.feras.mdv.MarkdownView;
+
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, HomeFragment.OnFragmentInteractionListener,
             AboutFragment.OnFragmentInteractionListener,BookmarkFragment.OnFragmentInteractionListener,
-            ToolFragment.OnFragmentInteractionListener{
+            ToolFragment.OnFragmentInteractionListener, PreparationFragment.OnFragmentInteractionListener{
 
 
 
     public static String [] code_tag = {"All", "Array","String", "Hash table" , "Linked List", "Stack",
-            "Tree" ,"Binary Search", "Backtracking", "DP" , "DFS", "BFS", "Greedy", "Design", "Math", "Bit Manipulation"};
+            "Tree" ,"Binary Search", "Backtracking", "DP" , "DFS", "BFS", "Greedy", "Design","Divide and Conquer","Sort", "Math", "Bit Manipulation"};
 
     private Cursor codingQuestionsCursor;
     private DatabaseHelper db;
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity
 
 
     public static HashMap<Integer, List<List<String>>> populateList = new HashMap<>();
+
 
     public static List<String> listId = new ArrayList<>();
     public static List<String> listTitle = new ArrayList<>();
@@ -100,14 +104,12 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.getMenu().getItem(0).setChecked(true);
-
+        navigationView.setItemIconTintList(null);
 
         db = new DatabaseHelper(this);
         db.setForcedUpgrade();
 
         codingQuestionsCursor = db.getEmployees();
-
-
 
         initializeVariables();
 
@@ -188,20 +190,56 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+
+
         if (id == R.id.navi_home) {
 
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            HomeFragment fragment = new HomeFragment();
-            transaction.replace(R.id.main_fragment, fragment);
-            transaction.commit();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    HomeFragment fragment = new HomeFragment();
+                    transaction.replace(R.id.main_fragment, fragment);
+                    transaction.commit();
+
+                }
+            }, 300);
+
+
+        } else if(id == R.id.navi_prepare){
+
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    PreparationFragment fragment = new PreparationFragment();
+                    transaction.replace(R.id.main_fragment, fragment);
+                    transaction.commit();
+                }
+
+            }, 300);
+
+
 
 
 
         } else if (id == R.id.navi_coding) {
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                SlidingTabFragment fragment = new SlidingTabFragment();
-                transaction.replace(R.id.main_fragment, fragment);
-                transaction.commit();
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    SlidingTabFragment fragment = new SlidingTabFragment();
+                    transaction.replace(R.id.main_fragment, fragment);
+                    transaction.commit();
+
+                }
+            }, 300);
+
+
 
         } else if(id == R.id.navi_bookmark){
 
@@ -212,10 +250,20 @@ public class MainActivity extends AppCompatActivity
 
 
         } else if(id == R.id.navi_tool){
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            ToolFragment fragment = new ToolFragment();
-            transaction.replace(R.id.main_fragment, fragment);
-            transaction.commit();
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    ToolFragment fragment = new ToolFragment();
+                    transaction.replace(R.id.main_fragment, fragment);
+                    transaction.commit();
+                }
+            }, 300);
+
+
+
 
         } else if(id == R.id.navi_setting){
 
@@ -226,16 +274,25 @@ public class MainActivity extends AppCompatActivity
 
         } else if(id == R.id.navi_about){
 
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            AboutFragment fragment = new AboutFragment();
-            transaction.replace(R.id.main_fragment, fragment);
-            transaction.commit();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    AboutFragment fragment = new AboutFragment();
+                    transaction.replace(R.id.main_fragment, fragment);
+                    transaction.commit();
+                }
+            }, 300);
+
 
 
         }
 
+
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+
         return true;
     }
 
@@ -327,6 +384,7 @@ public class MainActivity extends AppCompatActivity
 
             populateList.put(i,tempListList);
         }
+
 
 
 

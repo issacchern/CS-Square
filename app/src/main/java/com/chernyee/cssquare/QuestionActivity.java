@@ -85,6 +85,8 @@ public class QuestionActivity extends AppCompatActivity {
                 Toast.makeText(this, "Remove bookmarked!", Toast.LENGTH_SHORT).show();
             }
             return true;
+        } else if(id == R.id.hot){
+            Toast.makeText(this, "This question is hot!",Toast.LENGTH_LONG).show();
         }
 
 
@@ -99,6 +101,16 @@ public class QuestionActivity extends AppCompatActivity {
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.bookmark, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.hot);
+        if(info.get(9).contains("hot")){
+
+        } else{
+            menuItem.setVisible(false);
+        }
+
+
+
         MenuItem bedMenuItem = menu.findItem(R.id.bookmark_item);
         String markString = "cs"+info.get(0);
         int markScore = sharedPref.getInt(markString, 0);

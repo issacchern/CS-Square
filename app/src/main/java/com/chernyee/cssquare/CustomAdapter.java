@@ -106,7 +106,12 @@ public class CustomAdapter extends ArrayAdapter<List<String>>{
                 vh.holderDifficulty.setText(p.get(8));
 
                 if(p.get(8).contains("Easy")){
-                    vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+                    if(p.get(9).contains("hot")){
+                        vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds(vh.holderHot, null, null,null );
+                    } else{
+                        vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+                    }
+
                 }
 
                 else if(p.get(8).contains("Medium")){
@@ -115,10 +120,14 @@ public class CustomAdapter extends ArrayAdapter<List<String>>{
 
                     int remaining = sizemedium - sizeComplete;
                     if(remaining > 0){
-
                         vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds( vh.holderImage, null, null, null);
+
                     }else{
-                        vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+                        if(p.get(9).contains("hot")){
+                            vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds(vh.holderHot, null, null, null);
+                        } else{
+                            vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+                        }
                     }
 
 
@@ -131,7 +140,12 @@ public class CustomAdapter extends ArrayAdapter<List<String>>{
                     if(remaining > 0){
                         vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds( vh.holderImage, null, null, null);
                     }else{
-                        vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+                        if(p.get(9).contains("hot")){
+                            vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds(vh.holderHot, null, null, null);
+                        } else{
+                            vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+                        }
+
                     }
 
                 }
@@ -153,9 +167,11 @@ public class CustomAdapter extends ArrayAdapter<List<String>>{
         ImageView holderStar;
         LinearLayout holderLayout;
         Drawable holderImage;
+        Drawable holderHot;
 
         ViewHolder(){
             this.holderImage = context.getResources().getDrawable(R.drawable.lock);
+            this.holderHot = context.getResources().getDrawable(R.drawable.fire);
         }
     }
 
