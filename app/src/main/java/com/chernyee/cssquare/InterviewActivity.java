@@ -86,6 +86,13 @@ public class InterviewActivity extends AppCompatActivity{
         });
 
 
+        /**
+         * TODO: GOING TO REMOVE WHATEVER I HAVE WORKED ON AND TRY SOMETHING NEW.
+         * TODO: THE RXANDROIDAUDIO WORKS, I JUST CAN'T GET IT TO PLAY ON THE STORAGE AND ALSO THE FILE IS LARGE
+         * TODO: PLUS, NO VISUALIZERVIEW WHICH IS SAD.
+         *
+         */
+
 
 
         startButton = (Button) findViewById(R.id.startButton);
