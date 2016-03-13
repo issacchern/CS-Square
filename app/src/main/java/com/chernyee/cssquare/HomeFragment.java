@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.chernyee.cssquare.Visualizer.Visualizer;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -107,6 +108,9 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
         sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -119,7 +123,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                              Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_home, container, false);
-
 
         header = (TextView) v.findViewById(R.id.header1);
         header.setText("Completed: " + MainActivity.listCompleted.size() + "/" + MainActivity.listId.size());

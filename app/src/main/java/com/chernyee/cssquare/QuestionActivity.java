@@ -1,5 +1,6 @@
 package com.chernyee.cssquare;
 
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -17,12 +18,14 @@ import android.text.InputType;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -55,6 +58,9 @@ public class QuestionActivity extends AppCompatActivity {
     private String cliptoBoard;
     private long tStart = 0;
     private long tDelta = 0;
+
+
+
     private long tEnd = 0;
     private double elapsedSeconds = 0;
     private boolean weirdToggle = false;
@@ -68,7 +74,21 @@ public class QuestionActivity extends AppCompatActivity {
 
         int id = item.getItemId();
 
-        if (id == R.id.bookmark_item) {
+        if(id == android.R.id.home){
+            ActivityManager mngr = (ActivityManager) getSystemService( ACTIVITY_SERVICE );
+            List<ActivityManager.RunningTaskInfo> taskList = mngr.getRunningTasks(10);
+            if(taskList.get(0).numActivities == 1 &&
+                    taskList.get(0).topActivity.getClassName().equals(this.getClass().getName())) {
+                Intent i = new Intent(QuestionActivity.this, MainActivity.class);
+                startActivity(i);
+            } else{
+                finish();
+            }
+
+
+        }
+
+        else if (id == R.id.bookmark_item) {
             String markString = "cs"+info.get(0);
             int markScore = sharedPref.getInt(markString, 0);
             if(markScore == 0){
@@ -144,6 +164,7 @@ public class QuestionActivity extends AppCompatActivity {
         tStart = System.currentTimeMillis();
 
         Bundle extras = getIntent().getExtras();
+
         info = extras.getStringArrayList("information");
         sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 

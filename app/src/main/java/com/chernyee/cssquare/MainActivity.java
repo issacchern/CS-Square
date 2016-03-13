@@ -51,7 +51,8 @@ import us.feras.mdv.MarkdownView;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, HomeFragment.OnFragmentInteractionListener,
             AboutFragment.OnFragmentInteractionListener,BookmarkFragment.OnFragmentInteractionListener,
-            ToolFragment.OnFragmentInteractionListener, PreparationFragment.OnFragmentInteractionListener{
+            ToolFragment.OnFragmentInteractionListener, PreparationFragment.OnFragmentInteractionListener,
+            InterviewFragment.OnFragmentInteractionListener{
 
 
 
@@ -249,7 +250,25 @@ public class MainActivity extends AppCompatActivity
             transaction.commit();
 
 
-        } else if(id == R.id.navi_tool){
+        } else if(id == R.id.navi_interview){
+
+//           Intent intent = new Intent(this, Camcorder.class);
+//            startActivity(intent);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    InterviewFragment fragment = new InterviewFragment();
+                    transaction.replace(R.id.main_fragment, fragment);
+                    transaction.commit();
+                }
+            }, 300);
+
+
+
+        }else if(id == R.id.navi_tool){
 
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -283,7 +302,6 @@ public class MainActivity extends AppCompatActivity
                     transaction.commit();
                 }
             }, 300);
-
 
 
         }

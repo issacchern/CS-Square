@@ -1,0 +1,199 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context="com.chernyee.cssquare.InterviewFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <TextView
+        android:layout_marginBottom="10dp"
+        android:textColor="@color/half_black"
+        android:drawablePadding="10dp"
+        android:drawableLeft="@drawable/voice"
+        android:layout_gravity="center"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mock Interview"/>
+
+    <LinearLayout
+        android:layout_marginBottom="10dp"
+        android:background="@color/white_pressed"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:background="@color/colorAccent"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:text="Select categories"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_height="wrap_content" />
+
+
+
+        <CheckedTextView
+            android:textColor="@android:color/black"
+            android:gravity="center"
+            android:id="@+id/checkedTextView1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+            android:checked="true"
+            android:text="Basic HR interview questions" />
+
+        <CheckedTextView
+            android:textColor="@android:color/black"
+            android:gravity="center"
+            android:id="@+id/checkedTextView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+            android:checked="true"
+            android:text="Technical terms / knowledge based" />
+
+        <CheckedTextView
+            android:textColor="@android:color/black"
+            android:gravity="center"
+            android:id="@+id/checkedTextView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+            android:checked="true"
+            android:text="Marked coding questions" />
+
+        <CheckedTextView
+            android:textColor="@android:color/black"
+            android:gravity="center"
+            android:id="@+id/checkedTextView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+            android:checked="true"
+            android:text="Select all" />
+
+    </LinearLayout>
+
+
+
+
+
+    <LinearLayout
+        android:layout_marginBottom="10dp"
+        android:background="@color/white_pressed"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        
+        <TextView
+            android:background="@color/colorAccent"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:text="Select recording mode"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_height="wrap_content" />
+     
+
+        <RadioGroup android:id="@+id/radioGroup"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <RadioButton android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/radio1" android:checked="true"
+                android:text="Audio only">
+            </RadioButton>
+            <RadioButton android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/radio2"
+                android:text="Video camera" android:checked="false">
+            </RadioButton>
+            <RadioButton android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/radio3"
+                android:text="None" android:checked="false">
+            </RadioButton>
+        </RadioGroup>
+        
+    </LinearLayout>
+
+    <LinearLayout
+        android:background="@color/white_pressed"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:background="@color/colorAccent"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:text="Interview length"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <SeekBar
+                android:layout_weight="10"
+                android:layout_centerInParent="true"
+                android:id="@+id/seekbar"
+                style="?android:attr/seekBarStyle"
+                android:progress="10"
+                android:max="30"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+            <TextView
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/seekvalue"
+                android:text="10 mins"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+
+
+        </LinearLayout>
+
+
+
+
+
+
+
+    </LinearLayout>
+
+    
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start now"/>
+
+
+
+</LinearLayout>

@@ -2,7 +2,15 @@ package com.chernyee.cssquare;
 
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.support.v4.app.TaskStackBuilder;
 import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,17 +26,21 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.SwitchPreference;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 
@@ -37,6 +49,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private SharedPreferences sharedPreferences;
     private int value = 1;
     private SwitchPreference friendlyReminder;
+
+    private NotificationManager notificationManager;
+
+    private boolean isNotificationActive = false;
+    private int notifiID = 33;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,10 +150,54 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     editor.putInt("csswitch", 0);
                     editor.commit();
 
+
+
+
+
+
                 } else {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putInt("csswitch", 1);
                     editor.commit();
+//                    Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.app_logo);
+//                    NotificationCompat.Builder notiBuilder = new NotificationCompat.Builder(SettingsActivity.this).setContentTitle("Practice coding everyday")
+//                            .setContentText("[Leetcode] Maximum Subarray").setSmallIcon(R.drawable.app_logo)
+//                            .setAutoCancel(true).setDefaults(Notification.DEFAULT_SOUND).setTicker("Alert new message")
+//                            .setColor(Color.parseColor("#F9BB00"));
+//
+//                    Intent moreInforIntent = new Intent(SettingsActivity.this, QuestionActivity.class);
+//
+//
+//                    moreInforIntent.putExtra("information",new ArrayList<>(MainActivity.populateList.get(0).get(0)));
+//
+//                    TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(SettingsActivity.this);
+//
+//                    taskStackBuilder.addNextIntent(moreInforIntent);
+//                    PendingIntent pendingIntent = taskStackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+//                    notiBuilder.setContentIntent(pendingIntent);
+//
+//                    notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//                    notificationManager.notify(notifiID, notiBuilder.build());
+
+
+
+                    Long alertTime = new GregorianCalendar().getTimeInMillis()+5*1000;
+
+                    // Define our intention of executing AlertReceiver
+                    Intent alertIntent = new Intent(SettingsActivity.this, AlertReceiver.class);
+
+                    // Allows you to schedule for your application to do something at a later date
+                    // even if it is in he background or isn't active
+                    AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+                    // set() schedules an alarm to trigger
+                    // Trigger for alertIntent to fire in 5 seconds
+                    // FLAG_UPDATE_CURRENT : Update the Intent if active
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, alertTime,
+                            PendingIntent.getBroadcast(SettingsActivity.this, 1, alertIntent,
+                                    PendingIntent.FLAG_UPDATE_CURRENT));
+
+
                 }
                 return true;
             }
@@ -156,16 +217,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
 
-
-
-
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            if (!super.onMenuItemSelected(featureId, item)) {
-                NavUtils.navigateUpFromSameTask(this);
-            }
+            finish();
             return true;
         }
         return super.onMenuItemSelected(featureId, item);
