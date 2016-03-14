@@ -21,7 +21,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 
-import com.chernyee.cssquare.Visualizer.Visualizer;
+import com.chernyee.cssquare.Recording.RecordingSampler;
+import com.chernyee.cssquare.Recording.VisualizerView;
 import com.github.piasy.rxandroidaudio.AudioRecorder;
 import com.github.piasy.rxandroidaudio.RxAudioPlayer;
 import com.github.piasy.rxandroidaudio.StreamAudioPlayer;
@@ -42,26 +43,18 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 
-public class InterviewActivity extends AppCompatActivity{
+public class InterviewActivity extends AppCompatActivity implements
+        RecordingSampler.CalculateVolumeListener{
 
-    Visualizer v1;
     private Button startButton;
     private Button stopButton;
-
-    private StreamAudioRecorder mStreamAudioRecorder;
-    private StreamAudioPlayer mStreamAudioPlayer;
-
-    private File mAudioFile;
-    private FileOutputStream mFileOutputStream;
-
-    private boolean mIsRecording = false;
-
-    private byte[] mBuffer;
-    boolean toggle = true;
-
     private TextToSpeech tts;
 
-    static final int BUFFER_SIZE = 4096;
+    private MediaRecorder mediaRecorder;
+
+    private VisualizerView visualizerView;
+
+    private RecordingSampler mRecordingSampler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,27 +64,43 @@ public class InterviewActivity extends AppCompatActivity{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mStreamAudioRecorder = StreamAudioRecorder.getInstance();
-        mStreamAudioPlayer = StreamAudioPlayer.getInstance();
-        mBuffer = new byte[BUFFER_SIZE];
 
         tts = new TextToSpeech (this, new TextToSpeech.OnInitListener () {
 
 
             @Override
             public void onInit(int status) {
-                tts.setLanguage (Locale.US);
-                tts.speak ("Tell me about yourself", TextToSpeech.QUEUE_FLUSH, null);
+                tts.setLanguage(Locale.US);
+          //      tts.speak ("Tell me about yourself", TextToSpeech.QUEUE_FLUSH, null);
             }
         });
 
+        visualizerView = (VisualizerView) findViewById(R.id.visualizer3);
 
-        /**
-         * TODO: GOING TO REMOVE WHATEVER I HAVE WORKED ON AND TRY SOMETHING NEW.
-         * TODO: THE RXANDROIDAUDIO WORKS, I JUST CAN'T GET IT TO PLAY ON THE STORAGE AND ALSO THE FILE IS LARGE
-         * TODO: PLUS, NO VISUALIZERVIEW WHICH IS SAD.
-         *
-         */
+        mRecordingSampler = new RecordingSampler();
+        mRecordingSampler.setVolumeListener(this);
+        mRecordingSampler.setSamplingInterval(100);
+        mRecordingSampler.link(visualizerView);
+
+        mediaRecorder = new MediaRecorder();
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        mediaRecorder.setOutputFile(Environment.getExternalStorageDirectory()
+                .getAbsolutePath() + "/myrecording.mp3");
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+
+
+        try {
+            mediaRecorder.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+
+
 
 
 
@@ -101,50 +110,23 @@ public class InterviewActivity extends AppCompatActivity{
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //         ((Visualizer) findViewById(R.id.visualizer)).startListening();
+
+                if (mRecordingSampler.isRecording()) {
+                    startButton.setText("START");
+                    mRecordingSampler.release();
 
 
-                if (mIsRecording) {
-                    stopRecord();
-                    startButton.setText("Start");
-                    mIsRecording = false;
+
+
                 } else {
+                    startButton.setText("STOP");
+                    mRecordingSampler.startRecording();
 
-                    boolean isPermissionsGranted = RxPermissions.getInstance(getApplicationContext())
-                            .isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE) &&
-                            RxPermissions.getInstance(getApplicationContext())
-                                    .isGranted(Manifest.permission.RECORD_AUDIO);
-
-                    if (!isPermissionsGranted) {
-                        RxPermissions.getInstance(getApplicationContext())
-                                .request(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                        Manifest.permission.RECORD_AUDIO)
-                                .subscribe(new Action1<Boolean>() {
-                                    @Override
-                                    public void call(Boolean granted) {
-                                        // not record first time to request permission
-                                        if (granted) {
-                                            Toast.makeText(getApplicationContext(), "Permission granted",
-                                                    Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            Toast.makeText(getApplicationContext(), "Permission not granted",
-                                                    Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                }, new Action1<Throwable>() {
-                                    @Override
-                                    public void call(Throwable throwable) {
-                                        throwable.printStackTrace();
-                                    }
-                                });
-                    } else {
-                        startRecord();
-                        startButton.setText("Stop");
-                        mIsRecording = true;
-
-                    }
 
                 }
+
+
+
 
 
             }
@@ -153,14 +135,17 @@ public class InterviewActivity extends AppCompatActivity{
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //             ((Visualizer) findViewById(R.id.visualizer)).stopListening();
 
-                int random = (int) new Random().nextInt(220);
-                if(random == 0) random = 1;
+//
+//                int random = (int) new Random().nextInt(220);
+//                if(random == 0) random = 1;
+//
+//                String s = MainActivity.populateList.get(0).get(random).get(2);
+//
+//                tts.speak (s, TextToSpeech.QUEUE_FLUSH, null);
 
-                String s = MainActivity.populateList.get(0).get(random).get(2);
 
-                tts.speak (s, TextToSpeech.QUEUE_FLUSH, null);
+
 
             }
         });
@@ -176,7 +161,7 @@ public class InterviewActivity extends AppCompatActivity{
                 //         boolean ss = ((Visualizer) findViewById(R.id.visualizer)).checkThread();
                 //         Toast.makeText(getApplicationContext(), "" + ss, Toast.LENGTH_SHORT).show();
 
-                play();
+
             }
         });
 
@@ -192,76 +177,8 @@ public class InterviewActivity extends AppCompatActivity{
 
     }
 
-    private void stopRecord() {
-        mStreamAudioRecorder.stop();
-        try {
-            mFileOutputStream.close();
-            mFileOutputStream = null;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void onCalculateVolume(int volume) {
+
     }
-
-    private void startRecord() {
-        try {
-            mAudioFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
-                    File.separator + "ISSACTESTING" + ".mp3");
-            mAudioFile.createNewFile();
-            mFileOutputStream = new FileOutputStream(mAudioFile);
-            mStreamAudioRecorder.start(new StreamAudioRecorder.AudioDataCallback() {
-                @Override
-                public void onAudioData(byte[] data, int size) {
-                    if (mFileOutputStream != null) {
-                        try {
-                            mFileOutputStream.write(data, 0, size);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-
-                @Override
-                public void onError() {
-                    startButton.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "Record fail",
-                                    Toast.LENGTH_SHORT).show();
-                            startButton.setText("Start");
-                            mIsRecording = false;
-                        }
-                    });
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public void play() {
-        Observable.just(mAudioFile).subscribeOn(Schedulers.io()).subscribe(new Action1<File>() {
-            @Override
-            public void call(File file) {
-                try {
-                    mStreamAudioPlayer.init();
-                    FileInputStream inputStream = new FileInputStream(file);
-                    int read;
-                    while ((read = inputStream.read(mBuffer)) > 0) {
-                        mStreamAudioPlayer.play(mBuffer, read);
-                    }
-                    inputStream.close();
-                    mStreamAudioPlayer.release();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                throwable.printStackTrace();
-            }
-        });
-    }
-
 }

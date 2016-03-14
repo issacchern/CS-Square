@@ -69,31 +69,17 @@
         app:suffixSecond="s" />
 
 
-    <!--
-    <com.chernyee.cssquare.Visualizer.Visualizer
-        android:id="@+id/visualizer"
+    <com.chernyee.cssquare.Recording.VisualizerView
+        android:id="@+id/visualizer3"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        aw:aw_format="vertical_lines"
-        aw:aw_gravity="center"
-        aw:aw_width="100"
-        aw:aw_height="200"
-        aw:aw_num_waves="10"
-        aw:aw_line_with="30"
-        aw:aw_line_min_with="30"
-        aw:aw_line_height="30"
-        aw:aw_line_min_height="30"
-        aw:aw_line_spacing="10"
-        aw:aw_line_border_radius="50"
-        aw:aw_ball_diameter="30"
-        aw:aw_color_uniform="@color/pink"
-        aw:aw_color_is_gradient="true"
-        aw:aw_color_gradient_start="@color/colorAccent"
-        aw:aw_color_gradient_end="@color/nice_green"/>
-
-
-        -->
-
+        android:layout_height="100dp"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginTop="@dimen/spacing_large"
+        android:background="@android:color/darker_gray"
+        app:numColumns="100"
+        app:renderColor="@color/colorAccent"
+        app:renderRange="both"
+        app:renderType="pixel" />
 
 
 
