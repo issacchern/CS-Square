@@ -89,6 +89,7 @@
         <receiver android:name=".AlertReceiver" />
 
         <activity
+            android:screenOrientation="portrait"
             android:name=".InterviewActivity"
             android:label="@string/title_activity_interview"
             android:theme="@style/AppTheme.NoActionBar"></activity>

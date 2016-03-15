@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckedTextView;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
@@ -52,12 +53,17 @@ public class InterviewFragment extends Fragment {
     private RadioGroup radioGroup;
     private RadioButton radioButton1;
     private RadioButton radioButton2;
-    private RadioButton radioButton3;
+
+    private ImageView minusButton;
+    private ImageView plusButton;
+    private TextView questionText;
 
     private SeekBar seekBar;
     private TextView seekValue;
 
     private Button startButton;
+
+    private int initialNumberQuestion = 10;
 
     private OnFragmentInteractionListener mListener;
 
@@ -100,6 +106,8 @@ public class InterviewFragment extends Fragment {
         editor.commit();
         editor.putInt("csseek", 10);
         editor.commit();
+        editor.putInt("csplusminus", 10);
+        editor.commit();
 
 
     }
@@ -110,6 +118,39 @@ public class InterviewFragment extends Fragment {
         // Inflate the layout for this fragment
 
         View v = inflater.inflate(R.layout.fragment_interview, container, false);
+
+        minusButton = (ImageView) v.findViewById(R.id.minusButton);
+        plusButton = (ImageView) v.findViewById(R.id.plusButton);
+        questionText = (TextView) v.findViewById(R.id.questionText);
+
+        minusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(initialNumberQuestion > 0){
+                    initialNumberQuestion--;
+                    editor = sharedPreferences.edit();
+                    editor.putInt("csplusminus", initialNumberQuestion);
+                    editor.commit();
+                    questionText.setText(initialNumberQuestion + " Questions total");
+
+                }
+
+
+            }
+        });
+
+        plusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initialNumberQuestion++;
+                editor = sharedPreferences.edit();
+                editor.putInt("csplusminus", initialNumberQuestion);
+                editor.commit();
+                questionText.setText(initialNumberQuestion + " Questions total");
+            }
+        });
+
+
 
         seekBar = (SeekBar) v.findViewById(R.id.seekbar);
         seekValue = (TextView) v.findViewById(R.id.seekvalue);
@@ -154,8 +195,6 @@ public class InterviewFragment extends Fragment {
                     editor.putInt("csradio", 1);
                 } else if(radioButton2.isChecked()){
                     editor.putInt("csradio",2);
-                } else if(radioButton3.isChecked()){
-                    editor.putInt("csradio",3);
                 }
 
 
@@ -257,7 +296,6 @@ public class InterviewFragment extends Fragment {
         radioGroup = (RadioGroup) v.findViewById(R.id.radioGroup);
         radioButton1 = (RadioButton) radioGroup.findViewById(R.id.radio1);
         radioButton2 = (RadioButton) radioGroup.findViewById(R.id.radio2);
-        radioButton3 = (RadioButton) radioGroup.findViewById(R.id.radio3);
 
         radioButton2.setOnClickListener(new View.OnClickListener() {
             @Override

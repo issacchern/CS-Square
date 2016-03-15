@@ -27,7 +27,6 @@ android {
 
 repositories {
     maven { url "https://jitpack.io" }
-    maven { url "http://dl.bintray.com/tbruyelle/tbruyelle" }
     jcenter()
 }
 
@@ -42,6 +41,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:8.4.0'
     compile 'us.feras.mdv:markdownview:1.1.0'
     compile 'com.github.iwgang:countdownview:1.2'
-    compile 'com.github.piasy:rxandroidaudio:1.0.2'
-    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.5.2@aar'
+    compile 'com.github.chenupt.android:springindicator:1.0.2@aar'
+    compile 'com.github.chenupt.android:multiplemodel:1.1.0@aar'
+    compile 'com.google.guava:guava:18.0'
 }

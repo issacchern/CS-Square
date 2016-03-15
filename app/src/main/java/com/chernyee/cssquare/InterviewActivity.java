@@ -1,68 +1,252 @@
 package com.chernyee.cssquare;
 
-import android.Manifest;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.media.CamcorderProfile;
-import android.media.MediaRecorder;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Environment;
 import android.speech.tts.TextToSpeech;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
+import android.widget.ListView;
+import android.widget.TextView;
 
 
 import com.chernyee.cssquare.Recording.RecordingSampler;
 import com.chernyee.cssquare.Recording.VisualizerView;
-import com.github.piasy.rxandroidaudio.AudioRecorder;
-import com.github.piasy.rxandroidaudio.RxAudioPlayer;
-import com.github.piasy.rxandroidaudio.StreamAudioPlayer;
-import com.github.piasy.rxandroidaudio.StreamAudioRecorder;
-import com.tbruyelle.rxpermissions.RxPermissions;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+import com.google.common.collect.Lists;
+
 import cn.iwgang.countdownview.CountdownView;
-import rx.Observable;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 
 public class InterviewActivity extends AppCompatActivity implements
         RecordingSampler.CalculateVolumeListener{
 
-    private Button startButton;
+    private Button interviewButton;
     private Button stopButton;
     private TextToSpeech tts;
-
-    private MediaRecorder mediaRecorder;
 
     private VisualizerView visualizerView;
 
     private RecordingSampler mRecordingSampler;
+
+    private CountdownView mCvCountdownView;
+
+    private CustomPagerAdapter customAdapter;
+
+    private ViewPager mPager;
+
+    private TextView textView;
+
+    private TextView littleTag;
+
+    private SharedPreferences sharedPreferences;
+
+    private int filter1 = 0;
+
+    private int filter2= 0;
+
+    private int filter3 = 0;
+
+    private boolean endInterview = false;
+
+
+    private ArrayList<String> interviewQuestionList = new ArrayList<>();
+
+
+    private String [] HRQuestions = {
+            "What do you know about our company?",
+            "Tell me about your strength and weakness.",
+            "Tell me why you choose your major.",
+            "Where do you see yourself in 5 years?",
+            "What companies are you interviewing with?",
+            "Tell me about a time you dispute with someone.",
+            "What is your expected salary?",
+            "What are you looking for in terms of career development?",
+            "Are you a team player?",
+            "What would be your ideal working environment?",
+            "Tell me about your project, internship, or any of your work experience."
+
+    };
+
+    private String [] TechnicalQuestions = {
+            "Would you explain it to me the difference between iteration and recursion?",
+            "How would you compare array and linked list?",
+            "Explain to me what Bubble Sort is.",
+            "Tell me the difference between stack and queue?",
+            "Would you be able to design a stack using queue?",
+            "Would you be able to design a queue using stack?",
+            "Tell me the difference between singly linked list and doubly linked list.",
+            "Explain what a binary search tree is.",
+            "What is the difference between NULL and VOID?",
+            "What is the primary advantage of using linked list?",
+            "What is dynamic data structure? Give me an example of dynamic data structure. ",
+            "Why would you choose Quick Sort over Merge Sort?",
+            "What is a dequeue? How do we implement it?",
+            "Given Bubble Sort, Selection Sort, and Insertion Sort, which one would you choose? Why?",
+            "What is a Fibonacci search?",
+            "Tell me the difference between breadth first search and depth first search?",
+            "What is dynamic programming? When do we use it?",
+            "How do you prevent deadlock in your program?",
+            "What is the concept of object oriented programming?"
+
+
+    };
+
+    private String [] CodingQuestions = {
+            "How do you find the second largest element in an array without allocating space?",
+            "How do you find the third element from the end of linked list in one pass?",
+            "How would you reverse a String?",
+            "How to find the only duplicate element in an array? What about doing it in space?",
+            "Write a program to compute Fibonnacci series, iteratively and recursively.",
+            "How do you check if a string is palindrome?",
+            "How to reverse linked list using iteration and recursion?",
+            "Can you implement a stack using array or linked list?",
+            "Find the smallest element in a binary search tree.",
+            "Can you implement a square root function?",
+            "How do you find the most frequent element in an Integer array?",
+            "How do you write an effective program to check if a number is prime or not?"
+
+
+    };
+
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_interview);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+
+        sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+
+
+
+
+        boolean cscheck1 = sharedPreferences.getBoolean("cscheck1", false);
+        boolean cscheck2 = sharedPreferences.getBoolean("cscheck2", false);
+        boolean cscheck3 = sharedPreferences.getBoolean("cscheck3", false);
+        final int seekTime = sharedPreferences.getInt("csseek", 10);
+        int numQuestions = sharedPreferences.getInt("csplusminus",10);
+
+
+        interviewQuestionList.add("Hi, my name is Issac and I will be conducting your interview today. First of all, tell me about yourself.");
+
+        Collections.shuffle(Arrays.asList(HRQuestions));
+        Collections.shuffle(Arrays.asList(TechnicalQuestions));
+        Collections.shuffle(Arrays.asList(CodingQuestions));
+
+        if(cscheck1 && cscheck2 && cscheck3){
+
+            filter1 = (numQuestions / 3 > HRQuestions.length) ? HRQuestions.length : numQuestions / 3 ;
+            filter2 = (numQuestions - filter1 - numQuestions / 3 > TechnicalQuestions.length)? TechnicalQuestions.length : numQuestions - filter1 - numQuestions / 3 ;
+            filter3 = (numQuestions - filter1 - filter2 > CodingQuestions.length) ? CodingQuestions.length : numQuestions - filter1 - filter2;
+
+            for(int i = 0 ; i < filter1 ; i++){
+                interviewQuestionList.add(HRQuestions[i]);
+            }
+
+            for(int i = 0 ; i < filter2 ; i++){
+                interviewQuestionList.add(TechnicalQuestions[i]);
+            }
+
+            for(int i = 0 ; i < filter3 ; i++){
+                interviewQuestionList.add(CodingQuestions[i]);
+            }
+
+        } else if((cscheck1 && cscheck2) || (cscheck2 && cscheck3) || cscheck1 && cscheck3){
+            if(cscheck1 && cscheck2){
+                filter1 = (numQuestions / 2 > HRQuestions.length) ? HRQuestions.length : numQuestions / 2 ;
+                filter2 = (numQuestions - filter1 > TechnicalQuestions.length)? TechnicalQuestions.length : numQuestions - filter1;
+                for(int i = 0 ; i < filter1 ; i++){
+                    interviewQuestionList.add(HRQuestions[i]);
+                }
+
+                for(int i = 0 ; i < filter2 ; i++){
+                    interviewQuestionList.add(TechnicalQuestions[i]);
+                }
+
+
+            } else if (cscheck2 && cscheck3){
+                filter2 = (numQuestions / 2 > TechnicalQuestions.length) ? TechnicalQuestions.length : numQuestions / 2 ;
+                filter3 = (numQuestions - filter2 > CodingQuestions.length)? CodingQuestions.length : numQuestions - filter2;
+                for(int i = 0 ; i < filter2 ; i++){
+                    interviewQuestionList.add(TechnicalQuestions[i]);
+                }
+
+                for(int i = 0 ; i < filter3 ; i++){
+                    interviewQuestionList.add(CodingQuestions[i]);
+                }
+
+            } else if (cscheck1 && cscheck3){
+                filter1 = (numQuestions / 2 > HRQuestions.length) ? HRQuestions.length : numQuestions / 2 ;
+                filter3 = (numQuestions - filter1 > CodingQuestions.length)? CodingQuestions.length : numQuestions - filter1;
+                for(int i = 0 ; i < filter1 ; i++){
+                    interviewQuestionList.add(HRQuestions[i]);
+                }
+
+                for(int i = 0 ; i < filter3 ; i++){
+                    interviewQuestionList.add(CodingQuestions[i]);
+                }
+
+
+            }
+
+
+        } else if(cscheck1){
+            filter1 = (numQuestions > HRQuestions.length) ? HRQuestions.length : numQuestions;
+            for(int i = 0 ; i < filter1 ; i++){
+                interviewQuestionList.add(HRQuestions[i]);
+            }
+
+        } else if(cscheck2){
+            filter2 = (numQuestions > TechnicalQuestions.length) ? TechnicalQuestions.length : numQuestions;
+            for(int i = 0 ; i < filter2 ; i++){
+                interviewQuestionList.add(TechnicalQuestions[i]);
+            }
+
+        } else if(cscheck3){
+            filter3 = (numQuestions > CodingQuestions.length) ? CodingQuestions.length : numQuestions;
+            for(int i = 0 ; i < filter3 ; i++){
+                interviewQuestionList.add(CodingQuestions[i]);
+            }
+
+        }
+
+        interviewQuestionList.add("Do you have any question for me?");
+        interviewQuestionList.add("Thank you for completing the mock interview. Please click the end interview button to proceed.");
+
+
+
+
+
+        mPager = (ViewPager) findViewById(R.id.viewpager);
+        customAdapter = new CustomPagerAdapter(this);
+
+        mPager.setAdapter(customAdapter);
+
 
 
         tts = new TextToSpeech (this, new TextToSpeech.OnInitListener () {
@@ -82,46 +266,62 @@ public class InterviewActivity extends AppCompatActivity implements
         mRecordingSampler.setSamplingInterval(100);
         mRecordingSampler.link(visualizerView);
 
-        mediaRecorder = new MediaRecorder();
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mediaRecorder.setOutputFile(Environment.getExternalStorageDirectory()
-                .getAbsolutePath() + "/myrecording.mp3");
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-
-
-        try {
-            mediaRecorder.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
 
 
+        interviewButton = (Button) findViewById(R.id.interviewButton);
 
-
-
-
-
-
-        startButton = (Button) findViewById(R.id.startButton);
-        stopButton = (Button) findViewById(R.id.stopButton);
-
-        startButton.setOnClickListener(new View.OnClickListener() {
+        interviewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (mRecordingSampler.isRecording()) {
-                    startButton.setText("START");
+
+
+                if (mRecordingSampler.isRecording() && endInterview) {
+
                     mRecordingSampler.release();
+                    interviewButton.setText("Interview Ended");
+                    interviewButton.setEnabled(false);
+                    mCvCountdownView.stop();
+                    mCvCountdownView.allShowZero();
+
+                    // TODO : Intent to next phase of interview where you can replay audio and probably review answer at the end
+
+                } else{
+                    AlertDialog.Builder builder1 = new AlertDialog.Builder(InterviewActivity.this);
+                    builder1.setTitle("End Interview");
+                    builder1.setMessage("Do you wish to end the interview? ");
+                    builder1.setCancelable(false);
+
+
+                    builder1.setPositiveButton(
+                            "No",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+
+                    builder1.setNegativeButton(
+                            "Yes",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+
+
+                                    mRecordingSampler.release();
+                                    interviewButton.setText("Interview Ended");
+                                    interviewButton.setEnabled(false);
+                                    mCvCountdownView.stop();
+                                    mCvCountdownView.allShowZero();
 
 
 
+                                    dialog.cancel();
+                                }
+                            });
 
-                } else {
-                    startButton.setText("STOP");
-                    mRecordingSampler.startRecording();
-
+                    AlertDialog alert11 = builder1.create();
+                    alert11.show();
 
                 }
 
@@ -132,42 +332,14 @@ public class InterviewActivity extends AppCompatActivity implements
             }
         });
 
-        stopButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-//
-//                int random = (int) new Random().nextInt(220);
-//                if(random == 0) random = 1;
-//
-//                String s = MainActivity.populateList.get(0).get(random).get(2);
-//
-//                tts.speak (s, TextToSpeech.QUEUE_FLUSH, null);
+        mCvCountdownView = (CountdownView)findViewById(R.id.cv_countdownViewTest1);
 
+  //      mCvCountdownView.updateShow(seekTime * 60 * 1000);
 
-
-
-            }
-        });
-
-
-
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //         boolean ss = ((Visualizer) findViewById(R.id.visualizer)).checkThread();
-                //         Toast.makeText(getApplicationContext(), "" + ss, Toast.LENGTH_SHORT).show();
-
-
-            }
-        });
-
-
-        CountdownView mCvCountdownView = (CountdownView)findViewById(R.id.cv_countdownViewTest1);
-        mCvCountdownView.start(10 * 60 * 1000);
+        interviewButton.setText("End Interview");
+        mRecordingSampler.startRecording();
+        mCvCountdownView.start(seekTime * 60 * 1000);
 
     }
 
@@ -181,4 +353,94 @@ public class InterviewActivity extends AppCompatActivity implements
     public void onCalculateVolume(int volume) {
 
     }
+
+    public class CustomPagerAdapter extends PagerAdapter {
+
+        private Context mContext;
+
+        public CustomPagerAdapter(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            View view = getLayoutInflater().inflate(R.layout.pager_interview,
+                    container, false);
+            container.addView(view);
+
+
+
+            textView = (TextView) view.findViewById(R.id.text);
+            littleTag = (TextView) view.findViewById(R.id.littleTag);
+
+            textView.setText(interviewQuestionList.get(position));
+
+            if(position <= filter1){
+
+                view.setBackgroundResource(R.color.colorAccent);
+                if(position == 0){
+                    littleTag.setText("Introduction");
+                } else{
+                    littleTag.setText("Basic HR question");
+                }
+
+            } else if(position <= filter1 + filter2){
+                view.setBackgroundResource(R.color.nice_green);
+                littleTag.setText("Knowledge-based question");
+            } else{
+                view.setBackgroundResource(R.color.indicator_3);
+                littleTag.setText("Coding-based question");
+
+                if(position == interviewQuestionList.size() -2){
+                    view.setBackgroundResource(R.color.indicator_4);
+                    littleTag.setText("Wrapping up");
+                }
+
+                if(position == interviewQuestionList.size() -1){
+                    view.setBackgroundResource(R.color.pink_pressed);
+                    littleTag.setText("End of interview");
+                    endInterview = true;
+                }
+            }
+
+
+
+
+            return view;
+
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView((View) object);
+        }
+
+
+        public int getCount() {
+            return interviewQuestionList.size();
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+
+
+        @Override
+        public int getItemPosition(Object object) {
+            return super.getItemPosition(object);
+        }
+
+        @Override
+        public void notifyDataSetChanged() {
+            super.notifyDataSetChanged();
+
+
+
+        }
+
+    }
+
+
 }
