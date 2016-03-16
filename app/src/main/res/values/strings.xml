@@ -115,4 +115,6 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_interview">InterviewActivity</string>
+    <string name="title_activity_interview_after">View Result</string>
+
 </resources>

@@ -7,6 +7,8 @@
     android:fitsSystemWindows="true"
     tools:context="com.chernyee.cssquare.InterviewActivity">
 
+
+
     <!--
 
     <android.support.design.widget.AppBarLayout
@@ -26,6 +28,16 @@
     -->
 
     <include layout="@layout/content_interview" />
+
+    <TextView
+        android:background="@color/no_black"
+        android:textSize="150sp"
+        android:id="@+id/countDownText"
+        android:text="3"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 
     <!--
 

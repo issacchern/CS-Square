@@ -39,7 +39,7 @@
                 android:title="Settings" />
             <item
                 android:id="@+id/navi_about"
-                android:icon="@drawable/owl"
+                android:icon="@drawable/clipboard_account"
                 android:title="About" />
         </menu>
     </item>

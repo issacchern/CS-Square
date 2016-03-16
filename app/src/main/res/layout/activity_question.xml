@@ -71,7 +71,7 @@
             android:layout_height="wrap_content" />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
-            android:src="@drawable/owl"
+            android:src="@drawable/emoticon_cool"
             fab:fab_colorNormal="@color/colorAccent"
             fab:fab_colorPressed="@color/white_pressed"
             fab:fab_title="Need hints?"

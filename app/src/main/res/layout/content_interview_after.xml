@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.chernyee.cssquare.InterviewAfterActivity"
+    tools:showIn="@layout/activity_interview_after">
+
+    <LinearLayout
+        android:background="@color/white_pressed"
+        android:padding="10dp"
+        android:layout_weight="0"
+        android:gravity="center"
+        android:layout_marginBottom="4dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_marginRight="5dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time spent: "/>
+
+        <cn.iwgang.countdownview.CountdownView
+            android:layout_gravity="center"
+            android:id="@+id/cv_countdownViewTest1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:timeBgColor="@color/colorAccent"
+            app:isHideTimeBackground="true"
+            app:isShowDay="false"
+            app:isShowHour="false"
+            app:isShowMinute="true"
+            app:isShowSecond="true"
+            app:isShowMillisecond="false"
+            app:timeTextColor="#000000"
+            app:timeTextSize="22sp"
+            app:isTimeTextBold="true"
+            app:suffixGravity="bottom"
+            app:suffixTextColor="#000000"
+            app:suffixTextSize="14sp"
+            app:suffixMinute="m"
+            app:suffixSecond="s" />
+
+
+
+    </LinearLayout>
+
+    <com.baoyz.swipemenulistview.SwipeMenuListView
+        android:layout_weight="1"
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:background="@color/half_black"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:clickable="true"
+            android:id="@+id/fabReplay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/replay" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:clickable="true"
+            android:id="@+id/fabPlayPause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/play_pause" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:clickable="true"
+            android:id="@+id/fabSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/content_save" />
+
+
+
+
+
+    </LinearLayout>
+
+
+
+
+
+
+</LinearLayout>

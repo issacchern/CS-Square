@@ -67,7 +67,7 @@
                 android:layout_centerHorizontal="true"
                 android:checkMark="?android:attr/listChoiceIndicatorMultiple"
                 android:checked="true"
-                android:text="Technical knowledge based questions" />
+                android:text="Knowledged-based questions" />
 
             <CheckedTextView
                 android:textColor="@android:color/black"
@@ -79,7 +79,7 @@
                 android:layout_centerHorizontal="true"
                 android:checkMark="?android:attr/listChoiceIndicatorMultiple"
                 android:checked="true"
-                android:text="Marked coding questions" />
+                android:text="Coding-based questions" />
 
             <CheckedTextView
                 android:textColor="@android:color/black"

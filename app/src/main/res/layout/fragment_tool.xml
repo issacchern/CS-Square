@@ -130,7 +130,7 @@
                 <ImageView
                     android:background="@color/background"
                     android:layout_gravity="top"
-                    android:src="@drawable/fish"
+                    android:src="@drawable/cat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
@@ -145,7 +145,7 @@
                 <ImageView
                     android:background="@color/background"
                     android:layout_gravity="center"
-                    android:src="@drawable/duck"
+                    android:src="@drawable/cat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 

@@ -3,17 +3,22 @@ package com.chernyee.cssquare;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,14 +30,16 @@ import com.chernyee.cssquare.Recording.RecordingSampler;
 import com.chernyee.cssquare.Recording.VisualizerView;
 
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
-
-import com.google.common.collect.Lists;
 
 import cn.iwgang.countdownview.CountdownView;
 
@@ -52,7 +59,7 @@ public class InterviewActivity extends AppCompatActivity implements
 
     private CustomPagerAdapter customAdapter;
 
-    private ViewPager mPager;
+    private IssacViewPager mPager;
 
     private TextView textView;
 
@@ -66,7 +73,13 @@ public class InterviewActivity extends AppCompatActivity implements
 
     private int filter3 = 0;
 
+    private int seekTime = 0;
+
     private boolean endInterview = false;
+
+    private HashMap<String, String> map = new HashMap<>();
+
+    private int globalCount = 0;
 
 
     private ArrayList<String> interviewQuestionList = new ArrayList<>();
@@ -131,6 +144,7 @@ public class InterviewActivity extends AppCompatActivity implements
 
 
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,20 +153,78 @@ public class InterviewActivity extends AppCompatActivity implements
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
 
+        final TextView countDownText = (TextView) findViewById(R.id.countDownText);
+
+        new CountDownTimer(3900, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                countDownText.setText(millisUntilFinished / 1000 + "");
+            }
+
+            public void onFinish() {
+                countDownText.setVisibility(View.GONE);
+                mPager.setAdapter(customAdapter);
+
+                mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                    @Override
+                    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+
+                    }
+
+                    @Override
+                    public void onPageSelected(int position) {
+                        if (globalCount < position) {
+                            String s[] = interviewQuestionList.get(position).split("[.,?]");
+                            for (int i = 0; i < s.length; i++) {
+                                tts.speak(s[i], TextToSpeech.QUEUE_ADD, map);
+                                tts.playSilence(500, TextToSpeech.QUEUE_ADD, map);
+                            }
+
+                            globalCount++;
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onPageScrollStateChanged(int state) {
+
+                    }
+                });
+                interviewButton.setText("End Interview");
+                interviewButton.setEnabled(true);
+                mRecordingSampler.startRecording();
+                mCvCountdownView.start(seekTime * 60 * 1000);
+
+
+                String s[] = interviewQuestionList.get(0).split("[.,?]");
+                for(int i = 0; i < s.length; i++){
+                    tts.speak(s[i], TextToSpeech.QUEUE_ADD, map);
+                    tts.playSilence(500,TextToSpeech.QUEUE_ADD, map);
+                }
+
+
+            }
+        }.start();
+
+
+
+        map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "UniqueID");
+
+
+
         sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-
-
-
 
 
         boolean cscheck1 = sharedPreferences.getBoolean("cscheck1", false);
         boolean cscheck2 = sharedPreferences.getBoolean("cscheck2", false);
         boolean cscheck3 = sharedPreferences.getBoolean("cscheck3", false);
-        final int seekTime = sharedPreferences.getInt("csseek", 10);
-        int numQuestions = sharedPreferences.getInt("csplusminus",10);
+        seekTime = sharedPreferences.getInt("csseek", 10);
+        int numQuestions = sharedPreferences.getInt("csplusminus", 10);
 
 
-        interviewQuestionList.add("Hi, my name is Issac and I will be conducting your interview today. First of all, tell me about yourself.");
+        interviewQuestionList.add("Hi, my name is Kimberley and I will be conducting your interview today. First of all, tell me about yourself.");
 
         Collections.shuffle(Arrays.asList(HRQuestions));
         Collections.shuffle(Arrays.asList(TechnicalQuestions));
@@ -242,10 +314,9 @@ public class InterviewActivity extends AppCompatActivity implements
 
 
 
-        mPager = (ViewPager) findViewById(R.id.viewpager);
+        mPager = (IssacViewPager) findViewById(R.id.viewpager);
         customAdapter = new CustomPagerAdapter(this);
 
-        mPager.setAdapter(customAdapter);
 
 
 
@@ -255,9 +326,26 @@ public class InterviewActivity extends AppCompatActivity implements
             @Override
             public void onInit(int status) {
                 tts.setLanguage(Locale.US);
-          //      tts.speak ("Tell me about yourself", TextToSpeech.QUEUE_FLUSH, null);
             }
         });
+
+        tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+            @Override
+            public void onStart(String utteranceId) {
+                mPager.setPagingEnabled(false);
+            }
+
+            @Override
+            public void onDone(String utteranceId) {
+                mPager.setPagingEnabled(true);
+            }
+
+            @Override
+            public void onError(String utteranceId) {
+
+            }
+        });
+
 
         visualizerView = (VisualizerView) findViewById(R.id.visualizer3);
 
@@ -266,31 +354,50 @@ public class InterviewActivity extends AppCompatActivity implements
         mRecordingSampler.setSamplingInterval(100);
         mRecordingSampler.link(visualizerView);
 
+        mCvCountdownView = (CountdownView)findViewById(R.id.cv_countdownViewTest1);
 
+        mCvCountdownView.setOnCountdownEndListener(new CountdownView.OnCountdownEndListener() {
+            @Override
+            public void onEnd(CountdownView cv) {
 
+                if(mRecordingSampler.isRecording()){
+                    mRecordingSampler.release();
+                    interviewButton.setText("View result");
+                    mCvCountdownView.stop();
+                }
+
+            }
+        });
 
         interviewButton = (Button) findViewById(R.id.interviewButton);
-
+        interviewButton.setEnabled(false);
         interviewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                if (interviewButton.getText().equals("View result")) {
+                    int remaingTime = (int) mCvCountdownView.getRemainTime();
 
 
-                if (mRecordingSampler.isRecording() && endInterview) {
+                    Intent intent = new Intent(InterviewActivity.this, InterviewAfterActivity.class);
+                    intent.putExtra("RemainingTime", remaingTime);
+                    intent.putExtra("BeginningTime", seekTime * 60 * 1000);
+                    intent.putExtra("QuestionList", interviewQuestionList);
+
+
+                    startActivity(intent);
+
+                } else if (mRecordingSampler.isRecording() && endInterview) {
 
                     mRecordingSampler.release();
-                    interviewButton.setText("Interview Ended");
-                    interviewButton.setEnabled(false);
+                    interviewButton.setText("View result");
                     mCvCountdownView.stop();
-                    mCvCountdownView.allShowZero();
 
-                    // TODO : Intent to next phase of interview where you can replay audio and probably review answer at the end
 
-                } else{
+                } else {
                     AlertDialog.Builder builder1 = new AlertDialog.Builder(InterviewActivity.this);
                     builder1.setTitle("End Interview");
-                    builder1.setMessage("Do you wish to end the interview? ");
+                    builder1.setMessage("You are at the middle of interview. Do you wish to end it now?");
                     builder1.setCancelable(false);
 
 
@@ -309,11 +416,8 @@ public class InterviewActivity extends AppCompatActivity implements
 
 
                                     mRecordingSampler.release();
-                                    interviewButton.setText("Interview Ended");
-                                    interviewButton.setEnabled(false);
+                                    interviewButton.setText("View result");
                                     mCvCountdownView.stop();
-                                    mCvCountdownView.allShowZero();
-
 
 
                                     dialog.cancel();
@@ -326,28 +430,73 @@ public class InterviewActivity extends AppCompatActivity implements
                 }
 
 
-
-
-
             }
         });
 
 
-        mCvCountdownView = (CountdownView)findViewById(R.id.cv_countdownViewTest1);
 
-  //      mCvCountdownView.updateShow(seekTime * 60 * 1000);
-
-        interviewButton.setText("End Interview");
-        mRecordingSampler.startRecording();
-        mCvCountdownView.start(seekTime * 60 * 1000);
 
     }
 
     @Override
     protected void onDestroy() {
+
+        if (mRecordingSampler.isRecording()) {
+            mRecordingSampler.release();
+        }
+
+        tts.stop();
+        tts.shutdown();
+
         super.onDestroy();
 
     }
+
+    @Override
+    public void onBackPressed() {
+
+        if(mRecordingSampler.isRecording()){
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(InterviewActivity.this);
+            builder1.setTitle("End Interview");
+            builder1.setMessage("You are at the middle of interview. Do you wish to end it now?");
+            builder1.setCancelable(false);
+
+
+            builder1.setPositiveButton(
+                    "No",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            builder1.setNegativeButton(
+                    "Yes",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+
+                            mRecordingSampler.release();
+                            interviewButton.setText("Interview Ended");
+                            interviewButton.setEnabled(false);
+                            mCvCountdownView.stop();
+                            finish();
+
+
+
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alert11 = builder1.create();
+            alert11.show();
+        } else{
+            super.onBackPressed();
+        }
+
+
+    }
+
 
     @Override
     public void onCalculateVolume(int volume) {
