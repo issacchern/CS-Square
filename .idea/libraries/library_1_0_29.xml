@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="library-1.0.29">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.github.codechimp-org.apprater/library/1.0.29/res" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.github.codechimp-org.apprater/library/1.0.29/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.codechimp-org.apprater/library/1.0.29/57e0e0964274762e42716f2bfb2922fc4b9aa5ba/library-1.0.29-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

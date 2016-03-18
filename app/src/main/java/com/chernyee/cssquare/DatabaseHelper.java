@@ -20,7 +20,7 @@ import java.io.OutputStream;
 public class DatabaseHelper extends SQLiteAssetHelper {
 
     private static final String DATABASE_NAME = "Questions.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 7;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -28,13 +28,30 @@ public class DatabaseHelper extends SQLiteAssetHelper {
 
 
 
-    public Cursor getEmployees() {
+    public Cursor getCodingQuestions() {
 
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
         String [] sqlSelect = {"Id", "Title", "Description", "Code", "Answer", "Hint", "Tags", "Category", "Difficulty", "Additional"};
         String sqlTables = "CodingQuestions";
+
+        qb.setTables(sqlTables);
+        Cursor c = qb.query(db, sqlSelect, null, null,
+                null, null, null);
+
+        c.moveToFirst();
+        return c;
+
+    }
+
+    public Cursor getInterviewQuestions() {
+
+        SQLiteDatabase db = getReadableDatabase();
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+
+        String [] sqlSelect = {"Id", "Question", "Answer", "Category", "Tag"};
+        String sqlTables = "QuestionsAndAnswers";
 
         qb.setTables(sqlTables);
         Cursor c = qb.query(db, sqlSelect, null, null,

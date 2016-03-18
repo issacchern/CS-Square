@@ -26,13 +26,20 @@
             android:title="Mock Interview" />
 
         <item
-            android:id="@+id/navi_tool"
-            android:icon="@drawable/wrench"
-            android:title="Useful Tools" />
+            android:clickable="false"
+            android:id="@+id/navi_questions"
+            android:icon="@drawable/tooltip_edit"
+            android:title="Short Q&amp;As" />
+
+
     </group>
 
-    <item android:title="Others">
-        <menu>
+    <group android:checkableBehavior="single"
+        android:id="@+id/second">
+            <item
+                android:id="@+id/navi_tool"
+                android:icon="@drawable/wrench"
+                android:title="Useful Tools" />
             <item
                 android:id="@+id/navi_setting"
                 android:icon="@drawable/settings"
@@ -41,7 +48,7 @@
                 android:id="@+id/navi_about"
                 android:icon="@drawable/clipboard_account"
                 android:title="About" />
-        </menu>
-    </item>
+
+    </group>
 
 </menu>

@@ -81,66 +81,14 @@ public class InterviewActivity extends AppCompatActivity implements
 
     private int globalCount = 0;
 
+    private boolean onCountDown = true;
+
 
     private ArrayList<String> interviewQuestionList = new ArrayList<>();
+    private ArrayList<String> interviewAnswerList = new ArrayList<>();
+    private ArrayList<String> interviewCategoryList = new ArrayList<>();
 
-
-    private String [] HRQuestions = {
-            "What do you know about our company?",
-            "Tell me about your strength and weakness.",
-            "Tell me why you choose your major.",
-            "Where do you see yourself in 5 years?",
-            "What companies are you interviewing with?",
-            "Tell me about a time you dispute with someone.",
-            "What is your expected salary?",
-            "What are you looking for in terms of career development?",
-            "Are you a team player?",
-            "What would be your ideal working environment?",
-            "Tell me about your project, internship, or any of your work experience."
-
-    };
-
-    private String [] TechnicalQuestions = {
-            "Would you explain it to me the difference between iteration and recursion?",
-            "How would you compare array and linked list?",
-            "Explain to me what Bubble Sort is.",
-            "Tell me the difference between stack and queue?",
-            "Would you be able to design a stack using queue?",
-            "Would you be able to design a queue using stack?",
-            "Tell me the difference between singly linked list and doubly linked list.",
-            "Explain what a binary search tree is.",
-            "What is the difference between NULL and VOID?",
-            "What is the primary advantage of using linked list?",
-            "What is dynamic data structure? Give me an example of dynamic data structure. ",
-            "Why would you choose Quick Sort over Merge Sort?",
-            "What is a dequeue? How do we implement it?",
-            "Given Bubble Sort, Selection Sort, and Insertion Sort, which one would you choose? Why?",
-            "What is a Fibonacci search?",
-            "Tell me the difference between breadth first search and depth first search?",
-            "What is dynamic programming? When do we use it?",
-            "How do you prevent deadlock in your program?",
-            "What is the concept of object oriented programming?"
-
-
-    };
-
-    private String [] CodingQuestions = {
-            "How do you find the second largest element in an array without allocating space?",
-            "How do you find the third element from the end of linked list in one pass?",
-            "How would you reverse a String?",
-            "How to find the only duplicate element in an array? What about doing it in space?",
-            "Write a program to compute Fibonnacci series, iteratively and recursively.",
-            "How do you check if a string is palindrome?",
-            "How to reverse linked list using iteration and recursion?",
-            "Can you implement a stack using array or linked list?",
-            "Find the smallest element in a binary search tree.",
-            "Can you implement a square root function?",
-            "How do you find the most frequent element in an Integer array?",
-            "How do you write an effective program to check if a number is prime or not?"
-
-
-    };
-
+    private List<List<String>> interviewKnowledgeAll = new ArrayList<List<String>>();
 
 
 
@@ -150,8 +98,6 @@ public class InterviewActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_interview);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
 
         final TextView countDownText = (TextView) findViewById(R.id.countDownText);
 
@@ -178,7 +124,7 @@ public class InterviewActivity extends AppCompatActivity implements
                             String s[] = interviewQuestionList.get(position).split("[.,?]");
                             for (int i = 0; i < s.length; i++) {
                                 tts.speak(s[i], TextToSpeech.QUEUE_ADD, map);
-                                tts.playSilence(500, TextToSpeech.QUEUE_ADD, map);
+                                tts.playSilence(400, TextToSpeech.QUEUE_ADD, map);
                             }
 
                             globalCount++;
@@ -201,8 +147,10 @@ public class InterviewActivity extends AppCompatActivity implements
                 String s[] = interviewQuestionList.get(0).split("[.,?]");
                 for(int i = 0; i < s.length; i++){
                     tts.speak(s[i], TextToSpeech.QUEUE_ADD, map);
-                    tts.playSilence(500,TextToSpeech.QUEUE_ADD, map);
+                    tts.playSilence(400,TextToSpeech.QUEUE_ADD, map);
                 }
+
+                onCountDown = false;
 
 
             }
@@ -219,68 +167,100 @@ public class InterviewActivity extends AppCompatActivity implements
 
         boolean cscheck1 = sharedPreferences.getBoolean("cscheck1", false);
         boolean cscheck2 = sharedPreferences.getBoolean("cscheck2", false);
+        boolean cscheck2Java = sharedPreferences.getBoolean("cscheck2Java", false);
+        boolean cscheck2Android = sharedPreferences.getBoolean("cscheck2Android", false);
         boolean cscheck3 = sharedPreferences.getBoolean("cscheck3", false);
         seekTime = sharedPreferences.getInt("csseek", 10);
         int numQuestions = sharedPreferences.getInt("csplusminus", 10);
 
+        interviewKnowledgeAll.addAll(MainActivity.interviewKnowledge);
+
+        if(cscheck2Java) interviewKnowledgeAll.addAll(MainActivity.interviewKnowledgeJava);
+        if(cscheck2Android) interviewKnowledgeAll.addAll(MainActivity.interviewKnowledgeAndroid);
+
+        Collections.shuffle(MainActivity.interviewHR);
+        Collections.shuffle(MainActivity.interviewCoding);
+        Collections.shuffle(interviewKnowledgeAll);
+
+        interviewAnswerList.clear();
+        interviewQuestionList.clear();
+        interviewCategoryList.clear();
+
 
         interviewQuestionList.add("Hi, my name is Kimberley and I will be conducting your interview today. First of all, tell me about yourself.");
 
-        Collections.shuffle(Arrays.asList(HRQuestions));
-        Collections.shuffle(Arrays.asList(TechnicalQuestions));
-        Collections.shuffle(Arrays.asList(CodingQuestions));
 
         if(cscheck1 && cscheck2 && cscheck3){
 
-            filter1 = (numQuestions / 3 > HRQuestions.length) ? HRQuestions.length : numQuestions / 3 ;
-            filter2 = (numQuestions - filter1 - numQuestions / 3 > TechnicalQuestions.length)? TechnicalQuestions.length : numQuestions - filter1 - numQuestions / 3 ;
-            filter3 = (numQuestions - filter1 - filter2 > CodingQuestions.length) ? CodingQuestions.length : numQuestions - filter1 - filter2;
+            filter1 = (numQuestions / 3 > MainActivity.interviewHR.size()) ? MainActivity.interviewHR.size() : numQuestions / 3 ;
+            filter2 = (numQuestions - filter1 - numQuestions / 3 > interviewKnowledgeAll.size())? interviewKnowledgeAll.size() : numQuestions - filter1 - numQuestions / 3 ;
+            filter3 = (numQuestions - filter1 - filter2 > MainActivity.interviewCoding.size()) ? MainActivity.interviewCoding.size() : numQuestions - filter1 - filter2;
 
             for(int i = 0 ; i < filter1 ; i++){
-                interviewQuestionList.add(HRQuestions[i]);
+                interviewQuestionList.add(MainActivity.interviewHR.get(i).get(1));
+                interviewAnswerList.add(MainActivity.interviewHR.get(i).get(2));
+                interviewCategoryList.add(MainActivity.interviewHR.get(i).get(3));
             }
 
             for(int i = 0 ; i < filter2 ; i++){
-                interviewQuestionList.add(TechnicalQuestions[i]);
+
+
+                interviewQuestionList.add(interviewKnowledgeAll.get(i).get(1));
+                interviewAnswerList.add(interviewKnowledgeAll.get(i).get(2));
+                interviewCategoryList.add(interviewKnowledgeAll.get(i).get(3));
             }
 
             for(int i = 0 ; i < filter3 ; i++){
-                interviewQuestionList.add(CodingQuestions[i]);
+                interviewQuestionList.add(MainActivity.interviewCoding.get(i).get(1));
+                interviewAnswerList.add(MainActivity.interviewCoding.get(i).get(2));
+                interviewCategoryList.add(MainActivity.interviewCoding.get(i).get(3));
             }
 
         } else if((cscheck1 && cscheck2) || (cscheck2 && cscheck3) || cscheck1 && cscheck3){
             if(cscheck1 && cscheck2){
-                filter1 = (numQuestions / 2 > HRQuestions.length) ? HRQuestions.length : numQuestions / 2 ;
-                filter2 = (numQuestions - filter1 > TechnicalQuestions.length)? TechnicalQuestions.length : numQuestions - filter1;
+                filter1 = (numQuestions / 2 >  MainActivity.interviewHR.size()) ?  MainActivity.interviewHR.size() : numQuestions / 2 ;
+                filter2 = (numQuestions - filter1 > interviewKnowledgeAll.size())? interviewKnowledgeAll.size() : numQuestions - filter1;
                 for(int i = 0 ; i < filter1 ; i++){
-                    interviewQuestionList.add(HRQuestions[i]);
+                    interviewQuestionList.add(MainActivity.interviewHR.get(i).get(1));
+                    interviewAnswerList.add(MainActivity.interviewHR.get(i).get(2));
+                    interviewCategoryList.add(MainActivity.interviewHR.get(i).get(3));
                 }
 
                 for(int i = 0 ; i < filter2 ; i++){
-                    interviewQuestionList.add(TechnicalQuestions[i]);
+                    interviewQuestionList.add(interviewKnowledgeAll.get(i).get(1));
+                    interviewAnswerList.add(interviewKnowledgeAll.get(i).get(2));
+                    interviewCategoryList.add(interviewKnowledgeAll.get(i).get(3));
                 }
 
 
             } else if (cscheck2 && cscheck3){
-                filter2 = (numQuestions / 2 > TechnicalQuestions.length) ? TechnicalQuestions.length : numQuestions / 2 ;
-                filter3 = (numQuestions - filter2 > CodingQuestions.length)? CodingQuestions.length : numQuestions - filter2;
+                filter2 = (numQuestions / 2 > interviewKnowledgeAll.size()) ? interviewKnowledgeAll.size() : numQuestions / 2 ;
+                filter3 = (numQuestions - filter2 > MainActivity.interviewCoding.size())? MainActivity.interviewCoding.size() : numQuestions - filter2;
                 for(int i = 0 ; i < filter2 ; i++){
-                    interviewQuestionList.add(TechnicalQuestions[i]);
+                    interviewQuestionList.add(interviewKnowledgeAll.get(i).get(1));
+                    interviewAnswerList.add(interviewKnowledgeAll.get(i).get(2));
+                    interviewCategoryList.add(interviewKnowledgeAll.get(i).get(3));
                 }
 
                 for(int i = 0 ; i < filter3 ; i++){
-                    interviewQuestionList.add(CodingQuestions[i]);
+                    interviewQuestionList.add(MainActivity.interviewCoding.get(i).get(1));
+                    interviewAnswerList.add(MainActivity.interviewCoding.get(i).get(2));
+                    interviewCategoryList.add(MainActivity.interviewCoding.get(i).get(3));
                 }
 
             } else if (cscheck1 && cscheck3){
-                filter1 = (numQuestions / 2 > HRQuestions.length) ? HRQuestions.length : numQuestions / 2 ;
-                filter3 = (numQuestions - filter1 > CodingQuestions.length)? CodingQuestions.length : numQuestions - filter1;
+                filter1 = (numQuestions / 2 > MainActivity.interviewHR.size()) ?MainActivity.interviewHR.size() : numQuestions / 2 ;
+                filter3 = (numQuestions - filter1 > MainActivity.interviewCoding.size())? MainActivity.interviewCoding.size() : numQuestions - filter1;
                 for(int i = 0 ; i < filter1 ; i++){
-                    interviewQuestionList.add(HRQuestions[i]);
+                    interviewQuestionList.add(MainActivity.interviewHR.get(i).get(1));
+                    interviewAnswerList.add(MainActivity.interviewHR.get(i).get(2));
+                    interviewCategoryList.add(MainActivity.interviewHR.get(i).get(3));
                 }
 
                 for(int i = 0 ; i < filter3 ; i++){
-                    interviewQuestionList.add(CodingQuestions[i]);
+                    interviewQuestionList.add(MainActivity.interviewCoding.get(i).get(1));
+                    interviewAnswerList.add(MainActivity.interviewCoding.get(i).get(2));
+                    interviewCategoryList.add(MainActivity.interviewCoding.get(i).get(3));
                 }
 
 
@@ -288,21 +268,27 @@ public class InterviewActivity extends AppCompatActivity implements
 
 
         } else if(cscheck1){
-            filter1 = (numQuestions > HRQuestions.length) ? HRQuestions.length : numQuestions;
+            filter1 = (numQuestions > MainActivity.interviewHR.size()) ? MainActivity.interviewHR.size() : numQuestions;
             for(int i = 0 ; i < filter1 ; i++){
-                interviewQuestionList.add(HRQuestions[i]);
+                interviewQuestionList.add(MainActivity.interviewHR.get(i).get(1));
+                interviewAnswerList.add(MainActivity.interviewHR.get(i).get(2));
+                interviewCategoryList.add(MainActivity.interviewHR.get(i).get(3));
             }
 
         } else if(cscheck2){
-            filter2 = (numQuestions > TechnicalQuestions.length) ? TechnicalQuestions.length : numQuestions;
+            filter2 = (numQuestions > interviewKnowledgeAll.size()) ? interviewKnowledgeAll.size() : numQuestions;
             for(int i = 0 ; i < filter2 ; i++){
-                interviewQuestionList.add(TechnicalQuestions[i]);
+                interviewQuestionList.add(interviewKnowledgeAll.get(i).get(1));
+                interviewAnswerList.add(interviewKnowledgeAll.get(i).get(2));
+                interviewCategoryList.add(interviewKnowledgeAll.get(i).get(3));
             }
 
         } else if(cscheck3){
-            filter3 = (numQuestions > CodingQuestions.length) ? CodingQuestions.length : numQuestions;
+            filter3 = (numQuestions > MainActivity.interviewCoding.size()) ? MainActivity.interviewCoding.size() : numQuestions;
             for(int i = 0 ; i < filter3 ; i++){
-                interviewQuestionList.add(CodingQuestions[i]);
+                interviewQuestionList.add(MainActivity.interviewCoding.get(i).get(1));
+                interviewAnswerList.add(MainActivity.interviewCoding.get(i).get(2));
+                interviewCategoryList.add(MainActivity.interviewCoding.get(i).get(3));
             }
 
         }
@@ -383,7 +369,8 @@ public class InterviewActivity extends AppCompatActivity implements
                     intent.putExtra("RemainingTime", remaingTime);
                     intent.putExtra("BeginningTime", seekTime * 60 * 1000);
                     intent.putExtra("QuestionList", interviewQuestionList);
-
+                    intent.putExtra("AnswerList", interviewAnswerList);
+                    intent.putExtra("CategoryList", interviewCategoryList);
 
                     startActivity(intent);
 
@@ -455,44 +442,47 @@ public class InterviewActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
 
-        if(mRecordingSampler.isRecording()){
-            AlertDialog.Builder builder1 = new AlertDialog.Builder(InterviewActivity.this);
-            builder1.setTitle("End Interview");
-            builder1.setMessage("You are at the middle of interview. Do you wish to end it now?");
-            builder1.setCancelable(false);
+        if(!onCountDown){
+            if(mRecordingSampler.isRecording()){
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(InterviewActivity.this);
+                builder1.setTitle("End Interview");
+                builder1.setMessage("You are at the middle of interview. Do you wish to end it now?");
+                builder1.setCancelable(false);
 
 
-            builder1.setPositiveButton(
-                    "No",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
+                builder1.setPositiveButton(
+                        "No",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
 
-            builder1.setNegativeButton(
-                    "Yes",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-
-
-                            mRecordingSampler.release();
-                            interviewButton.setText("Interview Ended");
-                            interviewButton.setEnabled(false);
-                            mCvCountdownView.stop();
-                            finish();
+                builder1.setNegativeButton(
+                        "Yes",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
 
 
+                                mRecordingSampler.release();
+                                interviewButton.setText("Interview Ended");
+                                interviewButton.setEnabled(false);
+                                mCvCountdownView.stop();
+                                finish();
 
-                            dialog.cancel();
-                        }
-                    });
 
-            AlertDialog alert11 = builder1.create();
-            alert11.show();
-        } else{
-            super.onBackPressed();
+
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert11 = builder1.create();
+                alert11.show();
+            } else{
+                super.onBackPressed();
+            }
         }
+
 
 
     }

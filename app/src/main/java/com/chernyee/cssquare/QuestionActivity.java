@@ -45,12 +45,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.gujun.android.taggroup.TagGroup;
+
 public class QuestionActivity extends AppCompatActivity {
 
     private InterstitialAd mInterstitialAd;
     private AdView adView;
     private AdRequest adRequest;
 
+    private TagGroup mTagGroup;
     private List<String> info;
     private Button codeButton;
     private int hintCount = 0;
@@ -195,9 +198,14 @@ public class QuestionActivity extends AppCompatActivity {
             weirdToggle = true;
         }
 
+        mTagGroup = (TagGroup) findViewById(R.id.tag_group);
 
-
-
+        String tag = info.get(6);
+        String [] tags = tag.split(",");
+        for(int i = 0; i < tags.length ; i++){
+            tags[i] = tags[i].trim();
+        }
+        mTagGroup.setTags(tags);
 
 
         TextView titleView = (TextView) findViewById(R.id.codeTitle);
@@ -206,6 +214,8 @@ public class QuestionActivity extends AppCompatActivity {
         descriptionView.setText(info.get(2));
 
         updateCodeAndNumber(info.get(3));
+
+
 
         cliptoBoard = info.get(3);
 
@@ -392,7 +402,7 @@ public class QuestionActivity extends AppCompatActivity {
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, cliptoBoard);
                 sendIntent.setType("text/plain");
-                startActivity(sendIntent);
+                startActivity(Intent.createChooser(sendIntent, "Share the code"));
 
             }
         });

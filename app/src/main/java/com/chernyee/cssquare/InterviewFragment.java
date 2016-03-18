@@ -49,6 +49,8 @@ public class InterviewFragment extends Fragment {
     private CheckedTextView checkedTextView2;
     private CheckedTextView checkedTextView3;
     private CheckedTextView checkedTextView4;
+    private CheckedTextView checkedTextViewJava;
+    private CheckedTextView checkedTextViewAndroid;
 
     private RadioGroup radioGroup;
     private RadioButton radioButton1;
@@ -100,6 +102,8 @@ public class InterviewFragment extends Fragment {
         editor = sharedPreferences.edit();
         editor.putBoolean("cscheck1", true);
         editor.putBoolean("cscheck2", true);
+        editor.putBoolean("cscheck2Java", false);
+        editor.putBoolean("cscheck2Android", false);
         editor.putBoolean("cscheck3", true);
         editor.commit();
         editor.putInt("csradio", 1);
@@ -184,19 +188,18 @@ public class InterviewFragment extends Fragment {
                     return;
                 }
 
-                if(seekBar.getProgress() == 0){
+                if (seekBar.getProgress() == 0) {
                     Toast.makeText(getContext(), "Length of interview must not be 0!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 editor = sharedPreferences.edit();
 
-                if(radioButton1.isChecked()){
+                if (radioButton1.isChecked()) {
                     editor.putInt("csradio", 1);
-                } else if(radioButton2.isChecked()){
-                    editor.putInt("csradio",2);
+                } else if (radioButton2.isChecked()) {
+                    editor.putInt("csradio", 2);
                 }
-
 
 
                 editor.putInt("csseek", seekBar.getProgress());
@@ -213,6 +216,8 @@ public class InterviewFragment extends Fragment {
         checkedTextView2 = (CheckedTextView) v.findViewById(R.id.checkedTextView2);
         checkedTextView3 = (CheckedTextView) v.findViewById(R.id.checkedTextView3);
         checkedTextView4 = (CheckedTextView) v.findViewById(R.id.checkedTextView4);
+        checkedTextViewJava = (CheckedTextView) v.findViewById(R.id.checkedTextViewJava);
+        checkedTextViewAndroid = (CheckedTextView) v.findViewById(R.id.checkedTextViewAndroid);
 
         checkedTextView1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -222,6 +227,7 @@ public class InterviewFragment extends Fragment {
                     editor = sharedPreferences.edit();
                     editor.putBoolean("cscheck1", false);
                     editor.commit();
+                    checkedTextView4.setChecked(false);
                 } else{
                     checkedTextView1.setChecked(true);
                     editor = sharedPreferences.edit();
@@ -238,11 +244,56 @@ public class InterviewFragment extends Fragment {
                     checkedTextView2.setChecked(false);
                     editor = sharedPreferences.edit();
                     editor.putBoolean("cscheck2", false);
+                    editor.putBoolean("cscheck2Java", false);
+                    editor.putBoolean("cscheck2Android", false);
                     editor.commit();
+                    checkedTextViewJava.setVisibility(View.GONE);
+                    checkedTextViewAndroid.setVisibility(View.GONE);
+                    checkedTextView4.setChecked(false);
                 } else{
                     checkedTextView2.setChecked(true);
                     editor = sharedPreferences.edit();
                     editor.putBoolean("cscheck2", true);
+                    editor.putBoolean("cscheck2Java", true);
+                    editor.putBoolean("cscheck2Android", true);
+                    editor.commit();
+                    checkedTextViewJava.setVisibility(View.VISIBLE);
+                    checkedTextViewAndroid.setVisibility(View.VISIBLE);
+                    checkedTextViewJava.setChecked(true);
+                    checkedTextViewAndroid.setChecked(true);
+                }
+            }
+        });
+
+        checkedTextViewJava.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(checkedTextViewJava.isChecked()){
+                    checkedTextViewJava.setChecked(false);
+                    editor = sharedPreferences.edit();
+                    editor.putBoolean("cscheck2Java", false);
+                    editor.commit();
+                } else{
+                    checkedTextViewJava.setChecked(true);
+                    editor = sharedPreferences.edit();
+                    editor.putBoolean("cscheck2Java", true);
+                    editor.commit();
+                }
+            }
+        });
+
+        checkedTextViewAndroid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(checkedTextViewAndroid.isChecked()){
+                    checkedTextViewAndroid.setChecked(false);
+                    editor = sharedPreferences.edit();
+                    editor.putBoolean("cscheck2Android", false);
+                    editor.commit();
+                } else{
+                    checkedTextViewAndroid.setChecked(true);
+                    editor = sharedPreferences.edit();
+                    editor.putBoolean("cscheck2Android", true);
                     editor.commit();
                 }
             }
@@ -256,6 +307,7 @@ public class InterviewFragment extends Fragment {
                     editor = sharedPreferences.edit();
                     editor.putBoolean("cscheck3", false);
                     editor.commit();
+                    checkedTextView4.setChecked(false);
                 } else{
                     checkedTextView3.setChecked(true);
                     editor = sharedPreferences.edit();
@@ -277,7 +329,11 @@ public class InterviewFragment extends Fragment {
                     editor.putBoolean("cscheck1", false);
                     editor.putBoolean("cscheck2", false);
                     editor.putBoolean("cscheck3", false);
+                    editor.putBoolean("cscheck2Java", false);
+                    editor.putBoolean("cscheck3Android", false);
                     editor.commit();
+                    checkedTextViewJava.setVisibility(View.GONE);
+                    checkedTextViewAndroid.setVisibility(View.GONE);
                 } else{
                     checkedTextView1.setChecked(true);
                     checkedTextView2.setChecked(true);
@@ -287,7 +343,13 @@ public class InterviewFragment extends Fragment {
                     editor.putBoolean("cscheck1", true);
                     editor.putBoolean("cscheck2", true);
                     editor.putBoolean("cscheck3", true);
+                    editor.putBoolean("cscheck2Java", true);
+                    editor.putBoolean("cscheck3Android", true);
                     editor.commit();
+                    checkedTextViewJava.setVisibility(View.VISIBLE);
+                    checkedTextViewAndroid.setVisibility(View.VISIBLE);
+                    checkedTextViewJava.setChecked(true);
+                    checkedTextViewAndroid.setChecked(true);
 
                 }
             }

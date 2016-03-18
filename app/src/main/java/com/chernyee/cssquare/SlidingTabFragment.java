@@ -25,6 +25,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,6 +34,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.SearchView;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -46,7 +48,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-public class SlidingTabFragment extends Fragment {
+public class SlidingTabFragment extends Fragment{
+
+
 
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
@@ -60,6 +64,16 @@ public class SlidingTabFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.filter, menu);
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -97,9 +111,6 @@ public class SlidingTabFragment extends Fragment {
                 selectedItems.add(2);
             }
 
-
-
-
             AlertDialog dialog = new AlertDialog.Builder(getActivity())
                     .setTitle("Select difficulty level")
                     .setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
@@ -122,9 +133,6 @@ public class SlidingTabFragment extends Fragment {
                     }).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
-
-
-
                             String level = "";
                             if(selectedItems.size() > 0){
                                 for(int i = 0 ; i < selectedItems.size(); i++){
@@ -142,18 +150,7 @@ public class SlidingTabFragment extends Fragment {
                                 editor.putString("cslevel", level);
                                 editor.commit();
 
-
-
                                 new FragmentAsyncTask().execute();
-
-
-//                                FragmentTransaction transaction = getFragmentManager().beginTransaction();
-//                                SlidingTabFragment fragment = new SlidingTabFragment();
-//                                transaction.replace(R.id.main_fragment, fragment);
-//                                transaction.commit();
-
-
-
 
                                 Toast.makeText(getContext(), "List has been refreshed!", Toast.LENGTH_LONG).show();
 
@@ -176,20 +173,29 @@ public class SlidingTabFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
-        //TODO: check if this fixes your problem
+        int pageNumber = sharedPreferences.getInt("csviewpager",0);
         mViewPager.setAdapter(new SamplePagerAdapter());
+        mViewPager.setCurrentItem(pageNumber);
+
+
 
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("csviewpager", mViewPager.getCurrentItem());
+        editor.commit();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-
-
-
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("cslistview", 0);
+        editor.commit();
         new FragmentAsyncTask().execute();
 
         super.onCreate(savedInstanceState);
@@ -198,20 +204,17 @@ public class SlidingTabFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.v("ONCREATEVIEW", "Do i get called?");
         View view = inflater.inflate(R.layout.slidingtab_fragment, container, false);
-
+        mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
+        mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         return view;
     }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
-        mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
-    }
+
 
 
     class SamplePagerAdapter extends PagerAdapter {
-
 
         @Override
         public void notifyDataSetChanged() {
@@ -249,21 +252,23 @@ public class SlidingTabFragment extends Fragment {
             container.addView(view);
 
             lv = (ListView) view.findViewById(R.id.questionlist);
- //           listOfListInFragment = MainActivity.populateList.get(position);
-
-
-
 
 
             customAdapter = new CustomAdapter(getActivity(), R.layout.list_item,
                     populateListCopy.get(position));
             lv.setAdapter(customAdapter);
 
+            final int itemNumber = sharedPreferences.getInt("cslistview",0);
+            lv.setSelection(itemNumber);
             final int final_position = position;
 
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putInt("cslistview", position);
+                    editor.commit();
 
                     if(populateListCopy.get(final_position).get(position).get(8).contains("Medium")){
 
@@ -317,7 +322,6 @@ public class SlidingTabFragment extends Fragment {
 
 
     private class FragmentAsyncTask extends AsyncTask<Void, Void, Void> {
-        ProgressDialog progressDialog;
 
         @Override
         protected void onPreExecute() {
@@ -327,8 +331,11 @@ public class SlidingTabFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            mViewPager.setAdapter(new SamplePagerAdapter());
-            mSlidingTabLayout.setViewPager(mViewPager);
+            if(mViewPager != null){
+                mViewPager.setAdapter(new SamplePagerAdapter());
+                mSlidingTabLayout.setViewPager(mViewPager);
+            }
+
 
         }
 
@@ -395,12 +402,6 @@ public class SlidingTabFragment extends Fragment {
                     populateListCopy.put(i, tempListList);
                 }
             }
-
-
-
-
-
-
             return null;
         }
     }

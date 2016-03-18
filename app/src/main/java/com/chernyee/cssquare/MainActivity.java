@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.NotificationCompat;
@@ -36,6 +37,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.leakcanary.LeakCanary;
+
+import org.codechimp.apprater.AppRater;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,7 +57,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, HomeFragment.OnFragmentInteractionListener,
             AboutFragment.OnFragmentInteractionListener,BookmarkFragment.OnFragmentInteractionListener,
             ToolFragment.OnFragmentInteractionListener, PreparationFragment.OnFragmentInteractionListener,
-            InterviewFragment.OnFragmentInteractionListener{
+            InterviewFragment.OnFragmentInteractionListener, ShortQAFragment.OnFragmentInteractionListener{
 
 
 
@@ -60,6 +65,7 @@ public class MainActivity extends AppCompatActivity
             "Tree" ,"Binary Search", "Backtracking", "DP" , "DFS", "BFS", "Greedy", "Design","Divide and Conquer","Sort", "Math", "Bit Manipulation"};
 
     private Cursor codingQuestionsCursor;
+    private Cursor interviewQuestionsCursor;
     private DatabaseHelper db;
 
     private SharedPreferences sharedPreferences;
@@ -86,6 +92,11 @@ public class MainActivity extends AppCompatActivity
     public static List<List<String>> listHard = new ArrayList<List<String>>();
     public static List<List<String>> listCompleted = new ArrayList<List<String>>();
 
+    public static List<List<String>> interviewHR = new ArrayList<List<String>>();
+    public static List<List<String>> interviewKnowledge = new ArrayList<List<String>>();
+    public static List<List<String>> interviewKnowledgeJava = new ArrayList<List<String>>();
+    public static List<List<String>> interviewKnowledgeAndroid = new ArrayList<List<String>>();
+    public static List<List<String>> interviewCoding = new ArrayList<List<String>>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +104,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        AppRater.app_launched(this);
         sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -110,19 +121,17 @@ public class MainActivity extends AppCompatActivity
         db = new DatabaseHelper(this);
         db.setForcedUpgrade();
 
-        codingQuestionsCursor = db.getEmployees();
+        codingQuestionsCursor = db.getCodingQuestions();
+        interviewQuestionsCursor = db.getInterviewQuestions();
+
+        db.close();
 
         initializeVariables();
-
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         HomeFragment fragment = new HomeFragment();
         transaction.replace(R.id.main_fragment, fragment);
         transaction.commit();
-
-
-
-
 
     }
 
@@ -252,9 +261,6 @@ public class MainActivity extends AppCompatActivity
 
         } else if(id == R.id.navi_interview){
 
-//           Intent intent = new Intent(this, Camcorder.class);
-//            startActivity(intent);
-
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -268,7 +274,23 @@ public class MainActivity extends AppCompatActivity
 
 
 
-        }else if(id == R.id.navi_tool){
+        } else if (id == R.id.navi_questions){
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    ShortQAFragment fragment = new ShortQAFragment();
+                    transaction.replace(R.id.main_fragment, fragment);
+                    transaction.commit();
+                }
+            }, 300);
+
+
+
+
+        } else if(id == R.id.navi_tool){
 
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -314,6 +336,8 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+
+
     @Override
     public void onFragmentInteraction(Uri uri) {
 
@@ -343,6 +367,11 @@ public class MainActivity extends AppCompatActivity
         listMedium.clear();
         listHard.clear();
         listCompleted.clear();
+        interviewHR.clear();
+        interviewCoding.clear();
+        interviewKnowledge.clear();
+        interviewKnowledgeJava.clear();
+        interviewKnowledgeAndroid.clear();
 
         do{
             listId.add(codingQuestionsCursor.getString(0));
@@ -357,6 +386,36 @@ public class MainActivity extends AppCompatActivity
             listAdditional.add(codingQuestionsCursor.getString(9));
 
         }while(codingQuestionsCursor.moveToNext());
+
+        codingQuestionsCursor.close();
+
+        do{
+            List<String> tempArray = new ArrayList<>();
+            tempArray.add(interviewQuestionsCursor.getString(0));
+            tempArray.add(interviewQuestionsCursor.getString(1));
+            tempArray.add(interviewQuestionsCursor.getString(2));
+            tempArray.add(interviewQuestionsCursor.getString(3));
+            tempArray.add(interviewQuestionsCursor.getString(4));
+
+            if(tempArray.get(3).equals("HR")){
+                interviewHR.add(tempArray);
+            } else if(tempArray.get(3).equals("Knowledge")){
+                if(tempArray.get(4).equals("Java")){
+                    interviewKnowledgeJava.add(tempArray);
+                } else if(tempArray.get(4).equals("Android")){
+                    interviewKnowledgeAndroid.add(tempArray);
+                } else{
+                    interviewKnowledge.add(tempArray);
+                }
+
+            } else if(tempArray.get(3).equals("Coding")){
+                interviewCoding.add(tempArray);
+            }
+
+        }while(interviewQuestionsCursor.moveToNext());
+
+        interviewQuestionsCursor.close();
+
 
         for(int i = 0; i < code_tag.length; i++){
 

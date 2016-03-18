@@ -24,10 +24,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-
-
-
-
         <TextView
             android:padding="10dp"
             android:id="@+id/codeTitle"
@@ -61,6 +57,29 @@
         </ScrollView>
 
 
+        <LinearLayout
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:src="@drawable/pound_box"
+                android:layout_marginRight="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+            <me.gujun.android.taggroup.TagGroup
+                android:id="@+id/tag_group"
+                style="@style/TagGroup" />
+
+
+        </LinearLayout>
+
+
 
 
         <LinearLayout
@@ -90,7 +109,7 @@
 
                 <TextView
 
-                    android:text="sssdadasdasd"
+                    android:text="Nothing"
                     android:fontFamily="monospace"
                     android:id="@+id/code"
                     android:layout_width="match_parent"

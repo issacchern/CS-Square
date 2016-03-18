@@ -31,6 +31,8 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.hanks.htextview.HTextView;
+import com.hanks.htextview.HTextViewType;
 
 import java.util.ArrayList;
 
@@ -99,6 +101,9 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
 
         header.setText("Completed: " + MainActivity.listCompleted.size() + "/" + MainActivity.listId.size());
+
+
+
         mChart.setCenterText(generateCenterText());
         mChart.setData(generatePieData());
 
@@ -125,6 +130,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
         header = (TextView) v.findViewById(R.id.header1);
         header.setText("Completed: " + MainActivity.listCompleted.size() + "/" + MainActivity.listId.size());
+
 
         mChart = (PieChart) v.findViewById(R.id.chart1);
         mChart.setDescription("");

@@ -7,6 +7,7 @@
 
 
     <color name ="nice_green">#ff8bc34a</color>
+    <color name ="nice_darker_green">#749e43</color>
     <color name="black_semi_transparent">#B2000000</color>
     <color name="background">#e5e5e5</color>
     <color name="half_black">#808080</color>
@@ -17,6 +18,10 @@
     <color name="pink_pressed">#f793b5</color>
     <color name="blue_semi_transparent">#805677fc</color>
     <color name="blue_semi_transparent_pressed">#80738ffe</color>
+
+    <color name="float_transparent">#00000000</color>
+    <color name="gray_btn_bg_color">#D0D0D0</color>
+    <color name="gray_btn_bg_pressed_color">#B6B6B6</color>
 
     <color name="indicator_1">#ff8bc34a</color>
     <color name="indicator_2">#64A4A4</color>

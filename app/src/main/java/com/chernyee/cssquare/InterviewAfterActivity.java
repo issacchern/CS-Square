@@ -52,11 +52,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import cn.iwgang.countdownview.CountdownView;
-import cn.pedant.SweetAlert.SweetAlertDialog;
+import com.chernyee.cssquare.AlertDialog.SweetAlertDialog;
 
 public class InterviewAfterActivity extends AppCompatActivity {
 
-    private List<String> mList;
+    private List<String> mQuestionList;
+    private List<String> mAnswerList;
+    private List<String> mCategoryList;
     private AppAdapter mAdapter;
     private SwipeMenuListView mListView;
     private CountdownView countdownView;
@@ -167,13 +169,13 @@ public class InterviewAfterActivity extends AppCompatActivity {
                             Toast.makeText(InterviewAfterActivity.this, "File extension must be in .wav type!", Toast.LENGTH_LONG).show();
                         } else{
                             String temp = s.substring(0,s.indexOf(".wav"));
-                            if(temp.matches("^[a-zA-Z0-9]+$")){
+                            if(temp.matches("^[a-zA-Z0-9]+$") && temp.length() > 0){
                                 // check if file exists...
 
                                 String wholePath = Environment.getExternalStorageDirectory().getPath()+ "/CS-Square/" + s;
                                 File check = new File(wholePath);
                                 if(check.exists()){
-                                    Toast.makeText(InterviewAfterActivity.this, "The filename has already existed!", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(InterviewAfterActivity.this, "The file has already existed, please choose other name!", Toast.LENGTH_LONG).show();
                                 } else{
                                     new MyAsyncTask(wholePath).execute();
                                     alertExit = false;
@@ -207,11 +209,12 @@ public class InterviewAfterActivity extends AppCompatActivity {
         countdownView = (CountdownView) findViewById(R.id.cv_countdownViewTest1);
         countdownView.updateShow(spendingTime);
 
-        mList = myIntent.getStringArrayListExtra("QuestionList");
-        mList.remove(0);
-        mList.remove(mList.size() - 1);
-
-
+        mQuestionList = myIntent.getStringArrayListExtra("QuestionList");
+        mQuestionList.remove(0);
+        mQuestionList.remove(mQuestionList.size() - 1);
+        mQuestionList.remove(mQuestionList.size() - 1);
+        mAnswerList = myIntent.getStringArrayListExtra("AnswerList");
+        mCategoryList = myIntent.getStringArrayListExtra("CategoryList");
 
         mListView = (SwipeMenuListView) findViewById(R.id.listView);
 
@@ -261,18 +264,34 @@ public class InterviewAfterActivity extends AppCompatActivity {
         mListView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
-                String item = mList.get(position);
+                String item = mAnswerList.get(position);
                 switch (index) {
                     case 0:
-                        new SweetAlertDialog(InterviewAfterActivity.this)
-                                .setTitleText("Answer")
-                                .setContentText(item)
-                                .show();
+
+                        if(mCategoryList.get(position).equals("Coding")){
+                            SyntaxHighlighter sh1 = new SyntaxHighlighter(item);
+
+                            new SweetAlertDialog(InterviewAfterActivity.this)
+                                    .setTitleText("Answer")
+                                    .setContentText(sh1.formatToHtml())
+                                    .show();
+
+                        } else{
+                            new SweetAlertDialog(InterviewAfterActivity.this)
+                                    .setTitleText("Answer")
+                                    .setContentText(item)
+                                    .show();
+                        }
 
                         break;
                     case 1:
-                        // share the answer
 
+                        String messageToCopy = mQuestionList.get(position) + "\n\n" + mAnswerList.get(position);
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, messageToCopy);
+                        sendIntent.setType("text/plain");
+                        startActivity(Intent.createChooser(sendIntent, "Share the answer"));
 
                         break;
                 }
@@ -280,19 +299,6 @@ public class InterviewAfterActivity extends AppCompatActivity {
             }
         });
 
-        // set SwipeListener
-
-
-        // set MenuStateChangeListener
-        mListView.setOnMenuStateChangeListener(new SwipeMenuListView.OnMenuStateChangeListener() {
-            @Override
-            public void onMenuOpen(int position) {
-            }
-
-            @Override
-            public void onMenuClose(int position) {
-            }
-        });
 
     }
 
@@ -395,12 +401,12 @@ public class InterviewAfterActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return mList.size();
+            return mQuestionList.size();
         }
 
         @Override
         public String getItem(int position) {
-            return mList.get(position);
+            return mQuestionList.get(position);
         }
 
         @Override
