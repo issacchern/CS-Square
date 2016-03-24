@@ -2,28 +2,18 @@ package com.chernyee.cssquare;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
-import android.util.Log;
 
 import com.chernyee.cssquare.SQLiteAssetHelper.SQLiteAssetHelper;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 public class DatabaseHelper extends SQLiteAssetHelper {
 
     private static final String DATABASE_NAME = "Questions.db";
-    private static final int DATABASE_VERSION = 7;
 
     public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, DATABASE_NAME, SplashActivity.databasePath,  null, SplashActivity.databaseVersion);
     }
 
 

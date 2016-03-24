@@ -2,12 +2,8 @@ package com.chernyee.cssquare;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
@@ -16,20 +12,15 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,10 +36,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 import cn.iwgang.countdownview.CountdownView;
@@ -62,16 +49,12 @@ public class InterviewAfterActivity extends AppCompatActivity {
     private AppAdapter mAdapter;
     private SwipeMenuListView mListView;
     private CountdownView countdownView;
-
     private FloatingActionButton fabReplay;
     private FloatingActionButton fabPlayPause;
     private FloatingActionButton fabSave;
-
     private boolean alertExit = true;
     private boolean isPlaying = false;
-
     private MediaPlayer mediaPlayer;
-
     private InputStream in;
     private OutputStream out;
 
@@ -88,10 +71,7 @@ public class InterviewAfterActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.home_variant);
 
-
-
         mediaPlayer = MediaPlayer.create(this, Uri.parse(FILE_PATH));
-
 
         fabReplay = (FloatingActionButton) findViewById(R.id.fabReplay);
         fabPlayPause = (FloatingActionButton) findViewById(R.id.fabPlayPause);
@@ -100,7 +80,6 @@ public class InterviewAfterActivity extends AppCompatActivity {
         fabReplay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
 
                 fabPlayPause.setImageResource(R.drawable.play_pause);
                 isPlaying = false;
@@ -137,8 +116,6 @@ public class InterviewAfterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-
-
                 LayoutInflater inflater = getLayoutInflater();
                 View dialoglayout = inflater.inflate(R.layout.edit_text, null);
                 final EditText input = (EditText) dialoglayout.findViewById(R.id.edit);
@@ -146,20 +123,16 @@ public class InterviewAfterActivity extends AppCompatActivity {
                 text.setText("Type your file name");
                 input.setText(".wav");
 
-
-
-
                 final AlertDialog.Builder alertDialog = new AlertDialog.Builder(InterviewAfterActivity.this);
                 alertDialog.setView(dialoglayout);
 
-                alertDialog.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-
                         dialog.cancel();
                     }
                 });
 
-                alertDialog.setNegativeButton("Confirm", new DialogInterface.OnClickListener() {
+                alertDialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // do something with it()
 
@@ -185,12 +158,6 @@ public class InterviewAfterActivity extends AppCompatActivity {
                                 Toast.makeText(InterviewAfterActivity.this, "Invalid file name!", Toast.LENGTH_LONG).show();
                             }
                         }
-
-
-
-
-
-
                         dialog.cancel();
                     }
                 });
@@ -199,8 +166,6 @@ public class InterviewAfterActivity extends AppCompatActivity {
 
             }
         });
-
-
 
         Intent myIntent = getIntent();
         int remainingTime = myIntent.getIntExtra("RemainingTime", 1);
@@ -298,8 +263,6 @@ public class InterviewAfterActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-
     }
 
 
@@ -312,8 +275,6 @@ public class InterviewAfterActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
 
-
-
                 if (alertExit) {
                     AlertDialog.Builder builder1 = new AlertDialog.Builder(InterviewAfterActivity.this);
                     builder1.setTitle("Exiting");
@@ -321,7 +282,7 @@ public class InterviewAfterActivity extends AppCompatActivity {
                     builder1.setCancelable(false);
 
 
-                    builder1.setPositiveButton(
+                    builder1.setNegativeButton(
                             "No",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
@@ -329,15 +290,14 @@ public class InterviewAfterActivity extends AppCompatActivity {
                                 }
                             });
 
-                    builder1.setNegativeButton(
+                    builder1.setPositiveButton(
                             "Yes",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     dialog.cancel();
-                                    Intent intent = new Intent(InterviewAfterActivity.this, MainActivity.class);
-                                    startActivity(intent);
-
-
+                            //        Intent intent = new Intent(InterviewAfterActivity.this, MainActivity.class);
+                             //       startActivity(intent);
+                                    finish();
 
                                 }
                             });
@@ -368,7 +328,7 @@ public class InterviewAfterActivity extends AppCompatActivity {
             builder1.setCancelable(false);
 
 
-            builder1.setPositiveButton(
+            builder1.setNegativeButton(
                     "No",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
@@ -376,13 +336,14 @@ public class InterviewAfterActivity extends AppCompatActivity {
                         }
                     });
 
-            builder1.setNegativeButton(
+            builder1.setPositiveButton(
                     "Yes",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             dialog.cancel();
-                            Intent intent = new Intent(InterviewAfterActivity.this, MainActivity.class);
-                            startActivity(intent);
+                   //         Intent intent = new Intent(InterviewAfterActivity.this, MainActivity.class);
+                   //         startActivity(intent);
+                            finish();
 
                         }
                     });

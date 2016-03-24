@@ -1,18 +1,24 @@
 package com.chernyee.cssquare;
 
+import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.app.TaskStackBuilder;
 import android.app.backup.BackupManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentTransaction;
@@ -32,12 +38,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v7.widget.SearchView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.squareup.leakcanary.LeakCanary;
 
 import org.codechimp.apprater.AppRater;
 
@@ -50,7 +55,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import us.feras.mdv.MarkdownView;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 
 public class MainActivity extends AppCompatActivity
@@ -58,8 +68,6 @@ public class MainActivity extends AppCompatActivity
             AboutFragment.OnFragmentInteractionListener,BookmarkFragment.OnFragmentInteractionListener,
             ToolFragment.OnFragmentInteractionListener, PreparationFragment.OnFragmentInteractionListener,
             InterviewFragment.OnFragmentInteractionListener, ShortQAFragment.OnFragmentInteractionListener{
-
-
 
     public static String [] code_tag = {"All", "Array","String", "Hash table" , "Linked List", "Stack",
             "Tree" ,"Binary Search", "Backtracking", "DP" , "DFS", "BFS", "Greedy", "Design","Divide and Conquer","Sort", "Math", "Bit Manipulation"};
@@ -70,11 +78,18 @@ public class MainActivity extends AppCompatActivity
 
     private SharedPreferences sharedPreferences;
 
+    private Handler mHandler;
+
+    private AmazonS3Client s3;
+    private List<S3ObjectSummary> s3ObjList;
+    private TransferUtility transferUtility;
+    private ProgressDialog progressDialog;
+
     private boolean doubleBackToExitPressedOnce = false;
 
+    private final String FILE_PATH = Environment.getExternalStorageDirectory().getPath()+ "/CS-Square/database";
 
     public static HashMap<Integer, List<List<String>>> populateList = new HashMap<>();
-
 
     public static List<String> listId = new ArrayList<>();
     public static List<String> listTitle = new ArrayList<>();
@@ -101,12 +116,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         AppRater.app_launched(this);
         sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -118,6 +134,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.getMenu().getItem(0).setChecked(true);
         navigationView.setItemIconTintList(null);
 
+
+
         db = new DatabaseHelper(this);
         db.setForcedUpgrade();
 
@@ -128,10 +146,226 @@ public class MainActivity extends AppCompatActivity
 
         initializeVariables();
 
+
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         HomeFragment fragment = new HomeFragment();
         transaction.replace(R.id.main_fragment, fragment);
         transaction.commit();
+
+
+        if(listId.size() == 0){
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
+            builder1.setTitle("Download Database");
+            builder1.setMessage("You have empty database. Do you wish to download data now?");
+            builder1.setCancelable(false);
+            builder1.setNegativeButton(
+                    "No",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            builder1.setPositiveButton(
+                    "Yes",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                            if(isNetworkAvailable(getApplicationContext())){
+
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+
+                                        s3 = AwsUtil.getS3Client(MainActivity.this);
+                                        s3ObjList = s3.listObjects("sabi-data").getObjectSummaries();
+                                        for (S3ObjectSummary summary : s3ObjList) {
+
+                                            if (summary.getKey().length() < 3) {
+                                                int onlineVersion = Integer.parseInt(summary.getKey());
+
+                                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                editor.putInt("csdbversion", onlineVersion);
+                                                editor.commit();
+                                            } else {
+                                                File file = new File(SplashActivity.databasePath + "/" + "Questions.db");
+                                                transferUtility = AwsUtil.getTransferUtility(MainActivity.this);
+                                                TransferObserver observer = transferUtility.download("sabi-data", "Questions.db", file);
+
+                                                observer.setTransferListener(new TransferListener() {
+
+                                                    public void onStateChanged(int id, String newState) {
+
+                                                    }
+
+                                                    @Override
+                                                    public void onStateChanged(int i, TransferState transferState) {
+
+                                                        if (transferState.toString().equals("IN_PROGRESS")) {
+
+                                                            progressDialog = ProgressDialog.show(MainActivity.this, "Downloading data",
+                                                                    "Please wait", true);
+
+                                                        } else if (transferState.toString().equals("COMPLETED")) {
+
+                                                            progressDialog.dismiss();
+                                                            Intent intent = new Intent(MainActivity.this, SplashActivity.class);
+                                                            startActivity(intent);
+                                                            finish();
+                                                        }
+                                                    }
+
+                                                    public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+
+                                                    }
+
+                                                    public void onError(int id, Exception e) {// Do something in the callback.
+
+                                                    }
+                                                });
+
+                                            }
+                                        }
+                                    }
+                                }).start();
+                            } else{
+                                AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
+                                builder1.setTitle("No Internet Access");
+                                builder1.setMessage("You need to connect to Internet to download the data.");
+                                builder1.setCancelable(false);
+                                builder1.setNeutralButton(
+                                        "Okay",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+
+                                                dialog.cancel();
+                                            }
+                                        });
+
+                                AlertDialog alert11 = builder1.create();
+                                alert11.show();
+
+
+                            }
+
+
+
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alert11 = builder1.create();
+            alert11.show();
+        } else{
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    s3 = AwsUtil.getS3Client(MainActivity.this);
+                    s3ObjList = s3.listObjects("sabi-data").getObjectSummaries();
+
+                    int currentVersion = sharedPreferences.getInt("csdbversion", 7);
+
+                    int onlineVersion = 0;
+
+                    for (S3ObjectSummary summary : s3ObjList) {
+
+                        if (summary.getKey().length() < 3) {
+                            onlineVersion = Integer.parseInt(summary.getKey());
+
+                        } else {
+
+                            if(onlineVersion > currentVersion && isNetworkAvailable(getApplicationContext())){
+                                final int onlineVersion2 = onlineVersion;
+
+                                runOnUiThread(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+
+                                        AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
+                                        builder1.setTitle("New Update");
+                                        builder1.setMessage("New data update is available. Do you wish to download the data now?");
+                                        builder1.setCancelable(false);
+
+                                        builder1.setNegativeButton(
+                                                "No",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        dialog.cancel();
+                                                    }
+                                                });
+
+                                        builder1.setPositiveButton(
+                                                "Yes",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+
+
+                                                        File file = new File(SplashActivity.databasePath + "/" + "Questions.db");
+                                                        transferUtility = AwsUtil.getTransferUtility(MainActivity.this);
+                                                        TransferObserver observer = transferUtility.download("sabi-data", "Questions.db", file);
+
+                                                        observer.setTransferListener(new TransferListener() {
+
+                                                            public void onStateChanged(int id, String newState) {
+
+                                                            }
+
+                                                            @Override
+                                                            public void onStateChanged(int i, TransferState transferState) {
+
+
+                                                                if (transferState.toString().equals("IN_PROGRESS")) {
+
+                                                                    progressDialog = ProgressDialog.show(MainActivity.this, "Downloading data",
+                                                                            "Please wait", true);
+
+                                                                } else if (transferState.toString().equals("COMPLETED")) {
+
+                                                                    progressDialog.dismiss();
+                                                                    Intent intent = new Intent(MainActivity.this, SplashActivity.class);
+                                                                    startActivity(intent);
+                                                                    finish();
+                                                                }
+                                                            }
+
+                                                            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+
+                                                            }
+
+                                                            public void onError(int id, Exception e) {// Do something in the callback.
+
+                                                            }
+                                                        });
+
+                                                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                        editor.putInt("csdbversion", onlineVersion2);
+                                                        editor.commit();
+
+
+                                                        dialog.cancel();
+                                                    }
+                                                });
+
+                                        AlertDialog alert11 = builder1.create();
+                                        alert11.show();
+
+
+                                    }
+                                });
+
+
+                            }
+
+
+                        }
+                    }
+                }
+            }).start();
+
+        }
 
     }
 
@@ -179,12 +413,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         } else if(id == R.id.search){
@@ -200,8 +431,6 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-
-
         if (id == R.id.navi_home) {
 
             new Handler().postDelayed(new Runnable() {
@@ -216,10 +445,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }, 300);
 
-
         } else if(id == R.id.navi_prepare){
-
-
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -231,16 +457,11 @@ public class MainActivity extends AppCompatActivity
 
             }, 300);
 
-
-
-
-
         } else if (id == R.id.navi_coding) {
 
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     SlidingTabFragment fragment = new SlidingTabFragment();
                     transaction.replace(R.id.main_fragment, fragment);
@@ -252,7 +473,6 @@ public class MainActivity extends AppCompatActivity
 
 
         } else if(id == R.id.navi_bookmark){
-
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             BookmarkFragment fragment = new BookmarkFragment();
             transaction.replace(R.id.main_fragment, fragment);
@@ -264,7 +484,6 @@ public class MainActivity extends AppCompatActivity
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     InterviewFragment fragment = new InterviewFragment();
                     transaction.replace(R.id.main_fragment, fragment);
@@ -273,13 +492,11 @@ public class MainActivity extends AppCompatActivity
             }, 300);
 
 
-
         } else if (id == R.id.navi_questions){
 
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     ShortQAFragment fragment = new ShortQAFragment();
                     transaction.replace(R.id.main_fragment, fragment);
@@ -295,7 +512,6 @@ public class MainActivity extends AppCompatActivity
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     ToolFragment fragment = new ToolFragment();
                     transaction.replace(R.id.main_fragment, fragment);
@@ -311,8 +527,6 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, SettingsActivity.class);
            startActivity(intent);
 
-
-
         } else if(id == R.id.navi_about){
 
             new Handler().postDelayed(new Runnable() {
@@ -324,18 +538,12 @@ public class MainActivity extends AppCompatActivity
                     transaction.commit();
                 }
             }, 300);
-
-
         }
-
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-
         return true;
     }
-
 
 
     @Override
@@ -347,6 +555,11 @@ public class MainActivity extends AppCompatActivity
     public static int countLines(String str){
         String[] lines = str.split("\r\n|\r|\n");
         return  lines.length;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     public void initializeVariables(){
@@ -373,48 +586,57 @@ public class MainActivity extends AppCompatActivity
         interviewKnowledgeJava.clear();
         interviewKnowledgeAndroid.clear();
 
-        do{
-            listId.add(codingQuestionsCursor.getString(0));
-            listTitle.add(codingQuestionsCursor.getString(1));
-            listDescription.add(codingQuestionsCursor.getString(2));
-            listCode.add(codingQuestionsCursor.getString(3));
-            listAnswer.add(new String(codingQuestionsCursor.getBlob(4)));
-            listHint.add(codingQuestionsCursor.getString(5));
-            listTag.add(codingQuestionsCursor.getString(6));
-            listCategory.add(codingQuestionsCursor.getString(7));
-            listDifficulty.add(codingQuestionsCursor.getString(8));
-            listAdditional.add(codingQuestionsCursor.getString(9));
+        if(codingQuestionsCursor.moveToFirst()){
+            do{
+                listId.add(codingQuestionsCursor.getString(0));
+                listTitle.add(codingQuestionsCursor.getString(1));
+                listDescription.add(codingQuestionsCursor.getString(2));
+                listCode.add(codingQuestionsCursor.getString(3));
+                listAnswer.add(new String(codingQuestionsCursor.getBlob(4)));
+                listHint.add(codingQuestionsCursor.getString(5));
+                listTag.add(codingQuestionsCursor.getString(6));
+                listCategory.add(codingQuestionsCursor.getString(7));
+                listDifficulty.add(codingQuestionsCursor.getString(8));
+                listAdditional.add(codingQuestionsCursor.getString(9));
 
-        }while(codingQuestionsCursor.moveToNext());
+            }while(codingQuestionsCursor.moveToNext());
 
-        codingQuestionsCursor.close();
+            codingQuestionsCursor.close();
+        }
 
-        do{
-            List<String> tempArray = new ArrayList<>();
-            tempArray.add(interviewQuestionsCursor.getString(0));
-            tempArray.add(interviewQuestionsCursor.getString(1));
-            tempArray.add(interviewQuestionsCursor.getString(2));
-            tempArray.add(interviewQuestionsCursor.getString(3));
-            tempArray.add(interviewQuestionsCursor.getString(4));
+        if(interviewQuestionsCursor.moveToFirst()){
 
-            if(tempArray.get(3).equals("HR")){
-                interviewHR.add(tempArray);
-            } else if(tempArray.get(3).equals("Knowledge")){
-                if(tempArray.get(4).equals("Java")){
-                    interviewKnowledgeJava.add(tempArray);
-                } else if(tempArray.get(4).equals("Android")){
-                    interviewKnowledgeAndroid.add(tempArray);
-                } else{
-                    interviewKnowledge.add(tempArray);
+
+            do{
+                List<String> tempArray = new ArrayList<>();
+                tempArray.add(interviewQuestionsCursor.getString(0));
+                tempArray.add(interviewQuestionsCursor.getString(1));
+                tempArray.add(interviewQuestionsCursor.getString(2));
+                tempArray.add(interviewQuestionsCursor.getString(3));
+                tempArray.add(interviewQuestionsCursor.getString(4));
+
+                if(tempArray.get(3).equals("HR")){
+                    interviewHR.add(tempArray);
+                } else if(tempArray.get(3).equals("Knowledge")){
+                    if(tempArray.get(4).equals("Java")){
+                        interviewKnowledgeJava.add(tempArray);
+                    } else if(tempArray.get(4).equals("Android")){
+                        interviewKnowledgeAndroid.add(tempArray);
+                    } else{
+                        interviewKnowledge.add(tempArray);
+                    }
+
+                } else if(tempArray.get(3).equals("Coding")){
+                    interviewCoding.add(tempArray);
                 }
 
-            } else if(tempArray.get(3).equals("Coding")){
-                interviewCoding.add(tempArray);
-            }
+            }while(interviewQuestionsCursor.moveToNext());
 
-        }while(interviewQuestionsCursor.moveToNext());
+            interviewQuestionsCursor.close();
 
-        interviewQuestionsCursor.close();
+        }
+
+
 
 
         for(int i = 0; i < code_tag.length; i++){
@@ -462,9 +684,6 @@ public class MainActivity extends AppCompatActivity
             populateList.put(i,tempListList);
         }
 
-
-
-
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("csnoads", 0);
         editor.commit();
@@ -474,5 +693,11 @@ public class MainActivity extends AppCompatActivity
         editor.commit();
         editor.putInt("cscomplete", listCompleted.size());
         editor.commit();
+    }
+
+
+    public boolean isNetworkAvailable(final Context context) {
+        final ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
     }
 }

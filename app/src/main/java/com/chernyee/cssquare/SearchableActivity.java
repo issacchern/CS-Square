@@ -6,12 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,8 +41,6 @@ public class SearchableActivity extends ListActivity {
         sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         handleIntent(getIntent());
 
-
-
     }
 
     @Override
@@ -80,7 +73,6 @@ public class SearchableActivity extends ListActivity {
 
             int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
             int sizemedium = sharedPreferences.getInt("cshard", 0);
-
             int remaining = sizemedium - sizeComplete;
 
             if(remaining > 0){
@@ -92,13 +84,10 @@ public class SearchableActivity extends ListActivity {
             }
 
         } else{
-
             Intent i = new Intent(this, QuestionActivity.class);
             i.putStringArrayListExtra("information", new ArrayList<>(customList.get(position)));
             startActivity(i);
-
         }
-
         super.onListItemClick(l, v, position, id);
     }
 
@@ -124,39 +113,27 @@ public class SearchableActivity extends ListActivity {
             }
 
             customList = new ArrayList<List<String>>();
-
             for(int i = 0 ; i < MainActivity.populateList.get(0).size(); i++){
-
                 if(MainActivity.populateList.get(0).get(i).get(1).toLowerCase().contains(query.toLowerCase())){
                     customList.add(MainActivity.populateList.get(0).get(i));
                 }
-
             }
 
-
-            customAdapter = new CustomAdapter(this, R.layout.list_item,
-                    customList);
+            customAdapter = new CustomAdapter(this, R.layout.list_item, customList);
             setListAdapter(customAdapter);
             customAdapter.notifyDataSetChanged();
 
             if(customList.size() < 1){
                 textView.setVisibility(View.VISIBLE);
                 textView.setText("Your search \'" + query + "\' did not match any query data.");
-
             }
 
         } else{
-
             customList = new ArrayList<List<String>>();
             String query = intent.getStringExtra("extraInfo");
-
-
             if(query.equals("Completed")){
 
                 for(int i = 0 ; i < MainActivity.populateList.get(0).size(); i++) {
-
-                    //                   somethign to do with sorting????
-
                     String markString = "cse" + MainActivity.populateList.get(0).get(i).get(0);
                     if (sharedPreferences.getInt(markString, 0) == 1) {
                         customList.add(MainActivity.populateList.get(0).get(i));
@@ -166,7 +143,6 @@ public class SearchableActivity extends ListActivity {
             } else{
 
                 for(int i = 0 ; i < MainActivity.populateList.get(0).size(); i++){
-
                     if(MainActivity.populateList.get(0).get(i).get(8).contains(query)){
                         String markString = "cse"+MainActivity.populateList.get(0).get(i).get(0);
                         if (sharedPreferences.getInt(markString, 0) == 0) { //because we only want the undone one
@@ -174,16 +150,10 @@ public class SearchableActivity extends ListActivity {
                         }
                     }
                 }
-
             }
-
             customAdapter = new CustomAdapter(this, R.layout.list_item,
                     customList);
             setListAdapter(customAdapter);
-
-
-
-
         }
     }
 }

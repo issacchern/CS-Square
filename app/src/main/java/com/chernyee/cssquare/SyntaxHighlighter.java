@@ -3,10 +3,6 @@ package com.chernyee.cssquare;
 /**
  * Created by Issac on 2/24/2016.
  */
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import android.text.Html;
 import android.text.SpannableString;
 

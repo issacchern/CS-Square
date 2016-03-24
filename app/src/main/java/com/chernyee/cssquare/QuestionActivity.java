@@ -8,41 +8,25 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
-
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import me.gujun.android.taggroup.TagGroup;
@@ -61,14 +45,15 @@ public class QuestionActivity extends AppCompatActivity {
     private String cliptoBoard;
     private long tStart = 0;
     private long tDelta = 0;
-
-
-
     private long tEnd = 0;
     private double elapsedSeconds = 0;
     private boolean weirdToggle = false;
     private TextView noteTitle;
     private TextView note;
+    private FloatingActionButton actionA;
+    private FloatingActionButton actionB;
+    private FloatingActionButton actionC;
+    private FloatingActionButton actionD;
 
     private SharedPreferences sharedPref;
 
@@ -121,10 +106,8 @@ public class QuestionActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.bookmark, menu);
-
         MenuItem menuItem = menu.findItem(R.id.hot);
         if(info.get(9).contains("hot")){
 
@@ -290,10 +273,6 @@ public class QuestionActivity extends AppCompatActivity {
                                             codeCheck.setVisibility(View.VISIBLE);
 
                                         }
-
-
-
-
                                         dialog.cancel();
                                     }
                                 });
@@ -317,8 +296,6 @@ public class QuestionActivity extends AppCompatActivity {
                             codeCheck.setVisibility(View.VISIBLE);
 
                         }
-
-
 
                     }
 
@@ -369,10 +346,7 @@ public class QuestionActivity extends AppCompatActivity {
 
 
 
-
-
-
-        final FloatingActionButton actionA = (FloatingActionButton) findViewById(R.id.action_a);
+        actionA = (FloatingActionButton) findViewById(R.id.action_a);
         actionA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -393,7 +367,7 @@ public class QuestionActivity extends AppCompatActivity {
             }
         });
 
-        final FloatingActionButton actionB = (FloatingActionButton) findViewById(R.id.action_b);
+        actionB = (FloatingActionButton) findViewById(R.id.action_b);
         actionB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -407,7 +381,7 @@ public class QuestionActivity extends AppCompatActivity {
             }
         });
 
-        final FloatingActionButton actionC = (FloatingActionButton) findViewById(R.id.action_c);
+        actionC = (FloatingActionButton) findViewById(R.id.action_c);
         actionC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -427,14 +401,14 @@ public class QuestionActivity extends AppCompatActivity {
                 final AlertDialog.Builder alertDialog = new AlertDialog.Builder(QuestionActivity.this);
                 alertDialog.setView(dialoglayout);
 
-                alertDialog.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
 
                         dialog.cancel();
                     }
                 });
 
-                alertDialog.setNegativeButton("Confirm", new DialogInterface.OnClickListener() {
+                alertDialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // do something with it()
                         String str = "csef" + info.get(0);
@@ -452,9 +426,6 @@ public class QuestionActivity extends AppCompatActivity {
                             note.setText(input.getText().toString());
                         }
 
-
-
-
                         dialog.cancel();
                     }
                 });
@@ -465,13 +436,11 @@ public class QuestionActivity extends AppCompatActivity {
         });
 
 
-        final FloatingActionButton actionD = (FloatingActionButton) findViewById(R.id.action_d);
+        actionD = (FloatingActionButton) findViewById(R.id.action_d);
         actionD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if(hintCount > split.length -1) hintCount = 0;
-
                 Snackbar.make(view, split[hintCount++], Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
@@ -497,7 +466,6 @@ public class QuestionActivity extends AppCompatActivity {
 
     public void updateCodeAndNumber(String str){
 
-
         SyntaxHighlighter sh1 = new SyntaxHighlighter(str);
         TextView codeView = (TextView) findViewById(R.id.code);
         codeView.setText(sh1.formatToHtml());
@@ -512,10 +480,7 @@ public class QuestionActivity extends AppCompatActivity {
 
         TextView codeNumberView = (TextView) findViewById(R.id.codeNumber);
         codeNumberView.setText(printLine);
-
     }
-
-
 
 
 }

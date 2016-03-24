@@ -1,37 +1,14 @@
 package com.chernyee.cssquare;
 
 
-import android.annotation.TargetApi;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.TaskStackBuilder;
 import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.SwitchPreference;
-import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.ActionBar;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,21 +18,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.text.format.Time;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.MenuItem;
-import android.support.v4.app.NavUtils;
 import android.widget.Toast;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 
 import be.billington.calendar.recurrencepicker.EventRecurrence;
 import be.billington.calendar.recurrencepicker.EventRecurrenceFormatter;
@@ -78,7 +45,6 @@ public class SettingsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
         sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         listView = (ListView) findViewById(R.id.list);
 
@@ -87,7 +53,6 @@ public class SettingsActivity extends AppCompatActivity {
         arrayOfItem.add(new SmallItem("Reset Data", "All of your data will be deleted"));
         arrayOfItem.add(new SmallItem("Backup Data", "Data is backed up to the cloud automatically"));
         arrayOfItem.add(new SmallItem(getString(R.string.title_setting), getString(R.string.desc_setting)));
-
 
         ItemAdapter adapter = new ItemAdapter(this, arrayOfItem);
         listView.setAdapter(adapter);
@@ -108,7 +73,6 @@ public class SettingsActivity extends AppCompatActivity {
                         @Override
                         public void onRecurrenceSet(String rrule) {
                             recurrenceRule = rrule;
-
                             if (recurrenceRule != null && recurrenceRule.length() > 0) {
                                 EventRecurrence recurrenceEvent = new EventRecurrence();
                                 recurrenceEvent.setStartDate(new Time("" + new Date().getTime()));
@@ -130,7 +94,7 @@ public class SettingsActivity extends AppCompatActivity {
                     builder1.setMessage("Are you sure you want to reset data? That means all of your bookmarks and saved data will be lost.");
                     builder1.setCancelable(true);
 
-                    builder1.setPositiveButton(
+                    builder1.setNegativeButton(
                             "No",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
@@ -138,7 +102,7 @@ public class SettingsActivity extends AppCompatActivity {
                                 }
                             });
 
-                    builder1.setNegativeButton(
+                    builder1.setPositiveButton(
                             "Yes",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
@@ -146,27 +110,25 @@ public class SettingsActivity extends AppCompatActivity {
                                     File pref_file = new File("/data/data/com.chernyee.cssquare/shared_prefs/pref_file.xml");
                                     if (pref_file.exists()) {
                                         pref_file.delete();
-
                                     }
-
-                                    System.exit(0);
-
-
                                     dialog.cancel();
+
+                                    Toast.makeText(SettingsActivity.this, "You need to restart the app to see the effect!", Toast.LENGTH_LONG).show();
+
+
+
+
+
                                 }
                             });
 
                     AlertDialog alert11 = builder1.create();
                     alert11.show();
 
-
-
-
                 } else if(position == 2){
                     BackupManager bm = new BackupManager(SettingsActivity.this);
                     bm.dataChanged();
                     Toast.makeText(SettingsActivity.this, "Make sure you have already enabled Backup & Restore options in Settings > Backup & reset", Toast.LENGTH_LONG).show();
-
 
                 } else if (position == 3){
                     try {
@@ -174,15 +136,11 @@ public class SettingsActivity extends AppCompatActivity {
                     } catch (android.content.ActivityNotFoundException anfe) {
                         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + "com.chernyee.cssquarepaid")));
                     }
-
                 }
             }
         });
 
     }
-
-
-
 
     public class SmallItem{
         public String title;
@@ -213,6 +171,4 @@ public class SettingsActivity extends AppCompatActivity {
             return convertView;
         }
     }
-
-
 }

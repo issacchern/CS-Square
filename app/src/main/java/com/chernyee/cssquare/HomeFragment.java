@@ -4,26 +4,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
 import android.text.SpannableString;
-import android.text.TextWatcher;
-import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
-
-import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -31,30 +22,25 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
-import com.hanks.htextview.HTextView;
-import com.hanks.htextview.HTextViewType;
 
 import java.util.ArrayList;
 
 
 public class HomeFragment extends Fragment implements OnChartValueSelectedListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private SharedPreferences sharedPreferences;
     private PieChart mChart;
     private TextView header;
 
-
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
     public HomeFragment() {
-        // Required empty public constructor
+
     }
 
     public static HomeFragment newInstance(String param1, String param2) {
@@ -113,8 +99,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
         sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -137,7 +121,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         mChart.setCenterText(generateCenterText());
         mChart.setCenterTextSize(10f);
         mChart.setUsePercentValues(true);
-
         // radius of the center hole in percent of maximum radius
         mChart.setHoleRadius(45f);
         mChart.setTransparentCircleRadius(50f);
@@ -145,17 +128,9 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
         mChart.setData(generatePieData());
 
-
-
         return v;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -177,10 +152,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     @Override
     public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
 
-
-
-        if (e == null)
-            return;
+        if (e == null) return;
 
         Intent intent = new Intent(getActivity(), SearchableActivity.class);
         if(e.getXIndex() == 0){

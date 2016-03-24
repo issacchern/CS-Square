@@ -12,22 +12,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Iiro Krankka (http://github.com/roughike)
- */
+
 public class ShortQATabFragment extends Fragment {
     private static final String ARG_TEXT = "ARG_TEXT";
 
     ExpandableListView expandableListView;
     ExpandableListAdapter expandableListAdapter;
     List<List<String>> expandableListData;
-
 
     public ShortQATabFragment() {
     }
@@ -41,8 +35,6 @@ public class ShortQATabFragment extends Fragment {
 
         return sampleFragment;
     }
-
-
 
     @Nullable
     @Override
@@ -65,12 +57,9 @@ public class ShortQATabFragment extends Fragment {
             expandableListData = new ArrayList<List<String>>(MainActivity.interviewHR);
         }
 
-
         expandableListView = (ExpandableListView) v.findViewById(R.id.expandableListView);
         expandableListAdapter = new CustomExpandableListAdapter(getContext(), expandableListData, isCode);
         expandableListView.setAdapter(expandableListAdapter);
-
-
 
         return v;
     }

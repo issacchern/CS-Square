@@ -5,27 +5,16 @@ package com.chernyee.cssquare;
  */
 
 import com.chernyee.cssquare.UI.SlidingTabLayout;
-import com.chernyee.cssquare.CustomAdapter;
-
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.app.SearchManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,16 +22,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v7.widget.SearchView;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -50,14 +34,11 @@ import java.util.List;
 
 public class SlidingTabFragment extends Fragment{
 
-
-
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private CustomAdapter customAdapter;
     private SharedPreferences sharedPreferences;
     public static HashMap<Integer, List<List<String>>> populateListCopy;
-    private List<List<String>> listOfListInFragment;
     private ListView lv;
 
     @Override
@@ -84,7 +65,6 @@ public class SlidingTabFragment extends Fragment{
             String levelstr = sharedPreferences.getString("cslevel", "All");
             final ArrayList<Integer> selectedItems=new ArrayList<>();
 
-
             CharSequence[] items = { "Easy","Medium","Hard"};
             boolean[] checkedItems = {false, false, false};
 
@@ -92,7 +72,6 @@ public class SlidingTabFragment extends Fragment{
                 if(levelstr.contains("Easy")){
                     checkedItems[0] = true;
                     selectedItems.add(0);
-
                 }
                 if(levelstr.contains("Medium")){
                     checkedItems[1] = true;
@@ -124,13 +103,13 @@ public class SlidingTabFragment extends Fragment{
                                 selectedItems.remove(Integer.valueOf(indexSelected));
                             }
                         }
-                    }).setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
 
 
                         }
-                    }).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                    }).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
                             String level = "";
@@ -143,28 +122,20 @@ public class SlidingTabFragment extends Fragment{
                                     } else if(selectedItems.get(i) == 2){
                                         level += "Hard";
                                     }
-
                                 }
 
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putString("cslevel", level);
                                 editor.commit();
-
                                 new FragmentAsyncTask().execute();
-
                                 Toast.makeText(getContext(), "List has been refreshed!", Toast.LENGTH_LONG).show();
-
                             } else{
                                 Toast.makeText(getContext(), "You must select either one of difficulty level!", Toast.LENGTH_LONG).show();
                             }
 
-
-
-
                         }
                     }).create();
             dialog.show();
-
         }
 
         return super.onOptionsItemSelected(item);
@@ -176,9 +147,6 @@ public class SlidingTabFragment extends Fragment{
         int pageNumber = sharedPreferences.getInt("csviewpager",0);
         mViewPager.setAdapter(new SamplePagerAdapter());
         mViewPager.setCurrentItem(pageNumber);
-
-
-
     }
 
     @Override
@@ -197,21 +165,17 @@ public class SlidingTabFragment extends Fragment{
         editor.putInt("cslistview", 0);
         editor.commit();
         new FragmentAsyncTask().execute();
-
         super.onCreate(savedInstanceState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.v("ONCREATEVIEW", "Do i get called?");
         View view = inflater.inflate(R.layout.slidingtab_fragment, container, false);
         mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         return view;
     }
-
-
 
 
     class SamplePagerAdapter extends PagerAdapter {
@@ -220,7 +184,6 @@ public class SlidingTabFragment extends Fragment{
         public void notifyDataSetChanged() {
             super.notifyDataSetChanged();
             customAdapter.notifyDataSetChanged();
-
         }
 
         @Override
@@ -247,12 +210,10 @@ public class SlidingTabFragment extends Fragment{
         @Override
         public Object instantiateItem(ViewGroup container, final int position) {
 
-            View view = getActivity().getLayoutInflater().inflate(R.layout.pager_item,
-                    container, false);
+            View view = getActivity().getLayoutInflater().inflate(R.layout.pager_item, container, false);
             container.addView(view);
 
             lv = (ListView) view.findViewById(R.id.questionlist);
-
 
             customAdapter = new CustomAdapter(getActivity(), R.layout.list_item,
                     populateListCopy.get(position));
@@ -315,7 +276,6 @@ public class SlidingTabFragment extends Fragment{
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
             container.removeView((View) object);
-        //    Log.i(LOG_TAG, "destroyItem() [position: " + position + "]");
         }
 
     }
@@ -335,8 +295,6 @@ public class SlidingTabFragment extends Fragment{
                 mViewPager.setAdapter(new SamplePagerAdapter());
                 mSlidingTabLayout.setViewPager(mViewPager);
             }
-
-
         }
 
         @Override
@@ -344,13 +302,10 @@ public class SlidingTabFragment extends Fragment{
 
             String levelstr = sharedPreferences.getString("cslevel", "All");
 
-
-
             if(levelstr.equals("All") || levelstr.equals("EasyMediumHard") || levelstr.equals("EasyHardMedium") || levelstr.equals("MediumEasyHard")
                     || levelstr.equals("MediumHardEasy") || levelstr.equals("HardEasyMedium") || levelstr.equals("HardMediumEasy")){
 
                 populateListCopy = new HashMap<>(MainActivity.populateList);
-
 
             } else {
 
@@ -405,6 +360,5 @@ public class SlidingTabFragment extends Fragment{
             return null;
         }
     }
-
 
 }
