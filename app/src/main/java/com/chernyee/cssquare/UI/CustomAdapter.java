@@ -1,4 +1,4 @@
-package com.chernyee.cssquare;
+package com.chernyee.cssquare.UI;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,6 +10,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.chernyee.cssquare.R;
+
 import java.util.List;
 
 /**
@@ -99,7 +102,7 @@ public class CustomAdapter extends ArrayAdapter<List<String>>{
             if (vh.holderDifficulty != null) {
                 vh.holderDifficulty.setText(p.get(8));
 
-                if(p.get(8).contains("Easy")){
+                if(p.get(8).contains("Easy") || p.get(8).contains("Beginner") ){
                     if(p.get(9).contains("hot")){
                         vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds(vh.holderHot, null, null,null );
                     } else{

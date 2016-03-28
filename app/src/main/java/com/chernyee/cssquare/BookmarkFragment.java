@@ -13,6 +13,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.chernyee.cssquare.UI.CustomAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 

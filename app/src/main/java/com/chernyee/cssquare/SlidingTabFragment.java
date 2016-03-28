@@ -4,6 +4,7 @@ package com.chernyee.cssquare;
  * Created by Issac on 2/22/2016.
  */
 
+import com.chernyee.cssquare.UI.CustomAdapter;
 import com.chernyee.cssquare.UI.SlidingTabLayout;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -12,10 +13,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +40,8 @@ public class SlidingTabFragment extends Fragment{
     private SharedPreferences sharedPreferences;
     public static HashMap<Integer, List<List<String>>> populateListCopy;
     private ListView lv;
+    private Parcelable state;
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -65,29 +67,36 @@ public class SlidingTabFragment extends Fragment{
             String levelstr = sharedPreferences.getString("cslevel", "All");
             final ArrayList<Integer> selectedItems=new ArrayList<>();
 
-            CharSequence[] items = { "Easy","Medium","Hard"};
-            boolean[] checkedItems = {false, false, false};
+            CharSequence[] items = { "Beginner","Easy","Medium","Hard"};
+            boolean[] checkedItems = {false, false, false, false};
 
             if(!levelstr.equals("All")){
-                if(levelstr.contains("Easy")){
+                if(levelstr.contains("Beginner")){
                     checkedItems[0] = true;
                     selectedItems.add(0);
                 }
-                if(levelstr.contains("Medium")){
+
+                if(levelstr.contains("Easy")){
                     checkedItems[1] = true;
                     selectedItems.add(1);
                 }
-                if(levelstr.contains("Hard")){
+                if(levelstr.contains("Medium")){
                     checkedItems[2] = true;
                     selectedItems.add(2);
+                }
+                if(levelstr.contains("Hard")){
+                    checkedItems[3] = true;
+                    selectedItems.add(3);
                 }
             } else{
                 checkedItems[0] = true;
                 checkedItems[1] = true;
                 checkedItems[2] = true;
+                checkedItems[3] = true;
                 selectedItems.add(0);
                 selectedItems.add(1);
                 selectedItems.add(2);
+                selectedItems.add(3);
             }
 
             AlertDialog dialog = new AlertDialog.Builder(getActivity())
@@ -116,10 +125,13 @@ public class SlidingTabFragment extends Fragment{
                             if(selectedItems.size() > 0){
                                 for(int i = 0 ; i < selectedItems.size(); i++){
                                     if(selectedItems.get(i) == 0){
+                                        level += "Beginner";
+                                    }
+                                    if(selectedItems.get(i) == 1){
                                         level += "Easy";
-                                    } else if(selectedItems.get(i) == 1){
-                                        level += "Medium";
                                     } else if(selectedItems.get(i) == 2){
+                                        level += "Medium";
+                                    } else if(selectedItems.get(i) == 3){
                                         level += "Hard";
                                     }
                                 }
@@ -144,26 +156,19 @@ public class SlidingTabFragment extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
-        int pageNumber = sharedPreferences.getInt("csviewpager",0);
-        mViewPager.setAdapter(new SamplePagerAdapter());
-        mViewPager.setCurrentItem(pageNumber);
+        if(customAdapter != null)
+             customAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("csviewpager", mViewPager.getCurrentItem());
-        editor.commit();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("cslistview", 0);
-        editor.commit();
         new FragmentAsyncTask().execute();
         super.onCreate(savedInstanceState);
     }
@@ -219,17 +224,11 @@ public class SlidingTabFragment extends Fragment{
                     populateListCopy.get(position));
             lv.setAdapter(customAdapter);
 
-            final int itemNumber = sharedPreferences.getInt("cslistview",0);
-            lv.setSelection(itemNumber);
             final int final_position = position;
 
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putInt("cslistview", position);
-                    editor.commit();
 
                     if(populateListCopy.get(final_position).get(position).get(8).contains("Medium")){
 
@@ -302,8 +301,7 @@ public class SlidingTabFragment extends Fragment{
 
             String levelstr = sharedPreferences.getString("cslevel", "All");
 
-            if(levelstr.equals("All") || levelstr.equals("EasyMediumHard") || levelstr.equals("EasyHardMedium") || levelstr.equals("MediumEasyHard")
-                    || levelstr.equals("MediumHardEasy") || levelstr.equals("HardEasyMedium") || levelstr.equals("HardMediumEasy")){
+            if(levelstr.equals("All") || (levelstr.contains("Beginner") && levelstr.contains("Easy") && levelstr.contains("Medium") && levelstr.contains("hard"))){
 
                 populateListCopy = new HashMap<>(MainActivity.populateList);
 

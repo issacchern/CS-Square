@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import com.chernyee.cssquare.Recording.RecordingSampler;
 import com.chernyee.cssquare.Recording.VisualizerView;
+import com.chernyee.cssquare.UI.IssacViewPager;
+import com.chernyee.cssquare.UI.ZoomOutPageTransformer;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,4 +1,4 @@
-package com.chernyee.cssquare;
+package com.chernyee.cssquare.UI;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;

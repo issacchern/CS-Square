@@ -1,4 +1,4 @@
-package com.chernyee.cssquare;
+package com.chernyee.cssquare.Utility;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 
 import com.chernyee.cssquare.SQLiteAssetHelper.SQLiteAssetHelper;
+import com.chernyee.cssquare.SplashActivity;
 
 
 public class DatabaseHelper extends SQLiteAssetHelper {

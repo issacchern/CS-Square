@@ -29,6 +29,9 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //  TODO : initialize all the data here
+        // BIG STEP INDEED
+
         String filepath = Environment.getExternalStorageDirectory().getPath();
         File file = new File(filepath,CS_FOLDER);
 

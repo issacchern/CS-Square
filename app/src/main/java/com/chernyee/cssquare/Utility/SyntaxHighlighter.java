@@ -1,4 +1,4 @@
-package com.chernyee.cssquare;
+package com.chernyee.cssquare.Utility;
 
 /**
  * Created by Issac on 2/24/2016.

@@ -12,6 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+
+import com.chernyee.cssquare.UI.CustomExpandableListAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -61,6 +61,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         super.onResume();
 
         MainActivity.listCompleted.clear();
+        MainActivity.listBeginner.clear();
         MainActivity.listEasy.clear();
         MainActivity.listMedium.clear();
         MainActivity.listHard.clear();
@@ -71,15 +72,19 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
             if(markScore == 1){
                 MainActivity.listCompleted.add(MainActivity.populateList.get(0).get(k));
             } else{
-                if(MainActivity.populateList.get(0).get(k).get(8).contains("Easy")){
+                if(MainActivity.populateList.get(0).get(k).get(8).contains("Beginner")){
+                    MainActivity.listBeginner.add(MainActivity.populateList.get(0).get(k));
+                } else if(MainActivity.populateList.get(0).get(k).get(8).contains("Easy")){
                     MainActivity.listEasy.add(MainActivity.populateList.get(0).get(k));
                 } else if(MainActivity.populateList.get(0).get(k).get(8).contains("Medium")){
                     MainActivity.listMedium.add(MainActivity.populateList.get(0).get(k));
                 } else if(MainActivity.populateList.get(0).get(k).get(8).contains("Hard")){
                     MainActivity.listHard.add(MainActivity.populateList.get(0).get(k));
-            }
+               }
             }
         }
+
+        Log.v("LISTCOMPLETED FRAGMENT", MainActivity.listCompleted.size() +"");
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("cscomplete", MainActivity.listCompleted.size());
@@ -161,6 +166,8 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
             intent.putExtra("extraInfo", "Medium");
         } else if(e.getXIndex() == 2){
             intent.putExtra("extraInfo", "Easy");
+        } else if(e.getXIndex() == 3) {
+            intent.putExtra("extraInfo", "Beginner");
         } else{
             intent.putExtra("extraInfo", "Completed");
         }
@@ -203,11 +210,13 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         xVals.add("Hard");
         xVals.add("Medium");
         xVals.add("Easy");
+        xVals.add("Beginner");;
         xVals.add("Completed");
         entries1.add(new Entry(MainActivity.listHard.size(), 0));
         entries1.add(new Entry(MainActivity.listMedium.size(), 1));
         entries1.add(new Entry(MainActivity.listEasy.size(), 2));
-        entries1.add(new Entry(MainActivity.listCompleted.size(), 3));
+        entries1.add(new Entry(MainActivity.listBeginner.size(), 3));
+        entries1.add(new Entry(MainActivity.listCompleted.size(), 4));
 
 
 

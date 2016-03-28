@@ -1,4 +1,4 @@
-package com.chernyee.cssquare;
+package com.chernyee.cssquare.UI;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -9,7 +9,9 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
-import java.util.HashMap;
+import com.chernyee.cssquare.R;
+import com.chernyee.cssquare.Utility.SyntaxHighlighter;
+
 import java.util.List;
 
 import me.gujun.android.taggroup.TagGroup;

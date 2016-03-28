@@ -22,6 +22,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.chernyee.cssquare.Utility.SyntaxHighlighter;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -209,7 +211,7 @@ public class QuestionActivity extends AppCompatActivity {
 
                 String markString = "cse"+info.get(0);
                 int markScore = sharedPref.getInt(markString, 0);
-                if(markScore == 1 || weirdToggle){
+                if(markScore == 1 || weirdToggle || info.get(8).equals("Beginner")){
                     if(codeButton.getText().equals("Hide Solution")){
                         updateCodeAndNumber(info.get(3));
                         cliptoBoard = info.get(3);
@@ -230,12 +232,12 @@ public class QuestionActivity extends AppCompatActivity {
                     tDelta = tEnd - tStart;
                     elapsedSeconds = tDelta / 1000.0;
 
-                    if(elapsedSeconds < 120){
+                    if(elapsedSeconds < 60){
 
 
                         AlertDialog.Builder builder1 = new AlertDialog.Builder(QuestionActivity.this);
                         builder1.setTitle("Show Solution");
-                        builder1.setMessage("Really? You spent less than 2 minutes and you already give up? ");
+                        builder1.setMessage("Really? You spent less than a minute and you already give up? ");
                         builder1.setCancelable(true);
 
 
@@ -256,8 +258,6 @@ public class QuestionActivity extends AppCompatActivity {
                                         if (mInterstitialAd.isLoaded()) {
                                             mInterstitialAd.show();
                                         }
-
-
                                         weirdToggle = true;
 
                                         if(codeButton.getText().equals("Hide Solution")){
@@ -298,9 +298,7 @@ public class QuestionActivity extends AppCompatActivity {
                         }
 
                     }
-
                 }
-
 
             }
         });

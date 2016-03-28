@@ -40,6 +40,7 @@ import java.util.List;
 
 import cn.iwgang.countdownview.CountdownView;
 import com.chernyee.cssquare.AlertDialog.SweetAlertDialog;
+import com.chernyee.cssquare.Utility.SyntaxHighlighter;
 
 public class InterviewAfterActivity extends AppCompatActivity {
 
