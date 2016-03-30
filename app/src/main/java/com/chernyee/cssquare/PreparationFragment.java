@@ -8,6 +8,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -18,59 +21,35 @@ import us.feras.mdv.MarkdownView;
 
 
 public class PreparationFragment extends Fragment{
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    private AsyncTask<Void,Void,Void> asyncTask;
-    private MarkdownView markdownView;
-    private ProgressDialog progress;
-    private View v;
 
+    private MarkdownView markdownView;
+    private View v;
     private AdView adView;
     private AdRequest adRequest;
-
     private SharedPreferences sharedPreferences;
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
 
     public PreparationFragment() {
         // Required empty public constructor
     }
 
-    public static PreparationFragment newInstance(String param1, String param2) {
-        PreparationFragment fragment = new PreparationFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        MenuItem item = menu.findItem(R.id.search);
+        item.setVisible(false);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_preparation, container, false);
-
         markdownView = (MarkdownView) v.findViewById(R.id.markdownView);
-      //  markdownView.loadMarkdownFile("file:///android_asset/README.md", "file:///android_asset/alt.css");
-
-
         int setAds = sharedPreferences.getInt("csnoads", 0);
         if(setAds == 0){
             adView = (AdView) v.findViewById(R.id.adView);
@@ -84,9 +63,7 @@ public class PreparationFragment extends Fragment{
             adView = (AdView) v.findViewById(R.id.adView);
             adView.setVisibility(View.GONE);
         }
-
         return v;
-
     }
 
     @Override
@@ -101,35 +78,6 @@ public class PreparationFragment extends Fragment{
     public void onResume() {
         super.onResume();
 
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 
     private class MyTask extends AsyncTask<Void, Void, Void> {
@@ -150,7 +98,7 @@ public class PreparationFragment extends Fragment{
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

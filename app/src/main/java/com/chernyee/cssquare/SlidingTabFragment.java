@@ -24,8 +24,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.Toast;
+
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,25 +44,17 @@ public class SlidingTabFragment extends Fragment{
     private ViewPager mViewPager;
     private CustomAdapter customAdapter;
     private SharedPreferences sharedPreferences;
-    public static HashMap<Integer, List<List<String>>> populateListCopy;
     private ListView lv;
-    private Parcelable state;
-
+    private String difficulty;
+    private String sortBy;
+    private HashMap<Integer,List<Question>> hashMap;
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.filter, menu);
-    }
-
-    @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+        MenuItem item = menu.findItem(R.id.search);
+        item.setVisible(true);
     }
 
     @Override
@@ -64,90 +62,66 @@ public class SlidingTabFragment extends Fragment{
         int id = item.getItemId();
         if(id == R.id.filter){
 
-            String levelstr = sharedPreferences.getString("cslevel", "All");
-            final ArrayList<Integer> selectedItems=new ArrayList<>();
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View dialoglayout = inflater.inflate(R.layout.filter, null);
+            final CheckBox inputBeginner = (CheckBox) dialoglayout.findViewById(R.id.beginner);
+            final CheckBox inputEasy = (CheckBox) dialoglayout.findViewById(R.id.easy);
+            final CheckBox inputMedium = (CheckBox) dialoglayout.findViewById(R.id.medium);
+            final CheckBox inputHard = (CheckBox) dialoglayout.findViewById(R.id.hard);
+            final RadioButton titleAscending = (RadioButton) dialoglayout.findViewById(R.id.titleAscending);
+            final RadioButton titleDescending = (RadioButton) dialoglayout.findViewById(R.id.titleDescending);
 
-            CharSequence[] items = { "Beginner","Easy","Medium","Hard"};
-            boolean[] checkedItems = {false, false, false, false};
+            if(difficulty.contains("Beginner")) inputBeginner.setChecked(true);
+            if(difficulty.contains("Easy")) inputEasy.setChecked(true);
+            if(difficulty.contains("Medium")) inputMedium.setChecked(true);
+            if(difficulty.contains("Hard")) inputHard.setChecked(true);
+            if(sortBy.equals("titleAscending")) titleAscending.setChecked(true);
+            else if(sortBy.equals("titleDescending")) titleDescending.setChecked(true);
 
-            if(!levelstr.equals("All")){
-                if(levelstr.contains("Beginner")){
-                    checkedItems[0] = true;
-                    selectedItems.add(0);
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+            alertDialog.setView(dialoglayout);
+
+            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    dialog.cancel();
                 }
+            });
 
-                if(levelstr.contains("Easy")){
-                    checkedItems[1] = true;
-                    selectedItems.add(1);
-                }
-                if(levelstr.contains("Medium")){
-                    checkedItems[2] = true;
-                    selectedItems.add(2);
-                }
-                if(levelstr.contains("Hard")){
-                    checkedItems[3] = true;
-                    selectedItems.add(3);
-                }
-            } else{
-                checkedItems[0] = true;
-                checkedItems[1] = true;
-                checkedItems[2] = true;
-                checkedItems[3] = true;
-                selectedItems.add(0);
-                selectedItems.add(1);
-                selectedItems.add(2);
-                selectedItems.add(3);
-            }
+            alertDialog.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    // do something with it()
 
-            AlertDialog dialog = new AlertDialog.Builder(getActivity())
-                    .setTitle("Select difficulty level")
-                    .setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int indexSelected, boolean isChecked) {
+                    if(!inputBeginner.isChecked() && !inputEasy.isChecked() && !inputMedium.isChecked()
+                            && !inputHard.isChecked()) {
+                        Toast.makeText(getContext(), "Please select at least one difficulty." , Toast.LENGTH_LONG).show();
+                    } else{
+                        String difficult = "";
+                        String sort = "";
+                        if(inputBeginner.isChecked()) difficult += "Beginner";
+                        if(inputEasy.isChecked()) difficult += "Easy";
+                        if(inputMedium.isChecked()) difficult += "Medium";
+                        if(inputHard.isChecked()) difficult += "Hard";
+                        if(titleAscending.isChecked()) sort = "titleAscending";
+                        else if(titleDescending.isChecked()) sort = "titleDescending";
 
-                            if (isChecked) {
-                                selectedItems.add(indexSelected);
-                            } else if (selectedItems.contains(indexSelected)) {
-                                // Else, if the item is already in the array, remove it
-                                selectedItems.remove(Integer.valueOf(indexSelected));
-                            }
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("csfilterdifficulty", difficult);
+                        editor.putString("csfiltersortby", sort);
+                        editor.commit();
+                        difficulty = sharedPreferences.getString("csfilterdifficulty", "BeginnerEasyMediumHard"); // default value
+                        sortBy = sharedPreferences.getString("csfiltersortby", "titleAscending"); // default value
+                        if(mViewPager != null){
+                            mViewPager.setAdapter(new SamplePagerAdapter());
+                            mSlidingTabLayout.setViewPager(mViewPager);
                         }
-                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
+                        Toast.makeText(getContext(), "List has been refreshed!", Toast.LENGTH_LONG).show();
+                    }
+                    dialog.cancel();
+                }
+            });
 
-
-                        }
-                    }).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            String level = "";
-                            if(selectedItems.size() > 0){
-                                for(int i = 0 ; i < selectedItems.size(); i++){
-                                    if(selectedItems.get(i) == 0){
-                                        level += "Beginner";
-                                    }
-                                    if(selectedItems.get(i) == 1){
-                                        level += "Easy";
-                                    } else if(selectedItems.get(i) == 2){
-                                        level += "Medium";
-                                    } else if(selectedItems.get(i) == 3){
-                                        level += "Hard";
-                                    }
-                                }
-
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString("cslevel", level);
-                                editor.commit();
-                                new FragmentAsyncTask().execute();
-                                Toast.makeText(getContext(), "List has been refreshed!", Toast.LENGTH_LONG).show();
-                            } else{
-                                Toast.makeText(getContext(), "You must select either one of difficulty level!", Toast.LENGTH_LONG).show();
-                            }
-
-                        }
-                    }).create();
-            dialog.show();
+            alertDialog.show();
         }
 
         return super.onOptionsItemSelected(item);
@@ -161,15 +135,13 @@ public class SlidingTabFragment extends Fragment{
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        new FragmentAsyncTask().execute();
+        difficulty = sharedPreferences.getString("csfilterdifficulty", "BeginnerEasyMediumHard"); // default value
+        sortBy = sharedPreferences.getString("csfiltersortby", "titleAscending"); // default value
+        hashMap = new HashMap<>();
+
         super.onCreate(savedInstanceState);
     }
 
@@ -179,6 +151,9 @@ public class SlidingTabFragment extends Fragment{
         View view = inflater.inflate(R.layout.slidingtab_fragment, container, false);
         mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
+        mViewPager.setAdapter(new SamplePagerAdapter());
+        mSlidingTabLayout.setViewPager(mViewPager);
+
         return view;
     }
 
@@ -193,7 +168,7 @@ public class SlidingTabFragment extends Fragment{
 
         @Override
         public int getCount() {
-            return MainActivity.code_tag.length;
+            return QuestionList.code_tag.length;
         }
 
         @Override
@@ -204,7 +179,7 @@ public class SlidingTabFragment extends Fragment{
         @Override
         public CharSequence getPageTitle(int position) {
            // return "Item " + (position + 1);
-            return MainActivity.code_tag[position];
+            return QuestionList.code_tag[position];
         }
 
         @Override
@@ -217,11 +192,10 @@ public class SlidingTabFragment extends Fragment{
 
             View view = getActivity().getLayoutInflater().inflate(R.layout.pager_item, container, false);
             container.addView(view);
-
+            List<Question> qList = QuestionList.getViewPosition(position, difficulty, sortBy);
+            hashMap.put(position, qList);
             lv = (ListView) view.findViewById(R.id.questionlist);
-
-            customAdapter = new CustomAdapter(getActivity(), R.layout.list_item,
-                    populateListCopy.get(position));
+            customAdapter = new CustomAdapter(getActivity(), R.layout.list_item,qList);
             lv.setAdapter(customAdapter);
 
             final int final_position = position;
@@ -230,40 +204,45 @@ public class SlidingTabFragment extends Fragment{
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    if(populateListCopy.get(final_position).get(position).get(8).contains("Medium")){
-
+                    if(hashMap.get(final_position).get(position).getDifficulty().contains("Medium")){
                         int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
                         int sizemedium = sharedPreferences.getInt("csmedium", 0);
-
                         int remaining = sizemedium - sizeComplete;
-
                         if(remaining > 0){
-                            Toast.makeText(getContext(), "You need to at least complete " + remaining + " questions to unlock Medium level." , Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "You need to at least complete " + remaining +
+                                    " questions to unlock Medium level." , Toast.LENGTH_SHORT).show();
                         } else{
                             Intent i = new Intent(getActivity(), QuestionActivity.class);
-                            i.putStringArrayListExtra("information", new ArrayList<>(populateListCopy.get(final_position).get(position)));
+                            Bundle bundle = new Bundle();
+                            Parcelable wrapped = Parcels.wrap(hashMap.get(final_position).get(position));
+                            bundle.putParcelable("data", wrapped);
+                            i.putExtras(bundle);
                             startActivity(i);
                         }
 
 
-                    } else if(populateListCopy.get(final_position).get(position).get(8).contains("Hard")) {
-
+                    } else if(hashMap.get(final_position).get(position).getDifficulty().contains("Hard")) {
                         int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
                         int sizehard = sharedPreferences.getInt("cshard", 0);
-
                         int remaining = sizehard - sizeComplete;
-
                         if(remaining > 0){
-                            Toast.makeText(getContext(), "You need to at least complete " + remaining + " questions to unlock Hard level." , Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "You need to at least complete " + remaining +
+                                    " questions to unlock Hard level." , Toast.LENGTH_SHORT).show();
                         } else{
                             Intent i = new Intent(getActivity(), QuestionActivity.class);
-                            i.putStringArrayListExtra("information", new ArrayList<>(populateListCopy.get(final_position).get(position)));
+                            Bundle bundle = new Bundle();
+                            Parcelable wrapped = Parcels.wrap(hashMap.get(final_position).get(position));
+                            bundle.putParcelable("data", wrapped);
+                            i.putExtras(bundle);
                             startActivity(i);
                         }
 
                     } else{
                         Intent i = new Intent(getActivity(), QuestionActivity.class);
-                        i.putStringArrayListExtra("information", new ArrayList<>(populateListCopy.get(final_position).get(position)));
+                        Bundle bundle = new Bundle();
+                        Parcelable wrapped = Parcels.wrap(hashMap.get(final_position).get(position));
+                        bundle.putParcelable("data", wrapped);
+                        i.putExtras(bundle);
                         startActivity(i);
                     }
                 }
@@ -280,6 +259,7 @@ public class SlidingTabFragment extends Fragment{
     }
 
 
+
     private class FragmentAsyncTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -290,71 +270,14 @@ public class SlidingTabFragment extends Fragment{
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if(mViewPager != null){
-                mViewPager.setAdapter(new SamplePagerAdapter());
-                mSlidingTabLayout.setViewPager(mViewPager);
-            }
+
         }
 
         @Override
         protected Void doInBackground(Void... params) {
 
-            String levelstr = sharedPreferences.getString("cslevel", "All");
 
-            if(levelstr.equals("All") || (levelstr.contains("Beginner") && levelstr.contains("Easy") && levelstr.contains("Medium") && levelstr.contains("hard"))){
 
-                populateListCopy = new HashMap<>(MainActivity.populateList);
-
-            } else {
-
-                populateListCopy = new HashMap<>();
-
-                for (int i = 0; i < MainActivity.code_tag.length; i++) {
-
-                    List<List<String>> tempListList = new ArrayList<>();
-                    for (int j = 0; j < MainActivity.listId.size(); j++) {
-
-                        if (!levelstr.contains(MainActivity.listDifficulty.get(j))) continue;
-
-                        if (i == 0) {
-                            List<String> tempList = new ArrayList<>();
-                            tempList.add(MainActivity.listId.get(j));
-                            tempList.add(MainActivity.listTitle.get(j));
-                            tempList.add(MainActivity.listDescription.get(j));
-                            tempList.add(MainActivity.listCode.get(j));
-                            tempList.add(MainActivity.listAnswer.get(j));
-                            tempList.add(MainActivity.listHint.get(j));
-                            tempList.add(MainActivity.listTag.get(j));
-                            tempList.add(MainActivity.listCategory.get(j));
-                            tempList.add(MainActivity.listDifficulty.get(j));
-                            tempList.add(MainActivity.listAdditional.get(j));
-                            tempListList.add(tempList);
-                        } else if (MainActivity.listTag.get(j).contains(MainActivity.code_tag[i])) {
-                            List<String> tempList = new ArrayList<>();
-                            tempList.add(MainActivity.listId.get(j));
-                            tempList.add(MainActivity.listTitle.get(j));
-                            tempList.add(MainActivity.listDescription.get(j));
-                            tempList.add(MainActivity.listCode.get(j));
-                            tempList.add(MainActivity.listAnswer.get(j));
-                            tempList.add(MainActivity.listHint.get(j));
-                            tempList.add(MainActivity.listTag.get(j));
-                            tempList.add(MainActivity.listCategory.get(j));
-                            tempList.add(MainActivity.listDifficulty.get(j));
-                            tempList.add(MainActivity.listAdditional.get(j));
-                            tempListList.add(tempList);
-                        }
-                    }
-
-                    Collections.sort(tempListList, new Comparator<List<String>>() {
-                        @Override
-                        public int compare(List<String> lhs, List<String> rhs) {
-                            return lhs.get(1).compareTo(rhs.get(1));
-                        }
-                    });
-
-                    populateListCopy.put(i, tempListList);
-                }
-            }
             return null;
         }
     }

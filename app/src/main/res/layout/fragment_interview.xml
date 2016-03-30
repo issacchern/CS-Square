@@ -48,7 +48,7 @@
             <CheckedTextView
                 android:textColor="@android:color/black"
                 android:gravity="center"
-                android:id="@+id/checkedTextView1"
+                android:id="@+id/checkedTextViewHR"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -60,7 +60,7 @@
             <CheckedTextView
                 android:textColor="@android:color/black"
                 android:gravity="center"
-                android:id="@+id/checkedTextView2"
+                android:id="@+id/checkedTextViewKnowledge"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -98,7 +98,7 @@
             <CheckedTextView
                 android:textColor="@android:color/black"
                 android:gravity="center"
-                android:id="@+id/checkedTextView3"
+                android:id="@+id/checkedTextViewCode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -110,7 +110,7 @@
             <CheckedTextView
                 android:textColor="@android:color/black"
                 android:gravity="center"
-                android:id="@+id/checkedTextView4"
+                android:id="@+id/checkedTextViewAll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"

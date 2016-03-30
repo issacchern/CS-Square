@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +30,9 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+
+import org.parceler.Parcels;
+
 import java.util.List;
 
 import me.gujun.android.taggroup.TagGroup;
@@ -38,16 +42,19 @@ public class QuestionActivity extends AppCompatActivity {
     private InterstitialAd mInterstitialAd;
     private AdView adView;
     private AdRequest adRequest;
-
     private TagGroup mTagGroup;
-    private List<String> info;
+    private TextView titleView;
+    private TextView descriptionView;
+    private TextView codeView;
+    private TextView codeNumberView;
     private Button codeButton;
-    private int hintCount = 0;
     private CheckBox codeCheck;
+    private int hintCount = 0;
     private String cliptoBoard;
     private long tStart = 0;
     private long tDelta = 0;
     private long tEnd = 0;
+    private String [] splitHint;
     private double elapsedSeconds = 0;
     private boolean weirdToggle = false;
     private TextView noteTitle;
@@ -56,6 +63,7 @@ public class QuestionActivity extends AppCompatActivity {
     private FloatingActionButton actionB;
     private FloatingActionButton actionC;
     private FloatingActionButton actionD;
+    private Question q;
 
     private SharedPreferences sharedPref;
 
@@ -63,7 +71,6 @@ public class QuestionActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
-
         if(id == android.R.id.home){
             ActivityManager mngr = (ActivityManager) getSystemService( ACTIVITY_SERVICE );
             List<ActivityManager.RunningTaskInfo> taskList = mngr.getRunningTasks(10);
@@ -74,22 +81,19 @@ public class QuestionActivity extends AppCompatActivity {
             } else{
                 finish();
             }
-
-
         }
 
         else if (id == R.id.bookmark_item) {
-            String markString = "cs"+info.get(0);
-            int markScore = sharedPref.getInt(markString, 0);
-            if(markScore == 0){
+            int markStar = sharedPref.getInt("cs"+ q.getId(), 0);
+            if(markStar == 0){
                 SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putInt(markString, 1);
+                editor.putInt("cs"+ q.getId(), 1);
                 editor.commit();
                 item.setIcon(getResources().getDrawable(R.drawable.star));
                 Toast.makeText(this, "Bookmarked!", Toast.LENGTH_SHORT).show();
             } else{
                 SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putInt(markString,0);
+                editor.putInt("cs"+ q.getId(),0);
                 editor.commit();
                 item.setIcon(getResources().getDrawable(R.drawable.star_outline));
                 Toast.makeText(this, "Remove bookmarked!", Toast.LENGTH_SHORT).show();
@@ -98,8 +102,6 @@ public class QuestionActivity extends AppCompatActivity {
         } else if(id == R.id.hot){
             Toast.makeText(this, "This question is hot!",Toast.LENGTH_LONG).show();
         }
-
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -111,24 +113,16 @@ public class QuestionActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.bookmark, menu);
         MenuItem menuItem = menu.findItem(R.id.hot);
-        if(info.get(9).contains("hot")){
-
-        } else{
+        if(!q.getAdditional().contains("hot")){
             menuItem.setVisible(false);
         }
-
-
-
         MenuItem bedMenuItem = menu.findItem(R.id.bookmark_item);
-        String markString = "cs"+info.get(0);
-        int markScore = sharedPref.getInt(markString, 0);
-        if(markScore == 0){
+        int markStar = sharedPref.getInt("cs" + q.getId(), 0);
+        if(markStar == 0){
             bedMenuItem.setIcon(getResources().getDrawable(R.drawable.star_outline));
         } else{
             bedMenuItem.setIcon(getResources().getDrawable(R.drawable.star));
         }
-
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -148,30 +142,31 @@ public class QuestionActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        tStart = System.currentTimeMillis();
-
-        Bundle extras = getIntent().getExtras();
-
-        info = extras.getStringArrayList("information");
         sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        tStart = System.currentTimeMillis();
+        q = Parcels.unwrap(getIntent().getParcelableExtra("data"));
+        mTagGroup = (TagGroup) findViewById(R.id.tag_group);
+        codeButton = (Button) findViewById(R.id.codeButton);
+        titleView = (TextView) findViewById(R.id.codeTitle);
+        descriptionView = (TextView) findViewById(R.id.codeDescription);
+        codeView = (TextView) findViewById(R.id.code);
+        codeNumberView = (TextView) findViewById(R.id.codeNumber);
+        codeCheck = (CheckBox) findViewById(R.id.codeCheckBox);
+        note = (TextView) findViewById(R.id.codeNotes);
+        noteTitle = (TextView) findViewById(R.id.codeNotesTitle);
 
-        final String [] split = info.get(5).split("\n");
 
+        // show ads
         int ads = sharedPref.getInt("csnoads",0);
-
         if(ads == 0){
             adView = (AdView) findViewById(R.id.adView);
-
             adRequest = new AdRequest.Builder()
 //                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)        // All emulators
 //                .addTestDevice("5F99E784008077D0C0404F50AF1A4B44")  // An example device ID
                     .build();
             adView.loadAd(adRequest);
-
             mInterstitialAd = new InterstitialAd(this);
             mInterstitialAd.setAdUnitId("ca-app-pub-6737882167206424/5868773590");
-
             mInterstitialAd.setAdListener(new AdListener() {
                 @Override
                 public void onAdClosed() {
@@ -183,64 +178,67 @@ public class QuestionActivity extends AppCompatActivity {
             weirdToggle = true;
         }
 
-        mTagGroup = (TagGroup) findViewById(R.id.tag_group);
+        splitHint = q.getHint().split("\n");
+        cliptoBoard = q.getCode();
 
-        String tag = info.get(6);
+        titleView.setText(q.getTitle());
+        descriptionView.setText(q.getDescription());
+        updateCodeAndNumber(q.getCode());
+
+        // update tag
+        String tag = q.getTag();
         String [] tags = tag.split(",");
         for(int i = 0; i < tags.length ; i++){
             tags[i] = tags[i].trim();
         }
         mTagGroup.setTags(tags);
 
+        // hide/show checkbox
+        int markRead = sharedPref.getInt("cse"+q.getId(), 0);
+        if(markRead == 1){
+            codeCheck.setVisibility(View.VISIBLE);
+            codeCheck.setChecked(true);
+        } else {
+            codeCheck.setVisibility(View.GONE);
+            codeCheck.setChecked(false);
+        }
 
-        TextView titleView = (TextView) findViewById(R.id.codeTitle);
-        titleView.setText(info.get(1));
-        TextView descriptionView = (TextView) findViewById(R.id.codeDescription);
-        descriptionView.setText(info.get(2));
+        // comment area
+        String comment = sharedPref.getString("csef" + q.getId(), "None");
+        if(comment.equals("None") || comment.equals("")){
+            note.setVisibility(View.GONE);
+            noteTitle.setVisibility(View.GONE);
+        } else{
+            note.setText(comment);
+        }
 
-        updateCodeAndNumber(info.get(3));
 
-
-
-        cliptoBoard = info.get(3);
-
-        codeButton = (Button) findViewById(R.id.codeButton);
         codeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                String markString = "cse"+info.get(0);
-                int markScore = sharedPref.getInt(markString, 0);
-                if(markScore == 1 || weirdToggle || info.get(8).equals("Beginner")){
-                    if(codeButton.getText().equals("Hide Solution")){
-                        updateCodeAndNumber(info.get(3));
-                        cliptoBoard = info.get(3);
+                int markRead = sharedPref.getInt("cse" + q.getId(), 0);
+                if (markRead == 1 || weirdToggle || q.getDifficulty().equals("Beginner")) {
+                    if (codeButton.getText().equals("Hide Solution")) {
+                        updateCodeAndNumber(q.getCode());
+                        cliptoBoard = q.getCode();
                         codeButton.setText("Show Solution");
                         codeCheck.setVisibility(View.VISIBLE);
-
-                    } else{
-                        updateCodeAndNumber(info.get(4));
-                        cliptoBoard = info.get(4);
+                    } else {
+                        updateCodeAndNumber(q.getAnswer());
+                        cliptoBoard = q.getAnswer();
                         codeButton.setText("Hide Solution");
                         codeCheck.setVisibility(View.VISIBLE);
-
                     }
-
-                } else{
-
+                } else {
                     tEnd = System.currentTimeMillis();
                     tDelta = tEnd - tStart;
                     elapsedSeconds = tDelta / 1000.0;
-
-                    if(elapsedSeconds < 60){
-
-
+                    if (elapsedSeconds < 60) {
                         AlertDialog.Builder builder1 = new AlertDialog.Builder(QuestionActivity.this);
                         builder1.setTitle("Show Solution");
                         builder1.setMessage("Really? You spent less than a minute and you already give up? ");
                         builder1.setCancelable(true);
-
-
                         builder1.setPositiveButton(
                                 "Keep trying",
                                 new DialogInterface.OnClickListener() {
@@ -253,77 +251,61 @@ public class QuestionActivity extends AppCompatActivity {
                                 "See answer",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-
                                         //TODO:show ads
                                         if (mInterstitialAd.isLoaded()) {
                                             mInterstitialAd.show();
                                         }
                                         weirdToggle = true;
-
-                                        if(codeButton.getText().equals("Hide Solution")){
-                                            updateCodeAndNumber(info.get(3));
-                                            cliptoBoard = info.get(3);
+                                        if (codeButton.getText().equals("Hide Solution")) {
+                                            updateCodeAndNumber(q.getCode());
+                                            cliptoBoard = q.getCode();
                                             codeButton.setText("Show Solution");
                                             codeCheck.setVisibility(View.VISIBLE);
 
-                                        } else{
-                                            updateCodeAndNumber(info.get(4));
-                                            cliptoBoard = info.get(4);
+                                        } else {
+                                            updateCodeAndNumber(q.getAnswer());
+                                            cliptoBoard = q.getAnswer();
                                             codeButton.setText("Hide Solution");
                                             codeCheck.setVisibility(View.VISIBLE);
-
                                         }
                                         dialog.cancel();
                                     }
                                 });
-
                         AlertDialog alert11 = builder1.create();
                         alert11.show();
 
-
-                    } else{
-
-                        if(codeButton.getText().equals("Hide Solution")){
-                            updateCodeAndNumber(info.get(3));
-                            cliptoBoard = info.get(3);
+                    } else {
+                        if (codeButton.getText().equals("Hide Solution")) {
+                            updateCodeAndNumber(q.getCode());
+                            cliptoBoard = q.getCode();
                             codeButton.setText("Show Solution");
                             codeCheck.setVisibility(View.VISIBLE);
 
-                        } else{
-                            updateCodeAndNumber(info.get(4));
-                            cliptoBoard = info.get(4);
+                        } else {
+                            updateCodeAndNumber(q.getAnswer());
+                            cliptoBoard = q.getAnswer();
                             codeButton.setText("Hide Solution");
                             codeCheck.setVisibility(View.VISIBLE);
-
                         }
-
                     }
                 }
-
             }
         });
-
-        codeCheck = (CheckBox) findViewById(R.id.codeCheckBox);
-        codeCheck.setVisibility(View.GONE);
 
         codeCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                String markString = "cse"+info.get(0);
-                int markScore = sharedPref.getInt(markString, 0);
+                int markScore = sharedPref.getInt("cse"+q.getId(), 0);
                 if(markScore == 0){
                     SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putInt(markString, 1);
+                    editor.putInt("cse"+q.getId(), 1);
                     editor.commit();
                     int ss = sharedPref.getInt("cscomplete",0) + 1;
                     editor.putInt("cscomplete", ss);
                     editor.commit();
-
-
                 } else{
                     SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putInt(markString, 0);
+                    editor.putInt("cse"+q.getId(), 0);
                     editor.commit();
                     int ss = sharedPref.getInt("cscomplete",0) - 1;
                     editor.putInt("cscomplete", ss);
@@ -331,18 +313,6 @@ public class QuestionActivity extends AppCompatActivity {
                 }
             }
         });
-
-        String markString = "cse"+info.get(0);
-        int markScore = sharedPref.getInt(markString, 0);
-        if(markScore == 1){
-            codeCheck.setVisibility(View.VISIBLE);
-            codeCheck.setChecked(true);
-        } else {
-            codeCheck.setVisibility(View.GONE);
-            codeCheck.setChecked(false);
-        }
-
-
 
         actionA = (FloatingActionButton) findViewById(R.id.action_a);
         actionA.setOnClickListener(new View.OnClickListener() {
@@ -388,8 +358,7 @@ public class QuestionActivity extends AppCompatActivity {
                 View dialoglayout = inflater.inflate(R.layout.edit_text, null);
                 final EditText input = (EditText) dialoglayout.findViewById(R.id.edit);
 
-                String str = "csef" + info.get(0);
-                String none = sharedPref.getString(str,"None");
+                String none = sharedPref.getString("csef" + q.getId(),"None");
                 if(none.equals("None") || none.equals("")){
 
                 } else {
@@ -409,11 +378,9 @@ public class QuestionActivity extends AppCompatActivity {
                 alertDialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // do something with it()
-                        String str = "csef" + info.get(0);
                         SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString(str, input.getText().toString());
+                        editor.putString("csef" + q.getId(), input.getText().toString());
                         editor.commit();
-
 
                         if(input.getText().toString().equals("None") || input.getText().toString().equals("")){
                             note.setVisibility(View.GONE);
@@ -433,52 +400,36 @@ public class QuestionActivity extends AppCompatActivity {
             }
         });
 
-
         actionD = (FloatingActionButton) findViewById(R.id.action_d);
         actionD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(hintCount > split.length -1) hintCount = 0;
-                Snackbar.make(view, split[hintCount++], Snackbar.LENGTH_LONG)
+                if(hintCount > splitHint.length -1) hintCount = 0;
+                Snackbar.make(view, splitHint[hintCount++], Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
             }
         });
-
-        note = (TextView) findViewById(R.id.codeNotes);
-        String str = "csef" + info.get(0);
-        String none = sharedPref.getString(str,"None");
-
-        noteTitle = (TextView) findViewById(R.id.codeNotesTitle);
-
-
-        if(none.equals("None") || none.equals("")){
-            note.setVisibility(View.GONE);
-            noteTitle.setVisibility(View.GONE);
-        } else{
-            note.setText(none);
-        }
     }
 
 
 
     public void updateCodeAndNumber(String str){
-
         SyntaxHighlighter sh1 = new SyntaxHighlighter(str);
-        TextView codeView = (TextView) findViewById(R.id.code);
         codeView.setText(sh1.formatToHtml());
-
-        int lineNumber = MainActivity.countLines(str);
+        int lineNumber = countLines(str);
         String printLine = "";
         for(int i = 1; i <= lineNumber; i++){
             if(i < lineNumber)
                 printLine += (i < 10) ? " " + i + "\n" : "" + i + "\n" ;
             else printLine += (i < 10) ? " " + i : "" + i;
         }
-
-        TextView codeNumberView = (TextView) findViewById(R.id.codeNumber);
         codeNumberView.setText(printLine);
     }
 
-
+    public int countLines(String str){
+        String[] lines = str.split("\r\n|\r|\n");
+        if(lines[lines.length-1].length() == 0) return lines.length - 1;
+        else return lines.length;
+    }
 }

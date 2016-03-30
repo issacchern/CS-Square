@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Parcelable;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.v4.view.PagerAdapter;
@@ -21,6 +22,8 @@ import com.chernyee.cssquare.Recording.RecordingSampler;
 import com.chernyee.cssquare.Recording.VisualizerView;
 import com.chernyee.cssquare.UI.IssacViewPager;
 import com.chernyee.cssquare.UI.ZoomOutPageTransformer;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,24 +49,117 @@ public class InterviewActivity extends AppCompatActivity implements
     private int filter1 = 0;
     private int filter2= 0;
     private int filter3 = 0;
-    private int seekTime = 0;
     private boolean endInterview = false;
     private HashMap<String, String> map = new HashMap<>();
     private int globalCount = 0;
     private boolean onCountDown = true;
+    private String firstViewPager = "Hi, my name is Kimberley and I will be conducting your interview today. First of all, tell me about yourself.";
+    private String secondLastViewPager = "Do you have any question for me?";
+    private String lastViewPager = "Thank you for completing the mock interview and please click the end interview button to proceed.";
 
-    private ArrayList<String> interviewQuestionList = new ArrayList<>();
-    private ArrayList<String> interviewAnswerList = new ArrayList<>();
-    private ArrayList<String> interviewCategoryList = new ArrayList<>();
-    private List<List<String>> interviewKnowledgeAll = new ArrayList<List<String>>();
-
+    private List<Question2> interviewList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_interview);
         final TextView countDownText = (TextView) findViewById(R.id.countDownText);
-        new CountDownTimer(3900, 1000) {
+        map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "UniqueID");
+        sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        boolean cscheckHR = sharedPreferences.getBoolean("cscheck1", false);
+        boolean cscheckKnowledge = sharedPreferences.getBoolean("cscheck2", false);
+        boolean cscheckJava = sharedPreferences.getBoolean("cscheck2Java", false);
+        boolean cscheckAndroid = sharedPreferences.getBoolean("cscheck2Android", false);
+        boolean cscheckCode = sharedPreferences.getBoolean("cscheck3", false);
+        final int seekTime = sharedPreferences.getInt("csseek", 10);
+        int numQuestions = sharedPreferences.getInt("csplusminus", 10);
+
+
+        interviewList = new ArrayList<>();
+        interviewList.add(new Question2(firstViewPager));
+        List<Question2> HRList = new ArrayList<>(QuestionList.getInterviewList("HR"));
+        List<Question2> knowledgeList = new ArrayList<>(QuestionList.getInterviewList("Knowledge"));
+        List<Question2> javaList = new ArrayList<>(QuestionList.getInterviewList("Java"));
+        List<Question2> androidList = new ArrayList<>(QuestionList.getInterviewList("Android"));
+        List<Question2> codeList = new ArrayList<>(QuestionList.getInterviewList("Coding"));
+        if(cscheckJava) knowledgeList.addAll(javaList);
+        if(cscheckAndroid) knowledgeList.addAll(androidList);
+        Collections.shuffle(HRList);
+        Collections.shuffle(codeList);
+        Collections.shuffle(knowledgeList);
+
+
+
+        if(cscheckHR && cscheckKnowledge && cscheckCode){
+            filter1 = (numQuestions / 3 > HRList.size()) ? HRList.size() : numQuestions / 3 ;
+            filter2 = (numQuestions - filter1 - numQuestions / 3 > knowledgeList.size())? knowledgeList.size() : numQuestions - filter1 - numQuestions / 3 ;
+            filter3 = (numQuestions - filter1 - filter2 > codeList.size()) ? codeList.size() : numQuestions - filter1 - filter2;
+
+            for(int i = 0 ; i < filter1 ; i++){
+                interviewList.add(HRList.get(i));
+            }
+            for(int i = 0 ; i < filter2 ; i++){
+                interviewList.add(knowledgeList.get(i));
+            }
+            for(int i = 0 ; i < filter3 ; i++){
+                interviewList.add(codeList.get(i));
+            }
+
+        } else if((cscheckHR && cscheckKnowledge) || (cscheckKnowledge && cscheckCode) || cscheckHR && cscheckCode){
+            if(cscheckHR && cscheckKnowledge){
+                filter1 = (numQuestions / 2 >  HRList.size()) ? HRList.size() : numQuestions / 2 ;
+                filter2 = (numQuestions - filter1 > knowledgeList.size())? knowledgeList.size() : numQuestions - filter1;
+                for(int i = 0 ; i < filter1 ; i++){
+                    interviewList.add(HRList.get(i));
+                }
+                for(int i = 0 ; i < filter2 ; i++){
+                    interviewList.add(knowledgeList.get(i));
+                }
+
+            } else if (cscheckKnowledge && cscheckCode){
+                filter2 = (numQuestions / 2 > knowledgeList.size()) ? knowledgeList.size() : numQuestions / 2 ;
+                filter3 = (numQuestions - filter2 > codeList.size())? codeList.size() : numQuestions - filter2;
+                for(int i = 0 ; i < filter2 ; i++){
+                    interviewList.add(knowledgeList.get(i));
+                }
+                for(int i = 0 ; i < filter3 ; i++){
+                    interviewList.add(codeList.get(i));
+                }
+
+            } else if (cscheckHR && cscheckCode){
+                filter1 = (numQuestions / 2 > HRList.size()) ? HRList.size() : numQuestions / 2 ;
+                filter3 = (numQuestions - filter1 > codeList.size())? codeList.size() : numQuestions - filter1;
+                for(int i = 0 ; i < filter1 ; i++){
+                    interviewList.add(HRList.get(i));
+                }
+                for(int i = 0 ; i < filter3 ; i++){
+                    interviewList.add(codeList.get(i));
+                }
+            }
+
+        } else if(cscheckHR){
+            filter1 = (numQuestions > HRList.size()) ? HRList.size() : numQuestions;
+            for(int i = 0 ; i < filter1 ; i++){
+                interviewList.add(HRList.get(i));
+            }
+
+        } else if(cscheckKnowledge){
+            filter2 = (numQuestions > knowledgeList.size()) ? knowledgeList.size() : numQuestions;
+            for(int i = 0 ; i < filter2 ; i++){
+                interviewList.add(knowledgeList.get(i));
+            }
+
+        } else if(cscheckCode){
+            filter3 = (numQuestions > codeList.size()) ? codeList.size() : numQuestions;
+            for(int i = 0 ; i < filter3 ; i++){
+                interviewList.add(codeList.get(i));
+            }
+        }
+
+        interviewList.add(new Question2(secondLastViewPager));
+        interviewList.add(new Question2(lastViewPager));
+
+        new CountDownTimer(3200, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 countDownText.setText(millisUntilFinished / 1000 + "");
@@ -83,7 +179,7 @@ public class InterviewActivity extends AppCompatActivity implements
                     @Override
                     public void onPageSelected(int position) {
                         if (globalCount < position) {
-                            String s[] = interviewQuestionList.get(position).split("[.,?]");
+                            String[] s = interviewList.get(position).getQuestion().split("[.,?]");
                             for (int i = 0; i < s.length; i++) {
                                 tts.speak(s[i], TextToSpeech.QUEUE_ADD, map);
                                 tts.playSilence(400, TextToSpeech.QUEUE_ADD, map);
@@ -102,141 +198,19 @@ public class InterviewActivity extends AppCompatActivity implements
                 mRecordingSampler.startRecording();
                 mCvCountdownView.start(seekTime * 60 * 1000);
 
-                String s[] = interviewQuestionList.get(0).split("[.,?]");
+
+                String s[] = firstViewPager.split("[.,?]");
                 for(int i = 0; i < s.length; i++){
                     tts.speak(s[i], TextToSpeech.QUEUE_ADD, map);
                     tts.playSilence(400,TextToSpeech.QUEUE_ADD, map);
                 }
-
                 onCountDown = false;
-
             }
         }.start();
 
-        map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "UniqueID");
-        sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        boolean cscheck1 = sharedPreferences.getBoolean("cscheck1", false);
-        boolean cscheck2 = sharedPreferences.getBoolean("cscheck2", false);
-        boolean cscheck2Java = sharedPreferences.getBoolean("cscheck2Java", false);
-        boolean cscheck2Android = sharedPreferences.getBoolean("cscheck2Android", false);
-        boolean cscheck3 = sharedPreferences.getBoolean("cscheck3", false);
-        seekTime = sharedPreferences.getInt("csseek", 10);
-        int numQuestions = sharedPreferences.getInt("csplusminus", 10);
-        interviewKnowledgeAll.addAll(MainActivity.interviewKnowledge);
-        if(cscheck2Java) interviewKnowledgeAll.addAll(MainActivity.interviewKnowledgeJava);
-        if(cscheck2Android) interviewKnowledgeAll.addAll(MainActivity.interviewKnowledgeAndroid);
-
-        Collections.shuffle(MainActivity.interviewHR);
-        Collections.shuffle(MainActivity.interviewCoding);
-        Collections.shuffle(interviewKnowledgeAll);
-
-        interviewAnswerList.clear();
-        interviewQuestionList.clear();
-        interviewCategoryList.clear();
-        interviewQuestionList.add("Hi, my name is Kimberley and I will be conducting your interview today. First of all, tell me about yourself.");
-
-        if(cscheck1 && cscheck2 && cscheck3){
-            filter1 = (numQuestions / 3 > MainActivity.interviewHR.size()) ? MainActivity.interviewHR.size() : numQuestions / 3 ;
-            filter2 = (numQuestions - filter1 - numQuestions / 3 > interviewKnowledgeAll.size())? interviewKnowledgeAll.size() : numQuestions - filter1 - numQuestions / 3 ;
-            filter3 = (numQuestions - filter1 - filter2 > MainActivity.interviewCoding.size()) ? MainActivity.interviewCoding.size() : numQuestions - filter1 - filter2;
-
-            for(int i = 0 ; i < filter1 ; i++){
-                interviewQuestionList.add(MainActivity.interviewHR.get(i).get(1));
-                interviewAnswerList.add(MainActivity.interviewHR.get(i).get(2));
-                interviewCategoryList.add(MainActivity.interviewHR.get(i).get(3));
-            }
-
-            for(int i = 0 ; i < filter2 ; i++){
-                interviewQuestionList.add(interviewKnowledgeAll.get(i).get(1));
-                interviewAnswerList.add(interviewKnowledgeAll.get(i).get(2));
-                interviewCategoryList.add(interviewKnowledgeAll.get(i).get(3));
-            }
-
-            for(int i = 0 ; i < filter3 ; i++){
-                interviewQuestionList.add(MainActivity.interviewCoding.get(i).get(1));
-                interviewAnswerList.add(MainActivity.interviewCoding.get(i).get(2));
-                interviewCategoryList.add(MainActivity.interviewCoding.get(i).get(3));
-            }
-
-        } else if((cscheck1 && cscheck2) || (cscheck2 && cscheck3) || cscheck1 && cscheck3){
-            if(cscheck1 && cscheck2){
-                filter1 = (numQuestions / 2 >  MainActivity.interviewHR.size()) ?  MainActivity.interviewHR.size() : numQuestions / 2 ;
-                filter2 = (numQuestions - filter1 > interviewKnowledgeAll.size())? interviewKnowledgeAll.size() : numQuestions - filter1;
-                for(int i = 0 ; i < filter1 ; i++){
-                    interviewQuestionList.add(MainActivity.interviewHR.get(i).get(1));
-                    interviewAnswerList.add(MainActivity.interviewHR.get(i).get(2));
-                    interviewCategoryList.add(MainActivity.interviewHR.get(i).get(3));
-                }
-
-                for(int i = 0 ; i < filter2 ; i++){
-                    interviewQuestionList.add(interviewKnowledgeAll.get(i).get(1));
-                    interviewAnswerList.add(interviewKnowledgeAll.get(i).get(2));
-                    interviewCategoryList.add(interviewKnowledgeAll.get(i).get(3));
-                }
 
 
-            } else if (cscheck2 && cscheck3){
-                filter2 = (numQuestions / 2 > interviewKnowledgeAll.size()) ? interviewKnowledgeAll.size() : numQuestions / 2 ;
-                filter3 = (numQuestions - filter2 > MainActivity.interviewCoding.size())? MainActivity.interviewCoding.size() : numQuestions - filter2;
-                for(int i = 0 ; i < filter2 ; i++){
-                    interviewQuestionList.add(interviewKnowledgeAll.get(i).get(1));
-                    interviewAnswerList.add(interviewKnowledgeAll.get(i).get(2));
-                    interviewCategoryList.add(interviewKnowledgeAll.get(i).get(3));
-                }
 
-                for(int i = 0 ; i < filter3 ; i++){
-                    interviewQuestionList.add(MainActivity.interviewCoding.get(i).get(1));
-                    interviewAnswerList.add(MainActivity.interviewCoding.get(i).get(2));
-                    interviewCategoryList.add(MainActivity.interviewCoding.get(i).get(3));
-                }
-
-            } else if (cscheck1 && cscheck3){
-                filter1 = (numQuestions / 2 > MainActivity.interviewHR.size()) ?MainActivity.interviewHR.size() : numQuestions / 2 ;
-                filter3 = (numQuestions - filter1 > MainActivity.interviewCoding.size())? MainActivity.interviewCoding.size() : numQuestions - filter1;
-                for(int i = 0 ; i < filter1 ; i++){
-                    interviewQuestionList.add(MainActivity.interviewHR.get(i).get(1));
-                    interviewAnswerList.add(MainActivity.interviewHR.get(i).get(2));
-                    interviewCategoryList.add(MainActivity.interviewHR.get(i).get(3));
-                }
-
-                for(int i = 0 ; i < filter3 ; i++){
-                    interviewQuestionList.add(MainActivity.interviewCoding.get(i).get(1));
-                    interviewAnswerList.add(MainActivity.interviewCoding.get(i).get(2));
-                    interviewCategoryList.add(MainActivity.interviewCoding.get(i).get(3));
-                }
-
-
-            }
-
-
-        } else if(cscheck1){
-            filter1 = (numQuestions > MainActivity.interviewHR.size()) ? MainActivity.interviewHR.size() : numQuestions;
-            for(int i = 0 ; i < filter1 ; i++){
-                interviewQuestionList.add(MainActivity.interviewHR.get(i).get(1));
-                interviewAnswerList.add(MainActivity.interviewHR.get(i).get(2));
-                interviewCategoryList.add(MainActivity.interviewHR.get(i).get(3));
-            }
-
-        } else if(cscheck2){
-            filter2 = (numQuestions > interviewKnowledgeAll.size()) ? interviewKnowledgeAll.size() : numQuestions;
-            for(int i = 0 ; i < filter2 ; i++){
-                interviewQuestionList.add(interviewKnowledgeAll.get(i).get(1));
-                interviewAnswerList.add(interviewKnowledgeAll.get(i).get(2));
-                interviewCategoryList.add(interviewKnowledgeAll.get(i).get(3));
-            }
-
-        } else if(cscheck3){
-            filter3 = (numQuestions > MainActivity.interviewCoding.size()) ? MainActivity.interviewCoding.size() : numQuestions;
-            for(int i = 0 ; i < filter3 ; i++){
-                interviewQuestionList.add(MainActivity.interviewCoding.get(i).get(1));
-                interviewAnswerList.add(MainActivity.interviewCoding.get(i).get(2));
-                interviewCategoryList.add(MainActivity.interviewCoding.get(i).get(3));
-            }
-
-        }
-
-        interviewQuestionList.add("Do you have any question for me?");
-        interviewQuestionList.add("Thank you for completing the mock interview. Please click the end interview button to proceed.");
 
         mPager = (IssacViewPager) findViewById(R.id.viewpager);
         customAdapter = new CustomPagerAdapter(this);
@@ -298,9 +272,13 @@ public class InterviewActivity extends AppCompatActivity implements
                     Intent intent = new Intent(InterviewActivity.this, InterviewAfterActivity.class);
                     intent.putExtra("RemainingTime", remaingTime);
                     intent.putExtra("BeginningTime", seekTime * 60 * 1000);
-                    intent.putExtra("QuestionList", interviewQuestionList);
-                    intent.putExtra("AnswerList", interviewAnswerList);
-                    intent.putExtra("CategoryList", interviewCategoryList);
+                    interviewList.remove(0); // remove first
+                    interviewList.remove(interviewList.size() - 1); // remove second last
+                    interviewList.remove(interviewList.size() - 1); // remove last
+                    Parcelable wrapped = Parcels.wrap(interviewList);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("data", wrapped);
+                    intent.putExtras(bundle);
                     startActivity(intent);
                     finish();
 
@@ -416,17 +394,14 @@ public class InterviewActivity extends AppCompatActivity implements
             container.addView(view);
             textView = (TextView) view.findViewById(R.id.text);
             littleTag = (TextView) view.findViewById(R.id.littleTag);
-            textView.setText(interviewQuestionList.get(position));
-
+            textView.setText(interviewList.get(position).getQuestion());
             if(position <= filter1){
-
                 view.setBackgroundResource(R.color.colorAccent);
                 if(position == 0){
                     littleTag.setText("Introduction");
                 } else{
                     littleTag.setText("Basic HR question");
                 }
-
             } else if(position <= filter1 + filter2){
                 view.setBackgroundResource(R.color.nice_green);
                 littleTag.setText("Knowledge-based question");
@@ -434,12 +409,11 @@ public class InterviewActivity extends AppCompatActivity implements
                 view.setBackgroundResource(R.color.indicator_3);
                 littleTag.setText("Coding-based question");
 
-                if(position == interviewQuestionList.size() -2){
+                if(position == interviewList.size() -2){
                     view.setBackgroundResource(R.color.indicator_4);
                     littleTag.setText("Wrapping up");
                 }
-
-                if(position == interviewQuestionList.size() -1){
+                if(position == interviewList.size() -1){
                     view.setBackgroundResource(R.color.pink_pressed);
                     littleTag.setText("End of interview");
                     endInterview = true;
@@ -455,7 +429,7 @@ public class InterviewActivity extends AppCompatActivity implements
 
 
         public int getCount() {
-            return interviewQuestionList.size();
+            return interviewList.size();
         }
 
         @Override

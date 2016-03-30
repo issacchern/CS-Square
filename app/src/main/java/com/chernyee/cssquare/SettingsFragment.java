@@ -12,6 +12,9 @@ import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -21,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -30,41 +34,26 @@ import be.billington.calendar.recurrencepicker.RecurrencePickerDialog;
 
 
 public class SettingsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+
     private SharedPreferences sharedPreferences;
     private ListView listView;
     private String recurrenceRule;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
 
     public SettingsFragment() {
         // Required empty public constructor
     }
 
-
-    public static SettingsFragment newInstance(String param1, String param2) {
-        SettingsFragment fragment = new SettingsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        MenuItem item = menu.findItem(R.id.search);
+        item.setVisible(false);
     }
 
     @Override
@@ -134,21 +123,33 @@ public class SettingsFragment extends Fragment {
                             "Yes",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
+                                    int db = sharedPreferences.getInt("csdbversion", 7);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.clear();
+                                    editor.commit();
+                                    editor.putInt("csdbversion", db);
+                                    editor.commit();
 
-                                    File pref_file = new File("/data/data/com.chernyee.cssquare/shared_prefs/pref_file.xml");
-                                    if (pref_file.exists()) {
-                                        Log.v("BEFORE DELETE", pref_file.exists() +"");
-                                        pref_file.delete();
-                                        Log.v("AFTER DELETE", pref_file.exists() + "");
-                                        File file = new File(SplashActivity.databasePath + "/" + "Questions.db");
-                                        if(file.exists()) file.delete();
-                                    }
+//                                    File pref_file = new File("/data/data/com.chernyee.cssquare/shared_prefs/pref_file.xml");
+//                                    if (pref_file.exists()) {
+//
+//
+//                                        pref_file.delete();
+//
+//                                        File pref_bak = new File("/data/data/com.chernyee.cssquare/shared_prefs/pref_file.bak");
+//                                        if(pref_bak.exists()) pref_bak.delete();
+//
+//
+//
+//                                        File file = new File(SplashActivity.databasePath + "/" + "Questions.db");
+//                                        if(file.exists()) file.delete();
+//                                    }
                                     dialog.cancel();
 
                                     Intent intent = new Intent(getActivity(), SplashActivity.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     startActivity(intent);
                                     getActivity().finish();
+
 
                                 }
                             });
@@ -177,35 +178,6 @@ public class SettingsFragment extends Fragment {
         return v;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
 
 
 

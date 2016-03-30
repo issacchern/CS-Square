@@ -6,11 +6,15 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -23,78 +27,44 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class HomeFragment extends Fragment implements OnChartValueSelectedListener {
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+
     private SharedPreferences sharedPreferences;
     private PieChart mChart;
     private TextView header;
-
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
+    private List<Question> listCompleted;
+    private List<Question> listBeginner;
+    private List<Question> listEasy;
+    private List<Question> listMedium;
+    private List<Question> listHard;
 
     public HomeFragment() {
 
     }
 
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    /**
-     * All the onResume() method being overriden is to make sure the data is accurate and up-to-date
-     */
 
     @Override
     public void onResume() {
         super.onResume();
-
-        MainActivity.listCompleted.clear();
-        MainActivity.listBeginner.clear();
-        MainActivity.listEasy.clear();
-        MainActivity.listMedium.clear();
-        MainActivity.listHard.clear();
-        for(int k = 0; k < MainActivity.populateList.get(0).size(); k++){
-
-            String markString = "cse"+ MainActivity.populateList.get(0).get(k).get(0);
-            int markScore = sharedPreferences.getInt(markString, 0);
-            if(markScore == 1){
-                MainActivity.listCompleted.add(MainActivity.populateList.get(0).get(k));
-            } else{
-                if(MainActivity.populateList.get(0).get(k).get(8).contains("Beginner")){
-                    MainActivity.listBeginner.add(MainActivity.populateList.get(0).get(k));
-                } else if(MainActivity.populateList.get(0).get(k).get(8).contains("Easy")){
-                    MainActivity.listEasy.add(MainActivity.populateList.get(0).get(k));
-                } else if(MainActivity.populateList.get(0).get(k).get(8).contains("Medium")){
-                    MainActivity.listMedium.add(MainActivity.populateList.get(0).get(k));
-                } else if(MainActivity.populateList.get(0).get(k).get(8).contains("Hard")){
-                    MainActivity.listHard.add(MainActivity.populateList.get(0).get(k));
-               }
-            }
-        }
-
-        Log.v("LISTCOMPLETED FRAGMENT", MainActivity.listCompleted.size() +"");
+        listBeginner = new ArrayList<>(QuestionList.getDifficulty("Beginner", getContext(), false));
+        listEasy = new ArrayList<>(QuestionList.getDifficulty("Easy",getContext(), false));
+        listMedium = new ArrayList<>(QuestionList.getDifficulty("Medium",getContext(), false));
+        listHard = new ArrayList<>(QuestionList.getDifficulty("Hard",getContext(),false));
+        listCompleted = new ArrayList<>(QuestionList.getDifficulty("", getContext(),true));
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("cscomplete", MainActivity.listCompleted.size());
+        editor.putInt("cscomplete", listCompleted.size());
         editor.commit();
 
 
-        header.setText("Completed: " + MainActivity.listCompleted.size() + "/" + MainActivity.listId.size());
-
-
-
+        header.setText("Completed: " + listCompleted.size() + "/" + SplashActivity.sharedCodeList.size());
         mChart.setCenterText(generateCenterText());
         mChart.setData(generatePieData());
 
@@ -103,12 +73,8 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setHasOptionsMenu(true);
         sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -117,59 +83,42 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
         View v = inflater.inflate(R.layout.fragment_home, container, false);
 
-        header = (TextView) v.findViewById(R.id.header1);
-        header.setText("Completed: " + MainActivity.listCompleted.size() + "/" + MainActivity.listId.size());
+        listBeginner = new ArrayList<>(QuestionList.getDifficulty("Beginner", getContext(), false));
+        listEasy = new ArrayList<>(QuestionList.getDifficulty("Easy",getContext(), false));
+        listMedium = new ArrayList<>(QuestionList.getDifficulty("Medium",getContext(), false));
+        listHard = new ArrayList<>(QuestionList.getDifficulty("Hard",getContext(),false));
+        listCompleted = new ArrayList<>(QuestionList.getDifficulty("", getContext(),true));
 
+        header = (TextView) v.findViewById(R.id.header1);
+        header.setText("Completed: " + listCompleted.size() + "/" + SplashActivity.sharedCodeList.size());
 
         mChart = (PieChart) v.findViewById(R.id.chart1);
         mChart.setDescription("");
         mChart.setCenterText(generateCenterText());
         mChart.setCenterTextSize(10f);
         mChart.setUsePercentValues(true);
-        // radius of the center hole in percent of maximum radius
         mChart.setHoleRadius(45f);
         mChart.setTransparentCircleRadius(50f);
         mChart.setOnChartValueSelectedListener(this);
-
         mChart.setData(generatePieData());
-
         return v;
-    }
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     @Override
     public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
 
         if (e == null) return;
-
         Intent intent = new Intent(getActivity(), SearchableActivity.class);
         if(e.getXIndex() == 0){
-            intent.putExtra("extraInfo", "Hard");
+            intent.putExtra("data","Hard");
         } else if(e.getXIndex() == 1){
-            intent.putExtra("extraInfo", "Medium");
+            intent.putExtra("data","Medium");
         } else if(e.getXIndex() == 2){
-            intent.putExtra("extraInfo", "Easy");
+            intent.putExtra("data","Easy");
         } else if(e.getXIndex() == 3) {
-            intent.putExtra("extraInfo", "Beginner");
-        } else{
-            intent.putExtra("extraInfo", "Completed");
+            intent.putExtra("data","Beginner");
+        } else {
+            intent.putExtra("data","Completed");
         }
 
         startActivity(intent);
@@ -185,16 +134,10 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         Log.i("PieChart", "nothing selected");
     }
 
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
-
     private SpannableString generateCenterText() {
 
-        double percentage = MainActivity.listCompleted.size() * 1.0 / MainActivity.listId.size() * 100;
+        double percentage = listCompleted.size() * 1.0 / SplashActivity.sharedCodeList.size() * 100;
         String pct = String.format("%.1f", percentage);
-
         SpannableString s = new SpannableString( pct + "%\nCompleted");
         s.setSpan(new RelativeSizeSpan(2f), 0, pct.length() + 1, 0);
         return s;
@@ -202,36 +145,31 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
     private PieData generatePieData() {
 
-        int count = 4;
-
         ArrayList<Entry> entries1 = new ArrayList<Entry>();
         ArrayList<String> xVals = new ArrayList<String>();
-
         xVals.add("Hard");
         xVals.add("Medium");
         xVals.add("Easy");
         xVals.add("Beginner");;
         xVals.add("Completed");
-        entries1.add(new Entry(MainActivity.listHard.size(), 0));
-        entries1.add(new Entry(MainActivity.listMedium.size(), 1));
-        entries1.add(new Entry(MainActivity.listEasy.size(), 2));
-        entries1.add(new Entry(MainActivity.listBeginner.size(), 3));
-        entries1.add(new Entry(MainActivity.listCompleted.size(), 4));
-
-
-
+        entries1.add(new Entry(listHard.size(), 0));
+        entries1.add(new Entry(listMedium.size(), 1));
+        entries1.add(new Entry(listEasy.size(), 2));
+        entries1.add(new Entry(listBeginner.size(), 3));
+        entries1.add(new Entry(listCompleted.size(), 4));
         PieDataSet ds1 = new PieDataSet(entries1, "CS Square 2016");
         ds1.setColors(ColorTemplate.COLORFUL_COLORS);
         ds1.setValueFormatter(new PercentFormatter());
         ds1.setSliceSpace(2f);
         ds1.setValueTextColor(Color.WHITE);
         ds1.setValueTextSize(12f);
-
         PieData d = new PieData(xVals,ds1);
-
         return d;
     }
 
-
-
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        MenuItem item = menu.findItem(R.id.search);
+        item.setVisible(true);
+    }
 }

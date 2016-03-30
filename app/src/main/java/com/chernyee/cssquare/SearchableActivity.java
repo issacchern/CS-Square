@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -13,7 +15,10 @@ import android.widget.Toast;
 
 import com.chernyee.cssquare.UI.CustomAdapter;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -23,7 +28,7 @@ public class SearchableActivity extends ListActivity {
 
     private CustomAdapter customAdapter;
     private TextView textView;
-    private List<List<String>> customList;
+    private List<Question> customList;
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -38,8 +43,7 @@ public class SearchableActivity extends ListActivity {
         setContentView(R.layout.search_item);
         textView =(TextView) findViewById(R.id.searchResult);
         textView.setVisibility(View.INVISIBLE);
-
-        if(customAdapter != null)customAdapter.notifyDataSetChanged();
+        customList = new ArrayList<>();
         sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         handleIntent(getIntent());
 
@@ -54,24 +58,23 @@ public class SearchableActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
 
-        if(customList.get(position).get(8).contains("Medium")){
+        if(customList.get(position).getDifficulty().contains("Medium")){
 
             int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
             int sizemedium = sharedPreferences.getInt("csmedium", 0);
-
             int remaining = sizemedium - sizeComplete;
-
             if(remaining > 0){
                 Toast.makeText(this, "You need to at least complete " + remaining + " questions to unlock Medium level.", Toast.LENGTH_SHORT).show();
             } else{
                 Intent i = new Intent(this, QuestionActivity.class);
-                i.putStringArrayListExtra("information", new ArrayList<>(customList.get(position)));
+                Bundle bundle = new Bundle();
+                Parcelable wrapped = Parcels.wrap(customList.get(position));
+                bundle.putParcelable("data", wrapped);
+                i.putExtras(bundle);
                 startActivity(i);
             }
 
-
-
-        } else if(customList.get(position).get(8).contains("Hard")){
+        } else if(customList.get(position).getDifficulty().contains("Hard")){
 
             int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
             int sizemedium = sharedPreferences.getInt("cshard", 0);
@@ -81,13 +84,19 @@ public class SearchableActivity extends ListActivity {
                 Toast.makeText(this, "You need to at least complete " + remaining + " questions to unlock Hard level.", Toast.LENGTH_SHORT).show();
             } else{
                 Intent i = new Intent(this, QuestionActivity.class);
-                i.putStringArrayListExtra("information", new ArrayList<>(customList.get(position)));
+                Bundle bundle = new Bundle();
+                Parcelable wrapped = Parcels.wrap(customList.get(position));
+                bundle.putParcelable("data", wrapped);
+                i.putExtras(bundle);
                 startActivity(i);
             }
 
         } else{
             Intent i = new Intent(this, QuestionActivity.class);
-            i.putStringArrayListExtra("information", new ArrayList<>(customList.get(position)));
+            Bundle bundle = new Bundle();
+            Parcelable wrapped = Parcels.wrap(customList.get(position));
+            bundle.putParcelable("data", wrapped);
+            i.putExtras(bundle);
             startActivity(i);
         }
         super.onListItemClick(l, v, position, id);
@@ -95,10 +104,8 @@ public class SearchableActivity extends ListActivity {
 
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-
             String query = intent.getStringExtra(SearchManager.QUERY);
-
-            if(query.toLowerCase().equals("csunlock")){
+            if (query.toLowerCase().equals("csunlock")) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt("csmedium", 0);
                 editor.commit();
@@ -106,18 +113,19 @@ public class SearchableActivity extends ListActivity {
                 editor.commit();
                 Toast.makeText(this, "You have gained access to all questions now!", Toast.LENGTH_SHORT).show();
                 finish();
-            } else if(query.toLowerCase().equals("csnoads")){
+            } else if (query.toLowerCase().equals("csnoads")) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt("csnoads", 1);
                 editor.commit();
                 Toast.makeText(this, "You have removed all ads!", Toast.LENGTH_SHORT).show();
                 finish();
-            }
-
-            customList = new ArrayList<List<String>>();
-            for(int i = 0 ; i < MainActivity.populateList.get(0).size(); i++){
-                if(MainActivity.populateList.get(0).get(i).get(1).toLowerCase().contains(query.toLowerCase())){
-                    customList.add(MainActivity.populateList.get(0).get(i));
+            } else{
+                Iterator<Question> itr = SplashActivity.sharedCodeList.iterator(); // not recommended but I got no choice :(
+                while(itr.hasNext()){
+                    Question q = itr.next();
+                    if(q.getTitle().toLowerCase().contains(query.toLowerCase())){
+                        customList.add(q);
+                    }
                 }
             }
 
@@ -125,34 +133,34 @@ public class SearchableActivity extends ListActivity {
             setListAdapter(customAdapter);
             customAdapter.notifyDataSetChanged();
 
-            if(customList.size() < 1){
+            if (customList.size() < 1) {
                 textView.setVisibility(View.VISIBLE);
                 textView.setText("Your search \'" + query + "\' did not match any query data.");
             }
 
-        } else{
-            customList = new ArrayList<List<String>>();
-            String query = intent.getStringExtra("extraInfo");
-            if(query.equals("Completed")){
+        } else {
 
-                for(int i = 0 ; i < MainActivity.populateList.get(0).size(); i++) {
-                    String markString = "cse" + MainActivity.populateList.get(0).get(i).get(0);
-                    if (sharedPreferences.getInt(markString, 0) == 1) {
-                        customList.add(MainActivity.populateList.get(0).get(i));
-                    }
+            String difficulty = getIntent().getExtras().getString("data");
+
+
+
+            Iterator<Question> itr = SplashActivity.sharedCodeList.iterator(); // not recommended
+            if(difficulty.equals("Completed")){
+                for(int i = 0; i < SplashActivity.sharedCodeList.size(); i++){
+                    String num = SplashActivity.sharedCodeList.get(i).getId();
+                    int markRead = sharedPreferences.getInt("cse" + num , 0);
+                    if(markRead == 1) customList.add(SplashActivity.sharedCodeList.get(i));
                 }
 
             } else{
-
-                for(int i = 0 ; i < MainActivity.populateList.get(0).size(); i++){
-                    if(MainActivity.populateList.get(0).get(i).get(8).contains(query)){
-                        String markString = "cse"+MainActivity.populateList.get(0).get(i).get(0);
-                        if (sharedPreferences.getInt(markString, 0) == 0) { //because we only want the undone one
-                            customList.add(MainActivity.populateList.get(0).get(i));
-                        }
+                while(itr.hasNext()){
+                    Question q = itr.next();
+                    if(q.getDifficulty().toLowerCase().contains(difficulty.toLowerCase())){
+                        customList.add(q);
                     }
                 }
             }
+
             customAdapter = new CustomAdapter(this, R.layout.list_item,
                     customList);
             setListAdapter(customAdapter);

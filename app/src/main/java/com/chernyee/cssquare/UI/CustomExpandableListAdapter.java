@@ -9,6 +9,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
+import com.chernyee.cssquare.Question2;
 import com.chernyee.cssquare.R;
 import com.chernyee.cssquare.Utility.SyntaxHighlighter;
 
@@ -22,10 +23,10 @@ import me.gujun.android.taggroup.TagGroup;
 public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
-    private List<List<String>> expandableData;
+    private List<Question2> expandableData;
     private boolean isCode;
 
-    public CustomExpandableListAdapter(Context context, List<List<String>> expandableData, boolean isCode) {
+    public CustomExpandableListAdapter(Context context, List<Question2> expandableData, boolean isCode) {
         this.context = context;
         this.expandableData = expandableData;
         this.isCode = isCode;
@@ -44,12 +45,12 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getGroup(int listPosition) {
-        return this.expandableData.get(listPosition).get(1);
+        return this.expandableData.get(listPosition).getQuestion();
     }
 
     @Override
     public Object getChild(int listPosition, int expandedListPosition) {
-        return this.expandableData.get(listPosition).get(2);
+        return this.expandableData.get(listPosition).getAnswer();
     }
 
 
@@ -96,7 +97,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
         TagGroup mTagGroup = (TagGroup) convertView.findViewById(R.id.tag_group);
 
-        String tag = expandableData.get(listPosition).get(4);
+        String tag = expandableData.get(listPosition).getTag();
         String [] tags = tag.split(",");
         for(int i = 0; i < tags.length ; i++){
             tags[i] = tags[i].trim();

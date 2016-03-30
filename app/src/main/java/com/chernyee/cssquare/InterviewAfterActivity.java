@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -42,11 +43,11 @@ import cn.iwgang.countdownview.CountdownView;
 import com.chernyee.cssquare.AlertDialog.SweetAlertDialog;
 import com.chernyee.cssquare.Utility.SyntaxHighlighter;
 
+import org.parceler.Parcels;
+
 public class InterviewAfterActivity extends AppCompatActivity {
 
-    private List<String> mQuestionList;
-    private List<String> mAnswerList;
-    private List<String> mCategoryList;
+    private List<Question2> interviewList;
     private AppAdapter mAdapter;
     private SwipeMenuListView mListView;
     private CountdownView countdownView;
@@ -59,7 +60,8 @@ public class InterviewAfterActivity extends AppCompatActivity {
     private InputStream in;
     private OutputStream out;
 
-    private final String FILE_PATH = Environment.getExternalStorageDirectory().getPath()+ "/CS-Square/TempRecording.wav";
+    private final String FILE_PATH = Environment.getExternalStorageDirectory().getPath()+ "/" +
+            SplashActivity.CS_FOLDER + "/TempRecording.wav";
 
 
     @Override
@@ -71,26 +73,43 @@ public class InterviewAfterActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.home_variant);
-
         mediaPlayer = MediaPlayer.create(this, Uri.parse(FILE_PATH));
-
         fabReplay = (FloatingActionButton) findViewById(R.id.fabReplay);
         fabPlayPause = (FloatingActionButton) findViewById(R.id.fabPlayPause);
         fabSave = (FloatingActionButton) findViewById(R.id.fabSave);
+        int remainingTime = getIntent().getIntExtra("RemainingTime", 1);
+        int beginningTime = getIntent().getIntExtra("BeginningTime", 1);
+        int spendingTime = beginningTime - remainingTime;
+        countdownView = (CountdownView) findViewById(R.id.cv_countdownViewTest1);
+        countdownView.updateShow(spendingTime);
+        interviewList = Parcels.unwrap(getIntent().getParcelableExtra("data"));
+        mListView = (SwipeMenuListView) findViewById(R.id.listView);
+        mAdapter = new AppAdapter();
+        mListView.setAdapter(mAdapter);
 
         fabReplay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mediaPlayer != null) {
+                    fabPlayPause.setImageResource(R.drawable.play_pause);
+                    isPlaying = false;
+                    mediaPlayer.stop();
 
-                fabPlayPause.setImageResource(R.drawable.play_pause);
-                isPlaying = false;
-                mediaPlayer.stop();
-
-                try {
-                    mediaPlayer.prepare();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    try {
+                        mediaPlayer.prepare();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
+            }
+        });
+
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                isPlaying = false;
+                fabPlayPause.setImageResource(R.drawable.play_pause);
+
             }
         });
 
@@ -98,7 +117,6 @@ public class InterviewAfterActivity extends AppCompatActivity {
         fabPlayPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if(isPlaying){
                     fabPlayPause.setImageResource(R.drawable.pause);
                     isPlaying = false;
@@ -116,7 +134,6 @@ public class InterviewAfterActivity extends AppCompatActivity {
         fabSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 LayoutInflater inflater = getLayoutInflater();
                 View dialoglayout = inflater.inflate(R.layout.edit_text, null);
                 final EditText input = (EditText) dialoglayout.findViewById(R.id.edit);
@@ -135,57 +152,34 @@ public class InterviewAfterActivity extends AppCompatActivity {
 
                 alertDialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        // do something with it()
-
-
+                        // do something with it(
                         String s = input.getText().toString();
-                        if(!s.endsWith(".wav")){
+                        if (!s.endsWith(".wav")) {
                             Toast.makeText(InterviewAfterActivity.this, "File extension must be in .wav type!", Toast.LENGTH_LONG).show();
-                        } else{
-                            String temp = s.substring(0,s.indexOf(".wav"));
-                            if(temp.matches("^[a-zA-Z0-9]+$") && temp.length() > 0){
+                        } else {
+                            String temp = s.substring(0, s.indexOf(".wav"));
+                            if (temp.matches("^[a-zA-Z0-9]+$") && temp.length() > 0) {
                                 // check if file exists...
 
-                                String wholePath = Environment.getExternalStorageDirectory().getPath()+ "/CS-Square/" + s;
+                                String wholePath = Environment.getExternalStorageDirectory().getPath() + "/" + SplashActivity.CS_FOLDER + "/" + s;
                                 File check = new File(wholePath);
-                                if(check.exists()){
+                                if (check.exists()) {
                                     Toast.makeText(InterviewAfterActivity.this, "The file has already existed, please choose other name!", Toast.LENGTH_LONG).show();
-                                } else{
+                                } else {
                                     new MyAsyncTask(wholePath).execute();
                                     alertExit = false;
                                 }
 
-                            } else{
+                            } else {
                                 Toast.makeText(InterviewAfterActivity.this, "Invalid file name!", Toast.LENGTH_LONG).show();
                             }
                         }
                         dialog.cancel();
                     }
                 });
-
                 alertDialog.show();
-
             }
         });
-
-        Intent myIntent = getIntent();
-        int remainingTime = myIntent.getIntExtra("RemainingTime", 1);
-        int beginningTime = myIntent.getIntExtra("BeginningTime", 1);
-        int spendingTime = beginningTime - remainingTime;
-        countdownView = (CountdownView) findViewById(R.id.cv_countdownViewTest1);
-        countdownView.updateShow(spendingTime);
-
-        mQuestionList = myIntent.getStringArrayListExtra("QuestionList");
-        mQuestionList.remove(0);
-        mQuestionList.remove(mQuestionList.size() - 1);
-        mQuestionList.remove(mQuestionList.size() - 1);
-        mAnswerList = myIntent.getStringArrayListExtra("AnswerList");
-        mCategoryList = myIntent.getStringArrayListExtra("CategoryList");
-
-        mListView = (SwipeMenuListView) findViewById(R.id.listView);
-
-        mAdapter = new AppAdapter();
-        mListView.setAdapter(mAdapter);
 
         // step 1. create a MenuCreator
         SwipeMenuCreator creator = new SwipeMenuCreator() {
@@ -230,11 +224,11 @@ public class InterviewAfterActivity extends AppCompatActivity {
         mListView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
-                String item = mAnswerList.get(position);
+                String item = interviewList.get(position).getAnswer();
                 switch (index) {
                     case 0:
 
-                        if(mCategoryList.get(position).equals("Coding")){
+                        if(interviewList.get(position).getCategory().equals("Coding")){
                             SyntaxHighlighter sh1 = new SyntaxHighlighter(item);
 
                             new SweetAlertDialog(InterviewAfterActivity.this)
@@ -251,8 +245,8 @@ public class InterviewAfterActivity extends AppCompatActivity {
 
                         break;
                     case 1:
-
-                        String messageToCopy = mQuestionList.get(position) + "\n\n" + mAnswerList.get(position);
+                        String messageToCopy = interviewList.get(position).getQuestion() + "\n\n" +
+                                interviewList.get(position).getAnswer();
                         Intent sendIntent = new Intent();
                         sendIntent.setAction(Intent.ACTION_SEND);
                         sendIntent.putExtra(Intent.EXTRA_TEXT, messageToCopy);
@@ -267,11 +261,16 @@ public class InterviewAfterActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mediaPlayer.isPlaying()){
+            mediaPlayer.stop();
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-
 
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -305,8 +304,6 @@ public class InterviewAfterActivity extends AppCompatActivity {
 
                     AlertDialog alert11 = builder1.create();
                     alert11.show();
-
-
                     return true;
 
 
@@ -345,7 +342,6 @@ public class InterviewAfterActivity extends AppCompatActivity {
                    //         Intent intent = new Intent(InterviewAfterActivity.this, MainActivity.class);
                    //         startActivity(intent);
                             finish();
-
                         }
                     });
 
@@ -363,12 +359,12 @@ public class InterviewAfterActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return mQuestionList.size();
+            return interviewList.size();
         }
 
         @Override
         public String getItem(int position) {
-            return mQuestionList.get(position);
+            return interviewList.get(position).getQuestion();
         }
 
         @Override
@@ -405,7 +401,6 @@ public class InterviewAfterActivity extends AppCompatActivity {
                 view.setTag(this);
             }
         }
-
     }
 
     private int dp2px(int dp) {
@@ -434,14 +429,9 @@ public class InterviewAfterActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-
-
-
             progressDialog.dismiss();
-            Toast.makeText(InterviewAfterActivity.this, "Your file has successfully copied!", Toast.LENGTH_LONG).show();
+            Toast.makeText(InterviewAfterActivity.this, "Your file has successfully saved!", Toast.LENGTH_LONG).show();
             super.onPostExecute(aVoid);
-
-
         }
 
         @Override
@@ -462,15 +452,9 @@ public class InterviewAfterActivity extends AppCompatActivity {
 
             } catch (IOException e){
                 e.printStackTrace();
+                Toast.makeText(getApplicationContext(), "Error saving file!", Toast.LENGTH_LONG).show();
             }
-
-
-
             return null;
         }
     }
-
-
-
-
 }
