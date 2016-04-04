@@ -33,6 +33,8 @@ import com.google.android.gms.ads.InterstitialAd;
 
 import org.parceler.Parcels;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 import me.gujun.android.taggroup.TagGroup;
@@ -64,6 +66,7 @@ public class QuestionActivity extends AppCompatActivity {
     private FloatingActionButton actionC;
     private FloatingActionButton actionD;
     private Question q;
+    private int month;
 
     private SharedPreferences sharedPref;
 
@@ -154,6 +157,10 @@ public class QuestionActivity extends AppCompatActivity {
         codeCheck = (CheckBox) findViewById(R.id.codeCheckBox);
         note = (TextView) findViewById(R.id.codeNotes);
         noteTitle = (TextView) findViewById(R.id.codeNotesTitle);
+
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat month_date = new SimpleDateFormat("M");
+        month = Integer.parseInt(month_date.format(cal.getTime()));
 
 
         // show ads
@@ -251,7 +258,6 @@ public class QuestionActivity extends AppCompatActivity {
                                 "See answer",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        //TODO:show ads
                                         if (mInterstitialAd.isLoaded()) {
                                             mInterstitialAd.show();
                                         }
@@ -298,17 +304,25 @@ public class QuestionActivity extends AppCompatActivity {
                 int markScore = sharedPref.getInt("cse"+q.getId(), 0);
                 if(markScore == 0){
                     SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putInt("cse"+q.getId(), 1);
-                    editor.commit();
+                    editor.putInt("cse" + q.getId(), 1);
                     int ss = sharedPref.getInt("cscomplete",0) + 1;
                     editor.putInt("cscomplete", ss);
+                    int tt = sharedPref.getInt("csmonth"+ month, 0) + 1;
+                    editor.putInt("csmonth"+ month, tt);
                     editor.commit();
+
+                    if(ss == 30){
+                        Toast.makeText(QuestionActivity.this,"Medium level is unlocked!", Toast.LENGTH_LONG).show();
+                    } else if(ss == 60){
+                        Toast.makeText(QuestionActivity.this,"Hard level is unlocked!", Toast.LENGTH_LONG).show();
+                    }
                 } else{
                     SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putInt("cse"+q.getId(), 0);
-                    editor.commit();
                     int ss = sharedPref.getInt("cscomplete",0) - 1;
                     editor.putInt("cscomplete", ss);
+                    int tt = sharedPref.getInt("csmonth"+ month , 0) - 1;
+                    editor.putInt("csmonth"+ month, tt);
                     editor.commit();
                 }
             }

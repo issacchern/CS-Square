@@ -14,11 +14,6 @@
             android:id="@+id/navi_coding"
             android:icon="@drawable/code_tags"
             android:title="Coding Questions" />
-        <item
-
-            android:id="@+id/navi_bookmark"
-            android:icon="@drawable/star"
-            android:title="Bookmark Questions" />
 
         <item
             android:id="@+id/navi_interview"

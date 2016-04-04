@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +40,7 @@ public class SettingsFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     private ListView listView;
     private String recurrenceRule;
+    private Switch sw;
 
 
     public SettingsFragment() {
@@ -48,6 +51,7 @@ public class SettingsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
     @Override
@@ -78,37 +82,13 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(position == 0){
-                    RecurrencePickerDialog recurrencePickerDialog = new RecurrencePickerDialog();
-
-                    if (recurrenceRule != null && recurrenceRule.length() > 0) {
-                        Bundle bundle = new Bundle();
-                        bundle.putString(RecurrencePickerDialog.BUNDLE_RRULE, recurrenceRule);
-                        recurrencePickerDialog.setArguments(bundle);
-                    }
-
-                    recurrencePickerDialog.setOnRecurrenceSetListener(new RecurrencePickerDialog.OnRecurrenceSetListener() {
-                        @Override
-                        public void onRecurrenceSet(String rrule) {
-                            recurrenceRule = rrule;
-                            if (recurrenceRule != null && recurrenceRule.length() > 0) {
-                                EventRecurrence recurrenceEvent = new EventRecurrence();
-                                recurrenceEvent.setStartDate(new Time("" + new Date().getTime()));
-                                recurrenceEvent.parse(rrule);
-                                String srt = EventRecurrenceFormatter.getRepeatString(getContext(), getResources(), recurrenceEvent, true);
-                                Toast.makeText(getContext(), srt, Toast.LENGTH_LONG).show();
-                                Toast.makeText(getContext(), "But it's not functional yet :(", Toast.LENGTH_LONG).show();
-                            } else {
-                                Toast.makeText(getContext(), "No occurence", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
-                    recurrencePickerDialog.show(getFragmentManager(), "recurrencePicker");
-
-
+                    // empty
                 } else if (position == 1){
                     AlertDialog.Builder builder1 = new AlertDialog.Builder(getContext());
-                    builder1.setTitle("Reset data");
-                    builder1.setMessage("Are you sure you want to reset data? That means all of your bookmarks and saved data will be lost.");
+                    builder1.setTitle("WARNING!");
+                    builder1.setMessage(
+                            "By resetting data, it means all of your saved data will be gone forever! " +
+                            "Are you sure you want to do that?");
                     builder1.setCancelable(true);
 
                     builder1.setNegativeButton(
@@ -129,21 +109,6 @@ public class SettingsFragment extends Fragment {
                                     editor.commit();
                                     editor.putInt("csdbversion", db);
                                     editor.commit();
-
-//                                    File pref_file = new File("/data/data/com.chernyee.cssquare/shared_prefs/pref_file.xml");
-//                                    if (pref_file.exists()) {
-//
-//
-//                                        pref_file.delete();
-//
-//                                        File pref_bak = new File("/data/data/com.chernyee.cssquare/shared_prefs/pref_file.bak");
-//                                        if(pref_bak.exists()) pref_bak.delete();
-//
-//
-//
-//                                        File file = new File(SplashActivity.databasePath + "/" + "Questions.db");
-//                                        if(file.exists()) file.delete();
-//                                    }
                                     dialog.cancel();
 
                                     Intent intent = new Intent(getActivity(), SplashActivity.class);
@@ -201,13 +166,42 @@ public class SettingsFragment extends Fragment {
         public View getView(int position, View convertView, ViewGroup parent) {
             SmallItem smallItem = getItem(position);
             if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_list_item_2, parent, false);
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.setting_list, parent, false);
             }
-            TextView tvTitle = (TextView) convertView.findViewById(android.R.id.text1);
-            TextView tvDesc = (TextView) convertView.findViewById(android.R.id.text2);
+            TextView tvTitle = (TextView) convertView.findViewById(R.id.text_title);
+            TextView tvDesc = (TextView) convertView.findViewById(R.id.text_desc);
             tvTitle.setText(smallItem.title);
             tvDesc.setText(smallItem.description);
+            sw = (Switch) convertView.findViewById(R.id.sw);
+            if(position == 0){
+                boolean notification = sharedPreferences.getBoolean("csnotification", true);
+                if(notification) sw.setChecked(true);
+                else sw.setChecked(false);
+                sw.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(sw.isChecked()){
+                            sw.setChecked(false);
+                            Toast.makeText(getContext(), "Disable notification!", Toast.LENGTH_SHORT).show();
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putBoolean("csnotification", false);
+                            editor.commit();
+                        } else{
+                            sw.setChecked(true);
+                            Toast.makeText(getContext(), "Enable notification!", Toast.LENGTH_SHORT).show();
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putBoolean("csnotification", true);
+                            editor.commit();
+                        }
+                    }
+                });
+            } else{
+                sw.setVisibility(View.GONE);
+            }
+
             return convertView;
         }
+
+
     }
 }

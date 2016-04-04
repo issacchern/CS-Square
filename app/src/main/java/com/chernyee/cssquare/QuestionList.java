@@ -25,7 +25,7 @@ public class QuestionList {
     public static List<Question> getViewPosition(int position, String difficulty, String sortBy){
 
         List<Question> newQuestionList = new ArrayList<>();
-        Iterator<Question> itr = SplashActivity.sharedCodeList.iterator();
+        Iterator<Question> itr = VarInit.getSharedCodeListInstance().iterator();
         while(itr.hasNext()){
             Question q = itr.next();
             if(position == 0){
@@ -66,16 +66,48 @@ public class QuestionList {
 
     }
 
+    public static int getRemaining(String difficulty, Context context , boolean complete){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(
+                context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        int count = 0;
+        int remaining = sharedPreferences.getInt("cs" + difficulty.toLowerCase(), 0);
+        if(remaining == 0){ // haven't run through the list yet
+            Iterator<Question> itr = VarInit.getSharedCodeListInstance().iterator();
+            while(itr.hasNext()){
+                Question q = itr.next();
+                if(complete){
+                    String markString = "cse"+ q.getId();
+                    int markScore = sharedPreferences.getInt(markString, 0);
+                    if(markScore == 1){
+                        count++;
+                    }
+                } else{
+                    if(q.difficulty.contains(difficulty)){
+                       count++;
+                    }
+                }
+            }
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("cs" + difficulty.toLowerCase(), count);
+            editor.commit();
+
+        } else{
+            count = remaining;
+        }
+
+        return count;
+    }
 
 
     public static List<Question> getDifficulty(String difficulty, Context context , boolean complete){
         SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         List<Question> newQuestionList = new ArrayList<>();
-        Iterator<Question> itr = SplashActivity.sharedCodeList.iterator();
+        Iterator<Question> itr = VarInit.getSharedCodeListInstance().iterator();
         while(itr.hasNext()){
             Question q = itr.next();
             if(complete){
-                String markString = "cse"+ q.id;
+                String markString = "cse"+ q.getId();
                 int markScore = sharedPreferences.getInt(markString, 0);
                 if(markScore == 1){
                     newQuestionList.add(q);
@@ -93,7 +125,6 @@ public class QuestionList {
             }
         });
 
-
         return newQuestionList;
     }
 
@@ -102,7 +133,7 @@ public class QuestionList {
     public static List<Question2> getInterviewList(String tag){
 
         List<Question2> newQuestion2List = new ArrayList<>();
-        Iterator<Question2> itr = SplashActivity.sharedQAList.iterator();
+        Iterator<Question2> itr = VarInit.getSharedQAListInstance().iterator();
         while(itr.hasNext()){
             Question2 q = itr.next();
             if(q.category.equals(tag)){

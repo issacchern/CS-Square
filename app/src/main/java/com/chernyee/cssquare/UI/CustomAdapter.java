@@ -107,7 +107,7 @@ public class CustomAdapter extends ArrayAdapter<Question>{
 
                 else if(q.getDifficulty().contains("Medium")){
                     int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
-                    int sizemedium = sharedPreferences.getInt("csmedium", 0);
+                    int sizemedium = sharedPreferences.getInt("cslockmedium", 0);
                     int remaining = sizemedium - sizeComplete;
                     if(remaining > 0){
                         vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds( vh.holderImage, null, null, null);
@@ -121,7 +121,7 @@ public class CustomAdapter extends ArrayAdapter<Question>{
 
                 } else if(q.getDifficulty().contains("Hard")){
                     int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
-                    int sizeHard = sharedPreferences.getInt("cshard", 0);
+                    int sizeHard = sharedPreferences.getInt("cslockhard", 0);
                     int remaining = sizeHard - sizeComplete;
                     if(remaining > 0){
                         vh.holderTitle.setCompoundDrawablesWithIntrinsicBounds( vh.holderImage, null, null, null);

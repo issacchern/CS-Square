@@ -14,8 +14,8 @@ android {
         applicationId "com.chernyee.cssquare"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 11
-        versionName "0.4.0"
+        versionCode 13
+        versionName "0.4.2"
     }
     buildTypes {
         release {
@@ -50,4 +50,9 @@ dependencies {
     compile 'me.gujun.android.taggroup:library:1.4@aar'
     compile 'org.parceler:parceler-api:1.0.4'
     apt 'org.parceler:parceler:1.0.4'
+    compile 'com.github.edanel:GBSlideBar:0.5'
+    compile 'com.squareup.retrofit2:retrofit:2.0.1'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.1'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+
 }

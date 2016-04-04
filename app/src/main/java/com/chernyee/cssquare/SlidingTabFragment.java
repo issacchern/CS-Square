@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -141,7 +142,7 @@ public class SlidingTabFragment extends Fragment{
         difficulty = sharedPreferences.getString("csfilterdifficulty", "BeginnerEasyMediumHard"); // default value
         sortBy = sharedPreferences.getString("csfiltersortby", "titleAscending"); // default value
         hashMap = new HashMap<>();
-
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         super.onCreate(savedInstanceState);
     }
 
@@ -206,7 +207,7 @@ public class SlidingTabFragment extends Fragment{
 
                     if(hashMap.get(final_position).get(position).getDifficulty().contains("Medium")){
                         int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
-                        int sizemedium = sharedPreferences.getInt("csmedium", 0);
+                        int sizemedium = sharedPreferences.getInt("cslockmedium", 0);
                         int remaining = sizemedium - sizeComplete;
                         if(remaining > 0){
                             Toast.makeText(getContext(), "You need to at least complete " + remaining +
@@ -223,7 +224,7 @@ public class SlidingTabFragment extends Fragment{
 
                     } else if(hashMap.get(final_position).get(position).getDifficulty().contains("Hard")) {
                         int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
-                        int sizehard = sharedPreferences.getInt("cshard", 0);
+                        int sizehard = sharedPreferences.getInt("cslockhard", 0);
                         int remaining = sizehard - sizeComplete;
                         if(remaining > 0){
                             Toast.makeText(getContext(), "You need to at least complete " + remaining +

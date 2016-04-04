@@ -107,11 +107,23 @@ public class SearchableActivity extends ListActivity {
             String query = intent.getStringExtra(SearchManager.QUERY);
             if (query.toLowerCase().equals("csunlock")) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putInt("csmedium", 0);
+                editor.putInt("cslockmedium", 0);
                 editor.commit();
-                editor.putInt("cshard", 0);
+                editor.putInt("cslockhard", 0);
                 editor.commit();
                 Toast.makeText(this, "You have gained access to all questions now!", Toast.LENGTH_SHORT).show();
+                finish();
+            } else if (query.toLowerCase().equals("csunlock29")){
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("cscomplete", 29);
+                Toast.makeText(this, "Complete 29 questions!", Toast.LENGTH_SHORT).show();
+                editor.commit();
+                finish();
+            } else if(query.toLowerCase().equals("csunlock59")){
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("cscomplete", 59);
+                Toast.makeText(this, "Complete 59 questions!", Toast.LENGTH_SHORT).show();
+                editor.commit();
                 finish();
             } else if (query.toLowerCase().equals("csnoads")) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -120,7 +132,7 @@ public class SearchableActivity extends ListActivity {
                 Toast.makeText(this, "You have removed all ads!", Toast.LENGTH_SHORT).show();
                 finish();
             } else{
-                Iterator<Question> itr = SplashActivity.sharedCodeList.iterator(); // not recommended but I got no choice :(
+                Iterator<Question> itr = VarInit.getSharedCodeListInstance().iterator(); // not recommended but I got no choice :(
                 while(itr.hasNext()){
                     Question q = itr.next();
                     if(q.getTitle().toLowerCase().contains(query.toLowerCase())){
@@ -142,14 +154,21 @@ public class SearchableActivity extends ListActivity {
 
             String difficulty = getIntent().getExtras().getString("data");
 
+            Iterator<Question> itr = VarInit.getSharedCodeListInstance().iterator(); // not recommended
 
+            if(difficulty.equals("Bookmarked")){
 
-            Iterator<Question> itr = SplashActivity.sharedCodeList.iterator(); // not recommended
-            if(difficulty.equals("Completed")){
-                for(int i = 0; i < SplashActivity.sharedCodeList.size(); i++){
-                    String num = SplashActivity.sharedCodeList.get(i).getId();
+                for(int i = 0; i < VarInit.getSharedCodeListInstance().size(); i++){
+                    String num = VarInit.getSharedCodeListInstance().get(i).getId();
+                    int markRead = sharedPreferences.getInt("cs" + num , 0);
+                    if(markRead == 1) customList.add(VarInit.getSharedCodeListInstance().get(i));
+                }
+
+            } else if(difficulty.equals("Completed")){
+                for(int i = 0; i < VarInit.getSharedCodeListInstance().size(); i++){
+                    String num = VarInit.getSharedCodeListInstance().get(i).getId();
                     int markRead = sharedPreferences.getInt("cse" + num , 0);
-                    if(markRead == 1) customList.add(SplashActivity.sharedCodeList.get(i));
+                    if(markRead == 1) customList.add(VarInit.getSharedCodeListInstance().get(i));
                 }
 
             } else{
@@ -164,6 +183,11 @@ public class SearchableActivity extends ListActivity {
             customAdapter = new CustomAdapter(this, R.layout.list_item,
                     customList);
             setListAdapter(customAdapter);
+
+            if (customList.size() < 1) {
+                textView.setVisibility(View.VISIBLE);
+                textView.setText("No bookmark is found.");
+            }
         }
     }
 }

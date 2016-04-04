@@ -4,8 +4,11 @@
     package="com.chernyee.cssquare">
 
     <uses-sdk
+        tools:overrideLibrary="so.orion.slidebar"
         android:minSdkVersion="15"
         android:targetSdkVersion="23" />
+
+
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
@@ -85,8 +88,6 @@
             android:label="@string/title_activity_question"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <receiver android:name=".Utility.AlertReceiver" />
-
         <activity
             android:name=".InterviewActivity"
             android:label="@string/title_activity_interview"
@@ -109,6 +110,21 @@
         <service
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:enabled="true" />
+
+        <receiver android:name=".Notification.AlarmReceiver">
+            <intent-filter>
+                <action android:name="com.chernyee.cssquare.alarm"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".Notification.KeepAlarmLiveReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.USER_PRESENT"/>
+            </intent-filter>
+        </receiver>
+
+
+
     </application>
 
 </manifest>

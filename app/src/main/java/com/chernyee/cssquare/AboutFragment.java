@@ -2,6 +2,9 @@ package com.chernyee.cssquare;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,6 +22,7 @@ public class AboutFragment extends Fragment {
     private ImageView aboutEmail;
     private ImageView aboutShare;
     private ImageView aboutApp;
+    private ImageView me;
 
     public AboutFragment() {
         // Required empty public constructor
@@ -29,6 +33,7 @@ public class AboutFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
     @Override
@@ -44,6 +49,10 @@ public class AboutFragment extends Fragment {
         aboutEmail = (ImageView) v.findViewById(R.id.about_email);
         aboutShare = (ImageView) v.findViewById(R.id.about_share);
         aboutApp = (ImageView) v.findViewById(R.id.about_app);
+        me = (ImageView) v.findViewById(R.id.me);
+        me.setImageBitmap(VarInit.getCircularBitmapWithWhiteBorder(BitmapFactory.decodeResource(getResources()
+                , R.drawable.me), 20));
+
         aboutEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

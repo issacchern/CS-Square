@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.UiThread;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -63,10 +64,16 @@ public class MainActivity extends AppCompatActivity
         navigationView.getMenu().getItem(0).setChecked(true);
         navigationView.setItemIconTintList(null);
         sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        int databaseVersion = sharedPreferences.getInt("csdbversion", 7);
+
+
+        if(VarInit.getSharedCodeListInstance().size() == 0)
+            new VarInit(this,databaseVersion).initializeVariable();
 
 
 
-        if(SplashActivity.sharedCodeList.size() == 0){
+        if(VarInit.getSharedCodeListInstance().size() == 0){
+
             AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
             builder1.setTitle("Download Database");
             builder1.setMessage("You have empty database. Do you wish to download database now?");
@@ -96,7 +103,7 @@ public class MainActivity extends AppCompatActivity
                                                 editor.putInt("csdbversion", onlineVersion);
                                                 editor.commit();
                                             } else {
-                                                File file = new File(SplashActivity.databasePath + "/" + "Questions.db");
+                                                File file = new File(SplashActivity.DATABASE_PATH + "/" + "Questions.db");
                                                 transferUtility = AwsUtil.getTransferUtility(MainActivity.this);
                                                 TransferObserver observer = transferUtility.download("sabi-data", "Questions.db", file);
                                                 observer.setTransferListener(new TransferListener() {
@@ -191,7 +198,7 @@ public class MainActivity extends AppCompatActivity
                                                     "Yes",
                                                     new DialogInterface.OnClickListener() {
                                                         public void onClick(DialogInterface dialog, int id) {
-                                                            File file = new File(SplashActivity.databasePath + "/" + "Questions.db");
+                                                            File file = new File(SplashActivity.DATABASE_PATH + "/" + "Questions.db");
                                                             transferUtility = AwsUtil.getTransferUtility(MainActivity.this);
                                                             TransferObserver observer = transferUtility.download("sabi-data", "Questions.db", file);
                                                             observer.setTransferListener(new TransferListener() {
@@ -341,13 +348,6 @@ public class MainActivity extends AppCompatActivity
 
                 }
             }, 300);
-
-        } else if(id == R.id.navi_bookmark){
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            BookmarkFragment fragment = new BookmarkFragment();
-            transaction.replace(R.id.main_fragment, fragment);
-            transaction.commit();
-
 
         } else if(id == R.id.navi_interview){
 

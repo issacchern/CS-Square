@@ -13,13 +13,18 @@
 
     <string name="title_activity_question">Question</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="aboutapp">This app is intended to help students in preparing and mastering coding interview. There
-        are more than 300++ (more and more will be added in) famous coding questions being asked in
-        technical interview, ranging from easy to difficult provided with concise solutions.
+    <string name="aboutapp">CS Square is intended to help students including myself in better
+        preparing and mastering coding interview. Not only does it contains more than 300++ coding
+        questions provided with concise solutions, it also has quick note section for preparation, mock interview,
+        short answers and etc. I am thinking to make this app even more versatile - maybe providing useful articles
+        from the Internet, letting user to create their own flash card, or implementing a fun and
+        addictive platform to learn new materials. That is all about CS Square!
+
+
         </string>
 
-     <string name="aboutme">I am like most of you here, a CSE graduate student who is passionate about
-         computer technology, Android development, web design and software/hardware interface.
+     <string name="aboutme">My name is Issac and I am a CSE graduate student who is passionate about
+         computer technology, Android development, web design, software/hardware interfaces and etc.
 
         </string>
 
