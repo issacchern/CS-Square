@@ -9,6 +9,8 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.util.Log;
 
+import com.chernyee.cssquare.SplashActivity;
+
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -41,7 +43,6 @@ public class RecordingSampler {
 
 
     private static final String AUDIO_RECORDER_FILE_EXT_WAV = ".wav";
-    private static final String AUDIO_RECORDER_FOLDER = "CS-Square";
     private static final String AUDIO_RECORDER_TEMP_FILE = "record_temp.raw";
     private static final int RECORDER_BPP = 16;
     private static final int RECORDER_SAMPLERATE = 44100;
@@ -225,19 +226,12 @@ public class RecordingSampler {
     }
 
     private String getFilename(){
-        String filepath = Environment.getExternalStorageDirectory().getPath();
-        File file = new File(filepath,AUDIO_RECORDER_FOLDER);
-
-        if(!file.exists()){
-            file.mkdirs();
-        }
-
-        return (file.getAbsolutePath() + "/" + "TempRecording" + AUDIO_RECORDER_FILE_EXT_WAV);
+        return (SplashActivity.RECORD_PATH + "/" + "TempRecording" + AUDIO_RECORDER_FILE_EXT_WAV);
     }
 
     private String getTempFilename(){
-        String filepath = Environment.getExternalStorageDirectory().getPath();
-        File file = new File(filepath,AUDIO_RECORDER_FOLDER);
+        String filepath = SplashActivity.CS_FOLDER_PATH;
+        File file = new File(filepath,SplashActivity.CS_FOLDER_RECORD);
 
         if(!file.exists()){
             file.mkdirs();

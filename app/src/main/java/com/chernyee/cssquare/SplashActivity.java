@@ -22,8 +22,13 @@ public class SplashActivity extends AppCompatActivity {
 
     public static final String CS_FOLDER = "CS-Square";
     public static final String CS_FOLDER_DATABASE = "database";
-    public static final String DATABASE_PATH = Environment.getExternalStorageDirectory().getPath()+"/" +
-            SplashActivity.CS_FOLDER + "/database";
+    public static final String CS_FOLDER_IMAGES = "images";
+    public static final String CS_FOLDER_RECORD = "recording";
+    public static final String CS_FOLDER_PATH = Environment.getExternalStorageDirectory().getPath()+"/"+
+            SplashActivity.CS_FOLDER;
+    public static final String DATABASE_PATH = CS_FOLDER_PATH +"/"+ CS_FOLDER_DATABASE;
+    public static final String IMAGES_PATH = CS_FOLDER_PATH +"/"+ CS_FOLDER_IMAGES;
+    public static final String RECORD_PATH = CS_FOLDER_PATH +"/"+ CS_FOLDER_RECORD;
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -37,10 +42,20 @@ public class SplashActivity extends AppCompatActivity {
         }
 
         String filepath2 = file.getAbsolutePath() ;
-        File file2 = new File(filepath2,CS_FOLDER_DATABASE);
+        File folder = new File(filepath2,CS_FOLDER_DATABASE);
 
-        if(!file2.exists()){
-            file2.mkdirs();
+        if(!folder.exists()){
+            folder.mkdirs();
+        }
+
+        folder = new File(filepath2, CS_FOLDER_IMAGES);
+        if(!folder.exists()){
+            folder.mkdir();
+        }
+
+        folder = new File(filepath2, CS_FOLDER_RECORD);
+        if(!folder.exists()){
+            folder.mkdir();
         }
 
         sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -59,7 +74,10 @@ public class SplashActivity extends AppCompatActivity {
         editor.putInt("csmedium", 0);
         editor.putInt("cshard", 0);
         editor.putInt("cscomplete", 0);
-        editor.putInt("csmonth" + 3, 0); // add March
+
+        if(sharedPreferences.getInt("csmonth"+month,-1) == -1){
+            editor.putInt("csmonth"+month, 0);
+        }
         editor.commit();
 
 

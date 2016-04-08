@@ -134,13 +134,14 @@
             android:layout_height="wrap_content" />
 
         <TextView
+            android:background="@color/white"
             android:drawablePadding="4dp"
             android:drawableLeft="@drawable/comment_text_outline"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textStyle="bold"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="3dp"
+            android:paddingBottom="4dp"
             android:layout_gravity="center"
             android:id="@+id/codeNotesTitle"
             android:text="My Comment"

@@ -1,22 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_horizontal_margin">
+    android:paddingTop="@dimen/activity_horizontal_margin"
+    android:background="@drawable/side_nav_bar">
+
 
     <TextView
-        android:id="@+id/text"
-        android:text="Add comment"
+        android:paddingBottom="5dp"
         android:textStyle="bold"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="What do you think of it?"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <EditText
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:paddingBottom="5dp"
         android:id="@+id/edit"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:hint="Add comment"
+        android:textCursorDrawable="@drawable/text_cursor_cyan"
+        app:met_floatingLabel="highlight"
+        app:met_maxCharacters="200"
+        app:met_baseColor="@android:color/white"
+        app:met_primaryColor="?colorAccent" />
 
 </LinearLayout>

@@ -72,7 +72,7 @@ public class SettingsFragment extends Fragment {
         ArrayList<SmallItem> arrayOfItem = new ArrayList<SmallItem>();
         arrayOfItem.add(new SmallItem("Friendly Reminder", "Enable CS-Square to send notification"));
         arrayOfItem.add(new SmallItem("Reset Data", "All of your data will be deleted"));
-        arrayOfItem.add(new SmallItem("Backup Data", "Data is backed up to the cloud automatically"));
+        arrayOfItem.add(new SmallItem("Backup Data", "Data is backed up to the cloud periodically"));
         arrayOfItem.add(new SmallItem(getString(R.string.title_setting), getString(R.string.desc_setting)));
 
         ItemAdapter adapter = new ItemAdapter(getContext(), arrayOfItem);

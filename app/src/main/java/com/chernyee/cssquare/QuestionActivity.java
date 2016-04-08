@@ -30,6 +30,7 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.parceler.Parcels;
 
@@ -370,7 +371,7 @@ public class QuestionActivity extends AppCompatActivity {
 
                 LayoutInflater inflater = getLayoutInflater();
                 View dialoglayout = inflater.inflate(R.layout.edit_text, null);
-                final EditText input = (EditText) dialoglayout.findViewById(R.id.edit);
+                final MaterialEditText input = (MaterialEditText) dialoglayout.findViewById(R.id.edit);
 
                 String none = sharedPref.getString("csef" + q.getId(),"None");
                 if(none.equals("None") || none.equals("")){

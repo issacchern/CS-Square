@@ -16,8 +16,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.chernyee.cssquare.Utility.AwsUtil;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+
+import java.io.File;
+import java.util.List;
+
 import us.feras.mdv.MarkdownView;
 
 
@@ -28,6 +39,9 @@ public class PreparationFragment extends Fragment{
     private AdView adView;
     private AdRequest adRequest;
     private SharedPreferences sharedPreferences;
+    private AmazonS3Client s3;
+    private List<S3ObjectSummary> s3ObjList;
+    private int count = 0;
 
     public PreparationFragment() {
         // Required empty public constructor
@@ -99,11 +113,13 @@ public class PreparationFragment extends Fragment{
 
         @Override
         protected Void doInBackground(Void... params) {
+
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
             return null;
         }
     }

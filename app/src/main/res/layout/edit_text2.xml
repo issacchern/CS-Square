@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_horizontal_margin"
+    android:background="@drawable/side_nav_bar">
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_title"
+        android:hint="Title"
+        android:text="Awesomeness"
+        android:textCursorDrawable="@drawable/text_cursor_cyan"
+        android:textSize="34sp"
+        app:met_baseColor="@android:color/white"
+        app:met_floatingLabel="highlight"
+        app:met_maxCharacters="20"
+        app:met_primaryColor="?colorAccent"
+        app:met_singleLineEllipsis="true" />
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_description"
+        android:hint="Description"
+        android:text="The quality of being awesome."
+        android:textCursorDrawable="@drawable/text_cursor_cyan"
+        app:met_baseColor="@android:color/white"
+        app:met_floatingLabel="highlight"
+        app:met_maxCharacters="100"
+        app:met_primaryColor="?colorAccent" />
+
+    <LinearLayout
+        android:paddingBottom="10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/colorPicker"
+            android:src="@color/nice_green"
+            android:layout_width="48dp"
+            android:layout_height="48dp" />
+
+        <TextView
+            android:textColor="@color/white_pressed"
+            android:layout_marginLeft="10dp"
+            android:layout_gravity="center"
+            android:textSize="20sp"
+            android:text="Choose color"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+
+
+</LinearLayout>
+

@@ -4,14 +4,19 @@ package com.chernyee.cssquare.Utility;
  * Created by Issac on 3/23/2016.
  */
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.chernyee.cssquare.SplashActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,9 +25,6 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.UUID;
 
-/*
- * Handles basic helper functions used throughout the app.
- */
 public class AwsUtil {
 
     // We only need one instance of the clients and credentials provider
@@ -30,13 +32,6 @@ public class AwsUtil {
     private static CognitoCachingCredentialsProvider sCredProvider;
     private static TransferUtility sTransferUtility;
 
-    /**
-     * Gets an instance of CognitoCachingCredentialsProvider which is
-     * constructed using the given Context.
-     *
-     * @param context An Context instance.
-     * @return A default credential provider.
-     */
     private static CognitoCachingCredentialsProvider getCredProvider(Context context) {
         if (sCredProvider == null) {
             sCredProvider = new CognitoCachingCredentialsProvider(
@@ -47,13 +42,6 @@ public class AwsUtil {
         return sCredProvider;
     }
 
-    /**
-     * Gets an instance of a S3 client which is constructed using the given
-     * Context.
-     *
-     * @param context An Context instance.
-     * @return A default S3 client.
-     */
     public static AmazonS3Client getS3Client(Context context) {
         if (sS3Client == null) {
             sS3Client = new AmazonS3Client(getCredProvider(context.getApplicationContext()));
@@ -61,13 +49,6 @@ public class AwsUtil {
         return sS3Client;
     }
 
-    /**
-     * Gets an instance of the TransferUtility which is constructed using the
-     * given Context
-     *
-     * @param context
-     * @return a TransferUtility instance
-     */
     public static TransferUtility getTransferUtility(Context context) {
         if (sTransferUtility == null) {
             sTransferUtility = new TransferUtility(getS3Client(context.getApplicationContext()),
@@ -77,12 +58,6 @@ public class AwsUtil {
         return sTransferUtility;
     }
 
-    /**
-     * Converts number of bytes into proper scale.
-     *
-     * @param bytes number of bytes to be converted.
-     * @return A string that represents the bytes in a proper scale.
-     */
     public static String getBytesString(long bytes) {
         String[] quantifiers = new String[] {
                 "KB", "MB", "GB", "TB"
@@ -99,15 +74,6 @@ public class AwsUtil {
         }
     }
 
-    /**
-     * Copies the data from the passed in Uri, to a new file for use with the
-     * Transfer Service
-     *
-     * @param context
-     * @param uri
-     * @return
-     * @throws IOException
-     */
     public static File copyContentUriToFile(Context context, Uri uri) throws IOException {
         InputStream is = context.getContentResolver().openInputStream(uri);
         File copiedData = new File(context.getDir("SampleImagesDir", Context.MODE_PRIVATE), UUID
@@ -127,10 +93,6 @@ public class AwsUtil {
         return copiedData;
     }
 
-    /*
-     * Fills in the map with information in the observer so that it can be used
-     * with a SimpleAdapter to populate the UI
-     */
     public static void fillMap(Map<String, Object> map, TransferObserver observer, boolean isChecked) {
         int progress = (int) ((double) observer.getBytesTransferred() * 100 / observer
                 .getBytesTotal());
@@ -144,4 +106,5 @@ public class AwsUtil {
         map.put("state", observer.getState());
         map.put("percentage", progress + "%");
     }
+
 }

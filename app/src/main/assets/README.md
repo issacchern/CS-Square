@@ -187,7 +187,6 @@
 
 ## Sorting
 ### Insertion
-![alt tag](file:///android_asset/small/insertion.gif)
 
 * Maintain a sorted sublist and insert new elements in it appropriately
 * Best `O(n)`, average `O(n^2)`, worst `O(n^2)`
@@ -201,7 +200,6 @@
   * Elements in order - one pass `O(n)`
 
 ### Bubble
-![alt tag](file:///android_asset/small/bubble.gif)
 
 * In each pass, compare adjacent pairs of elements and swap if in wrong order
 * Best `O(n)`, average `O(n^2)`, worst `O(n^2)`
@@ -216,7 +214,6 @@
   * slightly higher overhead than *insertion* sort
 
 ### Selection
-![alt tag](file:///android_asset/small/selection.gif)
 
 * Repeatedly find the smallest element to the right and swap with current element
 * Best `O(n^2)`, average `O(n^2)`, worst `O(n^2)`
@@ -230,7 +227,6 @@
 * **Note** : one should never use selection sort for the reason of not being adaptive
 
 ### Merge
-![alt tag](file:///android_asset/small/merge.gif)
 
 * Recursively divide input list into two halves, then recursively merge the two sorted halves (*divide and conquer*)
 * Best `O(n log n)`, average `O(n log n)`, worst `O(n log n)`
@@ -241,7 +237,6 @@
 * Space : `O(n)` for array, `O(logn)` for linked list
 
 ### Quick
-![alt tag](file:///android_asset/small/quick.gif)
 
 * Pick an element as *pivot* and partition the given array around picked pivot, then recursively sort leaf and right sub-arrays (*divide and conquer*)
   * always pick first element as pivot

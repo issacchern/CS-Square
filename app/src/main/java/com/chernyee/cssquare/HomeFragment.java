@@ -19,17 +19,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.chernyee.cssquare.Qod.QodApi;
-import com.chernyee.cssquare.Qod.QodData;
+import com.chernyee.cssquare.ApiData.QodApi;
+import com.chernyee.cssquare.ApiData.QodData;
 import com.chernyee.cssquare.UI.SlideAdapter;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -46,9 +46,6 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -223,11 +220,11 @@ public class HomeFragment extends Fragment {
     public void GenerateBar(){
 
         mBarChart.setDescription("");
-        mBarChart.setMaxVisibleValueCount(60);
+
 
         // scaling can now only be done on x- and y-axis separately
-        mBarChart.setPinchZoom(false);
-        mBarChart.setScaleEnabled(false);
+        mBarChart.setPinchZoom(true);
+        mBarChart.setScaleEnabled(true);
         mBarChart.setDrawBarShadow(false);
         mBarChart.setDrawGridBackground(false);
 
@@ -258,6 +255,15 @@ public class HomeFragment extends Fragment {
         right.setAxisMaxValue(10);
         right.setStartAtZero(true);
         right.setValueFormatter(myFormatter);
+
+        Legend l = mBarChart.getLegend();
+        l.setPosition(Legend.LegendPosition.BELOW_CHART_LEFT);
+        l.setForm(Legend.LegendForm.SQUARE);
+        l.setFormSize(9f);
+        l.setTextSize(11f);
+        l.setXEntrySpace(4f);
+
+
         mBarChart.setData(generateBarData());
     }
 
@@ -286,14 +292,16 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(getContext(),"Coming soon!", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getActivity(), JokesActivity.class);
+                startActivity(intent);
             }
         });
 
         flashcardTextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(),"Coming soon!", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getActivity(), FlashCardActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -359,15 +367,19 @@ public class HomeFragment extends Fragment {
         });
 
 
-        gbSlideBar.setPosition(1); // to prevent drawhole error!
+
+        gbSlideBar.setPosition(1);
+        header.animate().alpha(0.0f);
+        mPieChart.animate().alpha(0.0f);
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+
                 header.setVisibility(View.GONE);
                 mPieChart.setVisibility(View.GONE);
             }
-        }, 5);
+        }, 100);
 
         return v;
     }

@@ -37,7 +37,7 @@ import com.chernyee.cssquare.Utility.AwsUtil;
 import com.chernyee.cssquare.Utility.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener, TransferListener{
 
     private SharedPreferences sharedPreferences;
     private AmazonS3Client s3;
@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity
     private TransferUtility transferUtility;
     private ProgressDialog progressDialog;
     private boolean doubleBackToExitPressedOnce = false;
+    private int onlineVersion = 0;
 
 
     @Override
@@ -98,41 +99,14 @@ public class MainActivity extends AppCompatActivity
                                         s3ObjList = s3.listObjects("sabi-data").getObjectSummaries();
                                         for (S3ObjectSummary summary : s3ObjList) {
                                             if (summary.getKey().length() < 3) {
-                                                int onlineVersion = Integer.parseInt(summary.getKey());
-                                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                                editor.putInt("csdbversion", onlineVersion);
-                                                editor.commit();
-                                            } else {
+                                                onlineVersion = Integer.parseInt(summary.getKey());
+                                            } else if(summary.getKey().equals("Questions.db")){
+
                                                 File file = new File(SplashActivity.DATABASE_PATH + "/" + "Questions.db");
-                                                transferUtility = AwsUtil.getTransferUtility(MainActivity.this);
+                                                TransferUtility transferUtility = AwsUtil.getTransferUtility(MainActivity.this);
                                                 TransferObserver observer = transferUtility.download("sabi-data", "Questions.db", file);
-                                                observer.setTransferListener(new TransferListener() {
-                                                    public void onStateChanged(int id, String newState) {
-
-                                                    }
-
-                                                    @Override
-                                                    public void onStateChanged(int i, TransferState transferState) {
-                                                        if (transferState.toString().equals("IN_PROGRESS")) {
-                                                            progressDialog = ProgressDialog.show(MainActivity.this, "Downloading data",
-                                                                    "Please wait", true);
-
-                                                        } else if (transferState.toString().equals("COMPLETED")) {
-                                                            progressDialog.dismiss();
-                                                            Intent intent = new Intent(MainActivity.this, SplashActivity.class);
-                                                            startActivity(intent);
-                                                            finish();
-                                                        }
-                                                    }
-
-                                                    public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-
-                                                    }
-
-                                                    public void onError(int id, Exception e) {// Do something in the callback.
-
-                                                    }
-                                                });
+                                                observer.setTransferListener(MainActivity.this);
+                                                break; // no need to check for other cases
 
                                             }
                                         }
@@ -169,14 +143,13 @@ public class MainActivity extends AppCompatActivity
                         s3 = AwsUtil.getS3Client(MainActivity.this);
                         s3ObjList = s3.listObjects("sabi-data").getObjectSummaries();
                         int currentVersion = sharedPreferences.getInt("csdbversion", 7);
-                        int onlineVersion = 0;
                         for (S3ObjectSummary summary : s3ObjList) {
 
                             if (summary.getKey().length() < 3) {
                                 onlineVersion = Integer.parseInt(summary.getKey());
-                            } else {
+                            } else if(summary.getKey().equals("Questions.db")){
                                 if(onlineVersion > currentVersion && isNetworkAvailable(getApplicationContext())){
-                                    final int onlineVersion2 = onlineVersion;
+
                                     runOnUiThread(new Runnable() {
 
                                         @Override
@@ -198,41 +171,13 @@ public class MainActivity extends AppCompatActivity
                                                     "Yes",
                                                     new DialogInterface.OnClickListener() {
                                                         public void onClick(DialogInterface dialog, int id) {
+
                                                             File file = new File(SplashActivity.DATABASE_PATH + "/" + "Questions.db");
-                                                            transferUtility = AwsUtil.getTransferUtility(MainActivity.this);
+                                                            TransferUtility transferUtility = AwsUtil.getTransferUtility(MainActivity.this);
                                                             TransferObserver observer = transferUtility.download("sabi-data", "Questions.db", file);
-                                                            observer.setTransferListener(new TransferListener() {
-                                                                public void onStateChanged(int id, String newState) {
-
-                                                                }
-
-                                                                @Override
-                                                                public void onStateChanged(int i, TransferState transferState) {
+                                                            observer.setTransferListener(MainActivity.this);
 
 
-                                                                    if (transferState.toString().equals("IN_PROGRESS")) {
-                                                                        progressDialog = ProgressDialog.show(MainActivity.this, "Downloading data",
-                                                                                "Please wait", true);
-                                                                    } else if (transferState.toString().equals("COMPLETED")) {
-                                                                        progressDialog.dismiss();
-                                                                        Intent intent = new Intent(MainActivity.this, SplashActivity.class);
-                                                                        startActivity(intent);
-                                                                        finish();
-                                                                    }
-                                                                }
-
-                                                                public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-
-                                                                }
-
-                                                                public void onError(int id, Exception e) {// Do something in the callback.
-
-                                                                }
-                                                            });
-
-                                                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                                                            editor.putInt("csdbversion", onlineVersion2);
-                                                            editor.commit();
                                                             dialog.cancel();
                                                         }
                                                     });
@@ -241,6 +186,7 @@ public class MainActivity extends AppCompatActivity
                                         }
                                     });
                                 }
+                                break ; // no need to see for other case
                             }
                         }
                     }
@@ -299,9 +245,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -428,5 +374,35 @@ public class MainActivity extends AppCompatActivity
     public static boolean isNetworkAvailable(final Context context) {
         final ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
         return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
+    }
+
+    // this following method is from AWS TransferListener
+
+    @Override
+    public void onStateChanged(int i, TransferState transferState) {
+        if (transferState.toString().equals("IN_PROGRESS")) {
+            progressDialog = ProgressDialog.show(MainActivity.this, "Downloading data",
+                    "Please wait", true);
+        } else if (transferState.toString().equals("COMPLETED")) {
+            progressDialog.dismiss();
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("csdbversion", onlineVersion);
+            editor.commit();
+
+            Intent intent = new Intent(MainActivity.this, SplashActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    @Override
+    public void onProgressChanged(int i, long l, long l1) {
+
+    }
+
+    @Override
+    public void onError(int i, Exception e) {
+
     }
 }

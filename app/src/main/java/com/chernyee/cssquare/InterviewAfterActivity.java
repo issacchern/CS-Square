@@ -42,6 +42,7 @@ import java.util.List;
 import cn.iwgang.countdownview.CountdownView;
 import com.chernyee.cssquare.AlertDialog.SweetAlertDialog;
 import com.chernyee.cssquare.Utility.SyntaxHighlighter;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.parceler.Parcels;
 
@@ -60,8 +61,7 @@ public class InterviewAfterActivity extends AppCompatActivity {
     private InputStream in;
     private OutputStream out;
 
-    private final String FILE_PATH = Environment.getExternalStorageDirectory().getPath()+ "/" +
-            SplashActivity.CS_FOLDER + "/TempRecording.wav";
+    private final String FILE_PATH = SplashActivity.RECORD_PATH + "/TempRecording.wav";
 
 
     @Override
@@ -136,9 +136,9 @@ public class InterviewAfterActivity extends AppCompatActivity {
             public void onClick(View v) {
                 LayoutInflater inflater = getLayoutInflater();
                 View dialoglayout = inflater.inflate(R.layout.edit_text, null);
-                final EditText input = (EditText) dialoglayout.findViewById(R.id.edit);
+                final MaterialEditText input = (MaterialEditText) dialoglayout.findViewById(R.id.edit);
                 TextView text = (TextView) dialoglayout.findViewById(R.id.text);
-                text.setText("Type your file name");
+                text.setText("Enter your file name");
                 input.setText(".wav");
 
                 final AlertDialog.Builder alertDialog = new AlertDialog.Builder(InterviewAfterActivity.this);
@@ -161,7 +161,7 @@ public class InterviewAfterActivity extends AppCompatActivity {
                             if (temp.matches("^[a-zA-Z0-9]+$") && temp.length() > 0) {
                                 // check if file exists...
 
-                                String wholePath = Environment.getExternalStorageDirectory().getPath() + "/" + SplashActivity.CS_FOLDER + "/" + s;
+                                String wholePath = SplashActivity.RECORD_PATH + "/" + s;
                                 File check = new File(wholePath);
                                 if (check.exists()) {
                                     Toast.makeText(InterviewAfterActivity.this, "The file has already existed, please choose other name!", Toast.LENGTH_LONG).show();
