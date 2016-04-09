@@ -5,6 +5,7 @@ import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.AsyncTask;
@@ -27,6 +28,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chernyee.cssquare.FlingSwipe.SwipeFlingAdapterView;
+import com.chernyee.cssquare.model.DaoMaster;
+import com.chernyee.cssquare.model.DaoSession;
+import com.chernyee.cssquare.model.NoteDao;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.util.ArrayList;
@@ -55,6 +59,10 @@ public class FlashCardActivity extends AppCompatActivity implements SwipeFlingAd
     private int cardWidth;
     private int cardHeight;
 
+    private SQLiteDatabase db;
+    private DaoMaster daoMaster;
+    private DaoSession daoSession;
+    private NoteDao noteDao;
     private SwipeFlingAdapterView swipeView;
     private InnerAdapter adapter;
     private boolean isFirst = true;
@@ -92,6 +100,13 @@ public class FlashCardActivity extends AppCompatActivity implements SwipeFlingAd
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         fab = (FloatingActionButton) findViewById(R.id.fab);
+
+
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "db_file",null);
+        db = helper.getWritableDatabase();
+        daoMaster = new DaoMaster(db);
+        daoSession = daoMaster.newSession();
+        noteDao = daoSession.getNoteDao();
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

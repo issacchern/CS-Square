@@ -59,7 +59,7 @@ public class SplashActivity extends AppCompatActivity {
         }
 
         sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        int databaseVersion = sharedPreferences.getInt("csdbversion", 7);
+        int databaseVersion = sharedPreferences.getInt("csdbversion", 7); // prevent downgrade
 
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat month_date = new SimpleDateFormat("M");

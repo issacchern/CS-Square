@@ -1,11 +1,15 @@
 package com.chernyee.cssquare;
 
+import android.support.v7.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -18,7 +22,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,8 +51,12 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -65,6 +76,7 @@ public class HomeFragment extends Fragment {
     private String[] mMonths = new String[] {
             "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"
     };
+    private static final String SCENERY_URL = "http://www.chernyee.com/scenery/";
     private static final String BASE_URL = "http://quotes.rest/";
     private SharedPreferences sharedPreferences;
     private GBSlideBar gbSlideBar;
@@ -138,8 +150,9 @@ public class HomeFragment extends Fragment {
 
                         if(response.isSuccessful()){
                             String title = response.body().getContents().getQuotes().get(0).getQuote();
-                            String url = response.body().getContents().getQuotes().get(0).getBackground();
-                            String date = response.body().getContents().getQuotes().get(0).getDate();
+
+                            Calendar c = Calendar.getInstance();
+                            String url = SCENERY_URL + c.get(Calendar.DAY_OF_MONTH) +".jpg";
                             String author = response.body().getContents().getQuotes().get(0).getAuthor();
                             quoteView.setText(title);
                             authorView.setText(author);
@@ -153,7 +166,6 @@ public class HomeFragment extends Fragment {
                             editor.putString("csqobauthor", author);
                             editor.commit();
 
-                            Log.v("DATE IN RESPONSE", date);
                         } else{
                             Toast.makeText(getContext(), "Error on the server side!", Toast.LENGTH_LONG).show();
                         }
@@ -319,6 +331,85 @@ public class HomeFragment extends Fragment {
         Picasso.with(getContext()).load(sharedPreferences.getString("csqobimage",
                 "http://i.imgur.com/DvpvklR.png")).into(backgroundImage);
         authorView.setText(sharedPreferences.getString("csqobauthor", "Anonymous"));
+
+        backgroundImage.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                String names[] ={"Share the quote","Download background image"};
+
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+                final View dialoglayout = inflater.inflate(R.layout.list, null);
+                final ListView lv = (ListView) dialoglayout.findViewById(R.id.list);
+
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder((MainActivity) getActivity());
+                alertDialog.setView(dialoglayout);
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                        getActivity(),android.R.layout.simple_list_item_1,names);
+                lv.setAdapter(adapter);
+
+
+                final AlertDialog dialog = alertDialog.show();
+
+
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        if (position == 0) { // share code
+
+                            String quote = sharedPreferences.getString("csqobtitle", "");
+                            String author = sharedPreferences.getString("csqobauthor", "");
+                            String cliptoBoard = quote + " - " + author;
+                            Intent sendIntent = new Intent();
+                            sendIntent.setAction(Intent.ACTION_SEND);
+                            sendIntent.putExtra(Intent.EXTRA_TEXT, cliptoBoard);
+                            sendIntent.setType("text/plain");
+                            startActivity(Intent.createChooser(sendIntent, "Share the quote"));
+                        } else { // download image
+
+                            Picasso.with(getContext()).load(sharedPreferences.getString("csqobimage", ""))
+                                    .into(new Target() {
+                                        @Override
+                                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                            String fileName = sharedPreferences.getString("csdate", "");
+
+                                            File file = new File(SplashActivity.IMAGES_PATH + "/" + fileName + ".jpg");
+                                            try {
+                                                file.createNewFile();
+                                                FileOutputStream ostream = new FileOutputStream(file);
+                                                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, ostream);
+                                                ostream.close();
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            } finally {
+                                                Toast.makeText(getActivity(), "Image downloaded to"
+                                                        + SplashActivity.CS_FOLDER_PATH
+                                                        + SplashActivity.IMAGES_PATH, Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onBitmapFailed(Drawable errorDrawable) {
+
+                                        }
+
+                                        @Override
+                                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                                        }
+                                    });
+                        }
+                        dialog.dismiss();
+                    }
+                });
+
+
+                return false;
+            }
+        });
+
+
 
         GeneratePie();
         GenerateBar();

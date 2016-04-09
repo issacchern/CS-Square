@@ -47,16 +47,24 @@ public class VarInit {
 
     public void initializeVariable(){
 
-        db = new DatabaseHelper(context, databaseVersion);
-        sharedCodeList = db.getCodingQuestions();
-        sharedQAList = db.getInterviewQuestions();
+        try{
+            db = new DatabaseHelper(context, databaseVersion);
+            sharedCodeList = db.getCodingQuestions();
+            sharedQAList = db.getInterviewQuestions();
 
-        Collections.sort(sharedCodeList, new Comparator<Question>() {
-            @Override
-            public int compare(Question lhs, Question rhs) {
-                return lhs.title.compareTo(rhs.title);
-            }
-        });
+            Collections.sort(sharedCodeList, new Comparator<Question>() {
+                @Override
+                public int compare(Question lhs, Question rhs) {
+                    return lhs.title.compareTo(rhs.title);
+                }
+            });
+        } catch (Exception e){
+            Toast.makeText(context, "Error opening database!", Toast.LENGTH_LONG).show();
+            File db = new File(SplashActivity.DATABASE_PATH);
+            if(db.exists()) db.delete();
+        }
+
+
 
     }
 

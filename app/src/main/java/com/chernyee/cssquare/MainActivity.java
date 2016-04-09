@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,10 +23,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v7.widget.SearchView;
+import android.view.Window;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 import org.codechimp.apprater.AppRater;
 import java.io.File;
 import java.util.List;
+import java.util.Observable;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
@@ -35,9 +39,12 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.chernyee.cssquare.Utility.AwsUtil;
 import com.chernyee.cssquare.Utility.DatabaseHelper;
+import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
+import com.github.ksoichiro.android.observablescrollview.ScrollState;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, TransferListener{
+        implements NavigationView.OnNavigationItemSelectedListener, TransferListener
+                        , ObservableScrollViewCallbacks{
 
     private SharedPreferences sharedPreferences;
     private AmazonS3Client s3;
@@ -46,15 +53,20 @@ public class MainActivity extends AppCompatActivity
     private ProgressDialog progressDialog;
     private boolean doubleBackToExitPressedOnce = false;
     private int onlineVersion = 0;
+    private Toolbar toolbar;
+    private int oldScrollY = 0;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         AppRater.app_launched(this);
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -405,4 +417,35 @@ public class MainActivity extends AppCompatActivity
     public void onError(int i, Exception e) {
 
     }
+
+    @Override
+    public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
+
+    }
+
+    @Override
+    public void onDownMotionEvent() {
+
+    }
+
+    @Override
+    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
+
+        ActionBar ab = getSupportActionBar();
+        if (ab == null) {
+            return;
+        }
+        if (scrollState == ScrollState.UP) {
+            if (ab.isShowing()) {
+                ab.hide();
+            }
+        } else if (scrollState == ScrollState.DOWN) {
+            if (!ab.isShowing()) {
+                ab.show();
+            }
+        }
+    }
+
+
+
 }

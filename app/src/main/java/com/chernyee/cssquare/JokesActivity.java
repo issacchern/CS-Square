@@ -10,17 +10,12 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -29,15 +24,9 @@ import android.widget.Toast;
 
 import com.chernyee.cssquare.ApiData.JokesApi;
 import com.chernyee.cssquare.ApiData.JokesData;
-import com.chernyee.cssquare.UI.ResizableImageView;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -60,11 +49,10 @@ public class JokesActivity extends AppCompatActivity {
     private List<JokesData.Image> listImage;
     private FloatingActionButton fab;
     private String tempHoldStr = "";
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+    private int spanCount = 1; // 1 column
+    private int spacing = 50; // 50px
+
+
 
 
     @Override
@@ -129,6 +117,9 @@ public class JokesActivity extends AppCompatActivity {
                         }
                         tempHoldStr = filter;
 
+                        staggeredGridLayoutManager = new StaggeredGridLayoutManager(1, 1);
+                        mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
+
                         if (iList.size() == 0) {
                             Toast.makeText(JokesActivity.this, "No result is found!", Toast.LENGTH_SHORT).show();
                             mRecyclerView.setAdapter(adapter);
@@ -140,6 +131,7 @@ public class JokesActivity extends AppCompatActivity {
                             adapter.swap(iList);
 
                         }
+
 
                         runOnUiThread(new Runnable() {
                             @Override
@@ -162,10 +154,8 @@ public class JokesActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
-        int spanCount = 1; // 3 columns
-        int spacing = 50; // 50px
-        boolean includeEdge = true;
-        mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
+
+        mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, true));
 
 
         staggeredGridLayoutManager = new StaggeredGridLayoutManager(1, 1);
@@ -200,6 +190,8 @@ public class JokesActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<JokesData> call, Throwable t) {
+                    call.cancel();
+                    progress.dismiss();
 
                 }
             });
@@ -209,49 +201,6 @@ public class JokesActivity extends AppCompatActivity {
         }
 
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "Jokes Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app deep link URI is correct.
-                Uri.parse("android-app://com.chernyee.cssquare/http/host/path")
-        );
-        AppIndex.AppIndexApi.start(client, viewAction);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "Jokes Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app deep link URI is correct.
-                Uri.parse("android-app://com.chernyee.cssquare/http/host/path")
-        );
-        AppIndex.AppIndexApi.end(client, viewAction);
-        client.disconnect();
     }
 
 

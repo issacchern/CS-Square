@@ -42,6 +42,7 @@
         android:layout_height="match_parent" />
 
 
+
     <ScrollView
         android:id="@+id/home"
         android:layout_width="match_parent"
@@ -166,25 +167,10 @@
 
 
 
-    <LinearLayout
-        android:orientation="vertical"
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/chart2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <com.github.mikephil.charting.charts.BarChart
-            android:layout_weight="20"
-            android:id="@+id/chart2"
-            android:layout_width="match_parent"
-            android:layout_height="0dp" />
-
-        <TextView
-            android:layout_weight="1"
-            android:text="11"
-            android:layout_width="match_parent"
-            android:layout_height="0dp" />
-
-
-    </LinearLayout>
+        android:layout_height="match_parent" />
 
 
 </LinearLayout>

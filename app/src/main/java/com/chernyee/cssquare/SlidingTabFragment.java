@@ -6,6 +6,10 @@ package com.chernyee.cssquare;
 
 import com.chernyee.cssquare.UI.CustomAdapter;
 import com.chernyee.cssquare.UI.SlidingTabLayout;
+import com.github.ksoichiro.android.observablescrollview.ObservableListView;
+import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
+import com.github.ksoichiro.android.observablescrollview.ScrollState;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,12 +22,16 @@ import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -45,10 +53,11 @@ public class SlidingTabFragment extends Fragment{
     private ViewPager mViewPager;
     private CustomAdapter customAdapter;
     private SharedPreferences sharedPreferences;
-    private ListView lv;
+    private ObservableListView lv;
     private String difficulty;
     private String sortBy;
     private HashMap<Integer,List<Question>> hashMap;
+    private int pageSelected = 0;
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -131,6 +140,7 @@ public class SlidingTabFragment extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
+        ((MainActivity) getActivity()).getSupportActionBar().show();
         if(customAdapter != null)
              customAdapter.notifyDataSetChanged();
     }
@@ -143,6 +153,7 @@ public class SlidingTabFragment extends Fragment{
         sortBy = sharedPreferences.getString("csfiltersortby", "titleAscending"); // default value
         hashMap = new HashMap<>();
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
         super.onCreate(savedInstanceState);
     }
 
@@ -154,9 +165,29 @@ public class SlidingTabFragment extends Fragment{
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mViewPager.setAdapter(new SamplePagerAdapter());
         mSlidingTabLayout.setViewPager(mViewPager);
+        mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                ActionBar ab = ((MainActivity) getActivity()).getSupportActionBar();
+                ab.show();
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         return view;
     }
+
+
 
 
     class SamplePagerAdapter extends PagerAdapter {
@@ -195,9 +226,11 @@ public class SlidingTabFragment extends Fragment{
             container.addView(view);
             List<Question> qList = QuestionList.getViewPosition(position, difficulty, sortBy);
             hashMap.put(position, qList);
-            lv = (ListView) view.findViewById(R.id.questionlist);
+            lv = (ObservableListView) view.findViewById(R.id.questionlist);
+            lv.setScrollViewCallbacks((MainActivity) getActivity());
             customAdapter = new CustomAdapter(getActivity(), R.layout.list_item,qList);
             lv.setAdapter(customAdapter);
+
 
             final int final_position = position;
 

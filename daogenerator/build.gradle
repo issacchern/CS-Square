@@ -1,0 +1,9 @@
+apply plugin: 'application'
+apply plugin: 'java'
+
+mainClassName= "com.chernyee.cssquare.DAOGenerator"
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'de.greenrobot:greendao-generator:2.1.0'
+}
