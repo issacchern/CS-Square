@@ -1,13 +1,11 @@
 package com.chernyee.cssquare.Utility;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
-import android.os.Environment;
 
-import com.chernyee.cssquare.Question;
+import com.chernyee.cssquare.Question1;
 import com.chernyee.cssquare.Question2;
 import com.chernyee.cssquare.SQLiteAssetHelper.SQLiteAssetHelper;
 import com.chernyee.cssquare.SplashActivity;
@@ -33,10 +31,15 @@ public class DatabaseHelper extends SQLiteAssetHelper {
         super(context, DATABASE_NAME, SplashActivity.DATABASE_PATH, null, databaseVersion);
     }
 
+    public void resetDB(){
 
-    public List<Question> getCodingQuestions() {
+        mInstance = null;
+    }
 
-        List<Question> codeList = new ArrayList<>();
+
+    public List<Question1> getCodingQuestions() {
+
+        List<Question1> codeList = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
@@ -47,7 +50,7 @@ public class DatabaseHelper extends SQLiteAssetHelper {
                 null, null, null);
         if(c.moveToFirst()){
             do{
-                Question q = new Question(c.getString(0),c.getString(1),c.getString(2),
+                Question1 q = new Question1(c.getString(0),c.getString(1),c.getString(2),
                         c.getString(3),new String(c.getBlob(4)),c.getString(5),c.getString(6),
                         c.getString(7),c.getString(8),c.getString(9));
                 codeList.add(q);

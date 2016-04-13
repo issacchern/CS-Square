@@ -1,6 +1,5 @@
 package com.chernyee.cssquare;
 
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -12,7 +11,6 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,11 +18,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.chernyee.cssquare.Utility.DaoDBHelper;
 import com.chernyee.cssquare.Utility.SyntaxHighlighter;
+import com.chernyee.cssquare.model.Question;
+import com.chernyee.cssquare.model.QuestionDao;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -36,8 +36,8 @@ import org.parceler.Parcels;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.List;
 
+import de.greenrobot.dao.async.AsyncSession;
 import me.gujun.android.taggroup.TagGroup;
 
 public class QuestionActivity extends AppCompatActivity {
@@ -66,10 +66,13 @@ public class QuestionActivity extends AppCompatActivity {
     private FloatingActionButton actionB;
     private FloatingActionButton actionC;
     private FloatingActionButton actionD;
-    private Question q;
+    private Question1 q;
     private int month;
 
     private SharedPreferences sharedPref;
+    private DaoDBHelper daoDBHelper;
+    private QuestionDao questionDao;
+    private Question question;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -81,19 +84,21 @@ public class QuestionActivity extends AppCompatActivity {
         }
 
         else if (id == R.id.bookmark_item) {
-            int markStar = sharedPref.getInt("cs"+ q.getId(), 0);
-            if(markStar == 0){
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putInt("cs"+ q.getId(), 1);
-                editor.commit();
-                item.setIcon(getResources().getDrawable(R.drawable.star));
-                Toast.makeText(this, "Bookmarked!", Toast.LENGTH_SHORT).show();
-            } else{
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putInt("cs"+ q.getId(),0);
-                editor.commit();
+
+
+            boolean markStar = question.getBookmark();
+            if(markStar){
+                question.setBookmark(false);
+                questionDao.update(question);
                 item.setIcon(getResources().getDrawable(R.drawable.star_outline));
                 Toast.makeText(this, "Remove bookmarked!", Toast.LENGTH_SHORT).show();
+
+            } else{
+                question.setBookmark(true);
+                questionDao.update(question);
+                item.setIcon(getResources().getDrawable(R.drawable.star));
+                Toast.makeText(this, "Bookmarked!", Toast.LENGTH_SHORT).show();
+
             }
             return true;
         } else if(id == R.id.hot){
@@ -114,11 +119,12 @@ public class QuestionActivity extends AppCompatActivity {
             menuItem.setVisible(false);
         }
         MenuItem bedMenuItem = menu.findItem(R.id.bookmark_item);
-        int markStar = sharedPref.getInt("cs" + q.getId(), 0);
-        if(markStar == 0){
-            bedMenuItem.setIcon(getResources().getDrawable(R.drawable.star_outline));
-        } else{
+
+        boolean markStar = question.getBookmark();
+        if(markStar){
             bedMenuItem.setIcon(getResources().getDrawable(R.drawable.star));
+        } else{
+            bedMenuItem.setIcon(getResources().getDrawable(R.drawable.star_outline));
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -141,8 +147,13 @@ public class QuestionActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(null);
         sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        tStart = System.currentTimeMillis();
         q = Parcels.unwrap(getIntent().getParcelableExtra("data"));
+        daoDBHelper = DaoDBHelper.getInstance(this);
+        questionDao = daoDBHelper.getQuestionDao();
+        question = questionDao.loadByRowId(Long.parseLong(q.getId()));
+
+        tStart = System.currentTimeMillis();
+
         mTagGroup = (TagGroup) findViewById(R.id.tag_group);
         codeButton = (Button) findViewById(R.id.codeButton);
         descriptionView = (TextView) findViewById(R.id.codeDescription);
@@ -197,8 +208,8 @@ public class QuestionActivity extends AppCompatActivity {
         mTagGroup.setTags(tags);
 
         // hide/show checkbox
-        int markRead = sharedPref.getInt("cse"+q.getId(), 0);
-        if(markRead == 1){
+        boolean markRead = question.getRead();
+        if(markRead){
             codeCheck.setVisibility(View.VISIBLE);
             codeCheck.setChecked(true);
         } else {
@@ -207,7 +218,10 @@ public class QuestionActivity extends AppCompatActivity {
         }
 
         // comment area
-        String comment = sharedPref.getString("csef" + q.getId(), "None");
+
+
+        String comment = question.getComment();
+
         if(comment.equals("None") || comment.equals("")){
             note.setVisibility(View.GONE);
             noteTitle.setVisibility(View.GONE);
@@ -220,8 +234,9 @@ public class QuestionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                int markRead = sharedPref.getInt("cse" + q.getId(), 0);
-                if (markRead == 1 || weirdToggle || q.getDifficulty().equals("Beginner")) {
+                boolean markRead = question.getRead();
+
+                if (markRead || weirdToggle || q.getDifficulty().equals("Beginner")) {
                     if (codeButton.getText().equals("Hide Solution")) {
                         updateCodeAndNumber(q.getCode());
                         cliptoBoard = q.getCode();
@@ -297,13 +312,30 @@ public class QuestionActivity extends AppCompatActivity {
         codeCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int markScore = sharedPref.getInt("cse"+q.getId(), 0);
-                if(markScore == 0){
+
+                boolean markScore = question.getRead();
+                if(markScore){
+                    question.setRead(false);
+                    questionDao.update(question);
                     SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putInt("cse" + q.getId(), 1);
+                    int rr = sharedPref.getInt("cs" + q.getDifficulty().toLowerCase(),0) + 1; // inverse
+                    editor.putInt("cs" + q.getDifficulty().toLowerCase(), rr);
+                    int ss = sharedPref.getInt("cscomplete",0) - 1;
+                    editor.putInt("cscomplete", ss);
+                    int tt = sharedPref.getInt("csmonth"+ month, 0) - 1;
+                    editor.putInt("csmonth"+ month, tt);
+                    editor.commit();
+
+
+                } else{
+                    question.setRead(true);
+                    questionDao.update(question);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    int rr = sharedPref.getInt("cs" + q.getDifficulty().toLowerCase(),0) - 1; // inverse
+                    editor.putInt("cs" + q.getDifficulty().toLowerCase(), rr);
                     int ss = sharedPref.getInt("cscomplete",0) + 1;
                     editor.putInt("cscomplete", ss);
-                    int tt = sharedPref.getInt("csmonth"+ month, 0) + 1;
+                    int tt = sharedPref.getInt("csmonth"+ month , 0) + 1;
                     editor.putInt("csmonth"+ month, tt);
                     editor.commit();
 
@@ -312,14 +344,6 @@ public class QuestionActivity extends AppCompatActivity {
                     } else if(ss == 60){
                         Toast.makeText(QuestionActivity.this,"Hard level is unlocked!", Toast.LENGTH_LONG).show();
                     }
-                } else{
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putInt("cse"+q.getId(), 0);
-                    int ss = sharedPref.getInt("cscomplete",0) - 1;
-                    editor.putInt("cscomplete", ss);
-                    int tt = sharedPref.getInt("csmonth"+ month , 0) - 1;
-                    editor.putInt("csmonth"+ month, tt);
-                    editor.commit();
                 }
             }
         });
@@ -368,7 +392,7 @@ public class QuestionActivity extends AppCompatActivity {
                 View dialoglayout = inflater.inflate(R.layout.edit_text, null);
                 final MaterialEditText input = (MaterialEditText) dialoglayout.findViewById(R.id.edit);
 
-                String none = sharedPref.getString("csef" + q.getId(),"None");
+                String none = question.getComment();
                 if(none.equals("None") || none.equals("")){
 
                 } else {
@@ -388,9 +412,8 @@ public class QuestionActivity extends AppCompatActivity {
                 alertDialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // do something with it()
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("csef" + q.getId(), input.getText().toString());
-                        editor.commit();
+                        question.setComment(input.getText().toString());
+                        questionDao.update(question);
 
                         if(input.getText().toString().equals("None") || input.getText().toString().equals("")){
                             note.setVisibility(View.GONE);

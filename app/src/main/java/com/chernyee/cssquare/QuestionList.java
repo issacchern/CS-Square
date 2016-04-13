@@ -3,6 +3,11 @@ package com.chernyee.cssquare;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.chernyee.cssquare.Utility.DaoDBHelper;
+import com.chernyee.cssquare.model.NoteDao;
+import com.chernyee.cssquare.model.Question;
+import com.chernyee.cssquare.model.QuestionDao;
+
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
@@ -10,6 +15,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+
+import de.greenrobot.dao.query.QueryBuilder;
 
 /**
  * Created by Issac on 3/28/2016.
@@ -22,47 +29,48 @@ public class QuestionList {
             "Tree" ,"Binary Search", "Backtracking", "DP" , "DFS", "BFS", "Greedy", "Design","Divide and Conquer","Sort", "Math", "Bit Manipulation"};
 
 
-    public static List<Question> getViewPosition(int position, String difficulty, String sortBy){
 
-        List<Question> newQuestionList = new ArrayList<>();
-        Iterator<Question> itr = VarInit.getSharedCodeListInstance().iterator();
+    public static List<Question1> getViewPosition(int position, String difficulty, String sortBy){
+
+        List<Question1> newQuestion1List = new ArrayList<>();
+        Iterator<Question1> itr = VarInit.getSharedCodeListInstance().iterator();
         while(itr.hasNext()){
-            Question q = itr.next();
+            Question1 q = itr.next();
             if(position == 0){
                 if(difficulty.contains(q.difficulty)){
-                    newQuestionList.add(q);
+                    newQuestion1List.add(q);
                 }
             } else if(q.tag.contains(code_tag[position])){
                 if(difficulty.contains(q.difficulty)){
-                    newQuestionList.add(q);
+                    newQuestion1List.add(q);
                 }
             }
         }
         if(sortBy.equals("titleAscending")){
-            Collections.sort(newQuestionList, new Comparator<Question>() {
+            Collections.sort(newQuestion1List, new Comparator<Question1>() {
                 @Override
-                public int compare(Question lhs, Question rhs) {
+                public int compare(Question1 lhs, Question1 rhs) {
                     return lhs.title.substring(lhs.title.indexOf("]") + 1).compareTo(rhs.title.substring(rhs.title.indexOf("]") + 1));
                 }
             });
         } else if(sortBy.equals("titleDescending")){
-            Collections.sort(newQuestionList, new Comparator<Question>() {
+            Collections.sort(newQuestion1List, new Comparator<Question1>() {
                 @Override
-                public int compare(Question lhs, Question rhs) {
+                public int compare(Question1 lhs, Question1 rhs) {
                     return rhs.title.substring(rhs.title.indexOf("]") + 1).compareTo(lhs.title.substring(lhs.title.indexOf("]") + 1));
                 }
             });
         } else{
             // default sort
-            Collections.sort(newQuestionList, new Comparator<Question>() {
+            Collections.sort(newQuestion1List, new Comparator<Question1>() {
                 @Override
-                public int compare(Question lhs, Question rhs) {
+                public int compare(Question1 lhs, Question1 rhs) {
                     return lhs.title.substring(lhs.title.indexOf("]") + 1).compareTo(rhs.title.substring(rhs.title.indexOf("]") + 1));
                 }
             });
         }
 
-        return newQuestionList;
+        return newQuestion1List;
 
     }
 
@@ -70,22 +78,19 @@ public class QuestionList {
         SharedPreferences sharedPreferences = context.getSharedPreferences(
                 context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         int count = 0;
+
         int remaining = sharedPreferences.getInt("cs" + difficulty.toLowerCase(), 0);
         if(remaining == 0){ // haven't run through the list yet
-            Iterator<Question> itr = VarInit.getSharedCodeListInstance().iterator();
-            while(itr.hasNext()){
-                Question q = itr.next();
-                if(complete){
-                    String markString = "cse"+ q.getId();
-                    int markScore = sharedPreferences.getInt(markString, 0);
-                    if(markScore == 1){
-                        count++;
-                    }
-                } else{
-                    if(q.difficulty.contains(difficulty)){
-                       count++;
-                    }
-                }
+
+            DaoDBHelper daoDBHelper = DaoDBHelper.getInstance(context);
+            QuestionDao questionDao = daoDBHelper.getQuestionDao();
+            QueryBuilder qb = questionDao.queryBuilder();
+
+            if(complete){
+                count = (int) qb.where(QuestionDao.Properties.Read.eq(true)).buildCount().count();
+            } else{
+                count = (int) qb.where(qb.and(QuestionDao.Properties.Read.eq(false),
+                        QuestionDao.Properties.Difficulty.eq(difficulty))).buildCount().count();
             }
 
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -97,35 +102,6 @@ public class QuestionList {
         }
 
         return count;
-    }
-
-
-    public static List<Question> getDifficulty(String difficulty, Context context , boolean complete){
-        SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        List<Question> newQuestionList = new ArrayList<>();
-        Iterator<Question> itr = VarInit.getSharedCodeListInstance().iterator();
-        while(itr.hasNext()){
-            Question q = itr.next();
-            if(complete){
-                String markString = "cse"+ q.getId();
-                int markScore = sharedPreferences.getInt(markString, 0);
-                if(markScore == 1){
-                    newQuestionList.add(q);
-                }
-            } else{
-                if(q.difficulty.contains(difficulty)){
-                    newQuestionList.add(q);
-                }
-            }
-        }
-        Collections.sort(newQuestionList, new Comparator<Question>() {
-            @Override
-            public int compare(Question lhs, Question rhs) {
-                return lhs.title.substring(lhs.title.indexOf("]") + 1).compareTo(rhs.title.substring(rhs.title.indexOf("]") + 1));
-            }
-        });
-
-        return newQuestionList;
     }
 
 

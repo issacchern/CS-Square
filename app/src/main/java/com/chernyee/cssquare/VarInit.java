@@ -1,9 +1,7 @@
 package com.chernyee.cssquare;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
@@ -11,9 +9,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Shader;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.chernyee.cssquare.Utility.DaoDBHelper;
 import com.chernyee.cssquare.Utility.DatabaseHelper;
+import com.chernyee.cssquare.model.Note;
+import com.chernyee.cssquare.model.Question;
+import com.chernyee.cssquare.model.QuestionDao;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,20 +24,26 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import de.greenrobot.dao.async.AsyncSession;
+import de.greenrobot.dao.query.QueryBuilder;
+
 /**
  * Created by Issac on 4/1/2016.
  */
 public class VarInit {
 
     private DatabaseHelper db;
-    public static List<Question> sharedCodeList = new ArrayList<>();
+    public static List<Question1> sharedCodeList = new ArrayList<>();
     public static List<Question2> sharedQAList = new ArrayList<>();
     private int databaseVersion = 0;
 
+    private DaoDBHelper daoDBHelper;
+    private QuestionDao questionDao;
+    private List<Question> listQuestion;
     private Context context ;
 
 
-    public static List<Question> getSharedCodeListInstance(){
+    public static List<Question1> getSharedCodeListInstance(){
         return sharedCodeList;
     }
 
@@ -49,24 +58,53 @@ public class VarInit {
 
     public void initializeVariable(){
 
+
+
         try{
             db = DatabaseHelper.getInstance(context, databaseVersion);
             sharedCodeList = db.getCodingQuestions();
             sharedQAList = db.getInterviewQuestions();
 
-            Collections.sort(sharedCodeList, new Comparator<Question>() {
+            daoDBHelper = DaoDBHelper.getInstance(context);
+
+            questionDao = daoDBHelper.getQuestionDao();
+            listQuestion = questionDao.loadAll();
+
+            if(listQuestion.size() < 1) { // no data loaded; expect load once
+                for(int i = 0; i < sharedCodeList.size(); i++){
+                    Question1 q1 = sharedCodeList.get(i);
+                    Question q = new Question(Long.parseLong(q1.getId()), false,false,"",null, q1.getDifficulty());
+                    questionDao.insert(q);
+                    Log.v("add new", q.getId() + " ---");
+                }
+            }
+
+            DaoDBHelper daoDBHelper = DaoDBHelper.getInstance(context);
+            QuestionDao questionDao = daoDBHelper.getQuestionDao();
+            QueryBuilder qb = questionDao.queryBuilder();
+
+            if(qb.buildCount().count() < sharedCodeList.size()){ // data is updated through AWS
+                for(int i = (int) qb.buildCount().count(); i < sharedCodeList.size(); i++){
+
+                    Question1 q1 = sharedCodeList.get(i);
+                    Question q = new Question(Long.parseLong(q1.getId()), false,false,"",null, q1.getDifficulty());
+                    questionDao.insert(q);
+                }
+            }
+
+            Collections.sort(sharedCodeList, new Comparator<Question1>() {
                 @Override
-                public int compare(Question lhs, Question rhs) {
-                    return lhs.title.compareTo(rhs.title);
+                public int compare(Question1 lhs, Question1 rhs) {
+                    return lhs.title.substring(lhs.title.indexOf("]") + 1).compareTo(rhs.title.substring(rhs.title.indexOf("]") + 1));
                 }
             });
+
+
         } catch (Exception e){
             Toast.makeText(context, "Error opening database!", Toast.LENGTH_LONG).show();
             File db = new File(SplashActivity.DATABASE_PATH);
             if(db.exists()) db.delete();
         }
-
-
 
     }
 

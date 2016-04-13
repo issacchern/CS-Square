@@ -6,6 +6,7 @@ import com.chernyee.cssquare.model.DaoMaster;
 import com.chernyee.cssquare.model.DaoSession;
 import com.chernyee.cssquare.model.Note;
 import com.chernyee.cssquare.model.NoteDao;
+import com.chernyee.cssquare.model.QuestionDao;
 
 import java.util.List;
 
@@ -44,12 +45,12 @@ public class DaoDBHelper {
         return daoSession.getNoteDao();
     }
 
+    public QuestionDao getQuestionDao(){
+        return daoSession.getQuestionDao();
+    }
+
     public AsyncSession getAsyncSession(){
         return asyncSession;
     }
 
-    public List<Note> getAllNotes(){
-        QueryBuilder<Note> queryBuilder = getNoteDao().queryBuilder();
-        return queryBuilder.list();
-    }
 }

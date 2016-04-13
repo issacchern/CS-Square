@@ -7,13 +7,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chernyee.cssquare.UI.CustomAdapter;
+import com.chernyee.cssquare.Utility.DaoDBHelper;
+import com.chernyee.cssquare.model.Question;
+import com.chernyee.cssquare.model.QuestionDao;
 
 import org.parceler.Parcels;
 
@@ -28,8 +30,10 @@ public class SearchableActivity extends ListActivity {
 
     private CustomAdapter customAdapter;
     private TextView textView;
-    private List<Question> customList;
+    private List<Question1> customList;
     private SharedPreferences sharedPreferences;
+    private DaoDBHelper daoDBHelper;
+    private QuestionDao questionDao;
 
     @Override
     protected void onResume() {
@@ -45,6 +49,8 @@ public class SearchableActivity extends ListActivity {
         textView.setVisibility(View.INVISIBLE);
         customList = new ArrayList<>();
         sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        daoDBHelper = DaoDBHelper.getInstance(this);
+        questionDao = daoDBHelper.getQuestionDao();
         handleIntent(getIntent());
 
     }
@@ -132,9 +138,9 @@ public class SearchableActivity extends ListActivity {
                 Toast.makeText(this, "You have removed all ads!", Toast.LENGTH_SHORT).show();
                 finish();
             } else{
-                Iterator<Question> itr = VarInit.getSharedCodeListInstance().iterator(); // not recommended but I got no choice :(
+                Iterator<Question1> itr = VarInit.getSharedCodeListInstance().iterator(); // not recommended but I got no choice :(
                 while(itr.hasNext()){
-                    Question q = itr.next();
+                    Question1 q = itr.next();
                     if(q.getTitle().toLowerCase().contains(query.toLowerCase())){
                         customList.add(q);
                     }
@@ -154,26 +160,29 @@ public class SearchableActivity extends ListActivity {
 
             String difficulty = getIntent().getExtras().getString("data");
 
-            Iterator<Question> itr = VarInit.getSharedCodeListInstance().iterator(); // not recommended
+            Iterator<Question1> itr = VarInit.getSharedCodeListInstance().iterator(); // not recommended
 
             if(difficulty.equals("Bookmarked")){
 
                 for(int i = 0; i < VarInit.getSharedCodeListInstance().size(); i++){
                     String num = VarInit.getSharedCodeListInstance().get(i).getId();
-                    int markRead = sharedPreferences.getInt("cs" + num , 0);
-                    if(markRead == 1) customList.add(VarInit.getSharedCodeListInstance().get(i));
+
+                    Question question = questionDao.loadByRowId(Long.parseLong(num));
+                    boolean markRead = question.getBookmark();
+                    if(markRead) customList.add(VarInit.getSharedCodeListInstance().get(i));
                 }
 
             } else if(difficulty.equals("Completed")){
                 for(int i = 0; i < VarInit.getSharedCodeListInstance().size(); i++){
                     String num = VarInit.getSharedCodeListInstance().get(i).getId();
-                    int markRead = sharedPreferences.getInt("cse" + num , 0);
-                    if(markRead == 1) customList.add(VarInit.getSharedCodeListInstance().get(i));
+                    Question question = questionDao.loadByRowId(Long.parseLong(num));
+                    boolean markRead = question.getRead();
+                    if(markRead) customList.add(VarInit.getSharedCodeListInstance().get(i));
                 }
 
             } else{
                 while(itr.hasNext()){
-                    Question q = itr.next();
+                    Question1 q = itr.next();
                     if(q.getDifficulty().toLowerCase().contains(difficulty.toLowerCase())){
                         customList.add(q);
                     }

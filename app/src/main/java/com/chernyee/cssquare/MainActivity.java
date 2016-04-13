@@ -399,6 +399,9 @@ public class MainActivity extends AppCompatActivity
             editor.putInt("csdbversion", onlineVersion);
             editor.commit();
 
+            DatabaseHelper db = DatabaseHelper.getInstance(this, sharedPreferences.getInt("csdbversion", 7));
+            db.resetDB();
+
             Intent intent = new Intent(MainActivity.this, SplashActivity.class);
             startActivity(intent);
             finish();

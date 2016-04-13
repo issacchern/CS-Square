@@ -117,6 +117,7 @@ public class HomeFragment extends Fragment {
         header.setText("Completed: " + qCompleted + "/" + VarInit.getSharedCodeListInstance().size());
         mPieChart.setCenterText(generateCenterText());
         mPieChart.setData(generatePieData());
+        mBarChart.setData(generateBarData());
 
     }
 

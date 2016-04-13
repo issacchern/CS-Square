@@ -72,7 +72,6 @@ public class FlashCardActivity extends AppCompatActivity implements SwipeFlingAd
 
     private int cardWidth;
     private int cardHeight;
-
     private DaoDBHelper daoDBHelper;
     private List<Note> listNote;
     private NoteDao noteDao;

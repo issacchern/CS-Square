@@ -25,14 +25,15 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.chernyee.cssquare.Utility.DaoDBHelper;
+import com.chernyee.cssquare.model.NoteDao;
+import com.chernyee.cssquare.model.QuestionDao;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
-import be.billington.calendar.recurrencepicker.EventRecurrence;
-import be.billington.calendar.recurrencepicker.EventRecurrenceFormatter;
-import be.billington.calendar.recurrencepicker.RecurrencePickerDialog;
 
 
 public class SettingsFragment extends Fragment {
@@ -109,6 +110,15 @@ public class SettingsFragment extends Fragment {
                                     editor.commit();
                                     editor.putInt("csdbversion", db);
                                     editor.commit();
+
+                                    DaoDBHelper daoDBHelper = DaoDBHelper.getInstance(getContext());
+
+                                    QuestionDao questionDao = daoDBHelper.getQuestionDao();
+                                    questionDao.deleteAll();
+                                    NoteDao noteDao = daoDBHelper.getNoteDao();
+                                    noteDao.deleteAll();
+
+
                                     dialog.cancel();
 
                                     Intent intent = new Intent(getActivity(), SplashActivity.class);

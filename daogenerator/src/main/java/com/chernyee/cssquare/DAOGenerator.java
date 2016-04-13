@@ -12,6 +12,7 @@ public class DAOGenerator {
         Schema schema = new Schema(1, "com.chernyee.cssquare.model");
 
         addNote(schema);
+        addQuestion(schema);
 
         new DaoGenerator().generateAll(schema, "app/src/main/java");
     }
@@ -23,6 +24,16 @@ public class DAOGenerator {
         note.addStringProperty("desc");
         note.addStringProperty("color");
         note.addBooleanProperty("check");
+    }
+
+    private static void addQuestion (Schema schema){
+        Entity question = schema.addEntity("Question");
+        question.addIdProperty();
+        question.addBooleanProperty("bookmark");
+        question.addBooleanProperty("read");
+        question.addStringProperty("comment");
+        question.addDateProperty("date");
+        question.addStringProperty("difficulty");
     }
 
 

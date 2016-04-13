@@ -21,27 +21,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
 import org.parceler.Parcels;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -54,7 +47,7 @@ public class SlidingTabFragment extends Fragment{
     private ListView lv;
     private String difficulty;
     private String sortBy;
-    private HashMap<Integer,List<Question>> hashMap;
+    private HashMap<Integer,List<Question1>> hashMap;
     private int pageSelected = 0;
 
     @Override
@@ -138,9 +131,10 @@ public class SlidingTabFragment extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
-        ((MainActivity) getActivity()).getSupportActionBar().show();
-        if(customAdapter != null)
-             customAdapter.notifyDataSetChanged();
+        if(customAdapter != null && lv != null){
+            lv.setAdapter(customAdapter);
+        }
+
     }
 
     @Override
@@ -163,24 +157,6 @@ public class SlidingTabFragment extends Fragment{
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mViewPager.setAdapter(new SamplePagerAdapter());
         mSlidingTabLayout.setViewPager(mViewPager);
-        mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                ActionBar ab = ((MainActivity) getActivity()).getSupportActionBar();
-                ab.show();
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
 
         return view;
     }
@@ -222,7 +198,7 @@ public class SlidingTabFragment extends Fragment{
 
             View view = getActivity().getLayoutInflater().inflate(R.layout.pager_item, container, false);
             container.addView(view);
-            List<Question> qList = QuestionList.getViewPosition(position, difficulty, sortBy);
+            List<Question1> qList = QuestionList.getViewPosition(position, difficulty, sortBy);
             hashMap.put(position, qList);
             lv = (ListView) view.findViewById(R.id.questionlist);
             customAdapter = new CustomAdapter(getActivity(), R.layout.list_item,qList);

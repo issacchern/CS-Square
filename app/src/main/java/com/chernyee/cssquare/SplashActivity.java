@@ -83,7 +83,6 @@ public class SplashActivity extends AppCompatActivity {
 
 
 
-
        new VarInit(this,databaseVersion).initializeVariable();
 
         MyAlarmManager.register(this);

@@ -10,7 +10,7 @@ import org.parceler.Parcel;
  */
 
 @Parcel
-public class Question{
+public class Question1 {
 
 
     String id;
@@ -24,13 +24,13 @@ public class Question{
     String difficulty;
     String additional;
 
-    public Question(){
+    public Question1(){
 
     }
 
-    public Question(String id, String title, String description, String code,
-                        String answer, String hint, String tag, String category,
-                        String difficulty, String additional){
+    public Question1(String id, String title, String description, String code,
+                     String answer, String hint, String tag, String category,
+                     String difficulty, String additional){
         this.id = id;
         this.title = title;
         this.description = description;

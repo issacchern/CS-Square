@@ -14,8 +14,8 @@ import java.io.IOException;
 
 public class MyBackupAgent extends BackupAgentHelper {
     // The name of the SharedPreferences file
-    static final String PREFS = "pref_file";
-    static final String DBS = "db_file";
+    static final String PREFS = "pref_file.xml";
+    static final String DBS = "db_file.db";
 
     // A key to uniquely identify the set of backup data
     static final String PREFS_BACKUP_KEY = "cs_prefs";
@@ -24,12 +24,12 @@ public class MyBackupAgent extends BackupAgentHelper {
     // Allocate a helper and add it to the backup agent
     @Override
     public void onCreate() {
-        Log.v("BackupAgentHelper" , "Backing up prefs file");
+        Log.v("BackupAgentHelper" , "Backing up db_file");
         SharedPreferencesBackupHelper prefHelper =
                 new SharedPreferencesBackupHelper(this, PREFS);
         addHelper(PREFS_BACKUP_KEY, prefHelper);
 
-        FileBackupHelper dbHelper = new FileBackupHelper(this,DBS);
+        FileBackupHelper dbHelper = new FileBackupHelper(this,"../databases/" + DBS);
         addHelper(DB_BACKUP_KEY, dbHelper);
     }
 

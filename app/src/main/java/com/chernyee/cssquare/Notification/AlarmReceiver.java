@@ -13,18 +13,15 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 
 import com.chernyee.cssquare.MainActivity;
-import com.chernyee.cssquare.Question;
+import com.chernyee.cssquare.Question1;
 import com.chernyee.cssquare.QuestionActivity;
 import com.chernyee.cssquare.R;
-import com.chernyee.cssquare.SplashActivity;
 import com.chernyee.cssquare.VarInit;
 
 import org.parceler.Parcels;
 
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -46,15 +43,9 @@ public class AlarmReceiver extends BroadcastReceiver{
 
             }
 
-            Question q ;
-            while(true){
-                int random = new Random().nextInt(VarInit.getSharedCodeListInstance().size());
-                int markRead = sharedPreferences.getInt("cse" + random , 0);
-                if(markRead != 1 && random != 0){
-                    q = VarInit.getSharedCodeListInstance().get(random);
-                    break;
-                }
-            }
+            Question1 q ;
+            int random = new Random().nextInt(VarInit.getSharedCodeListInstance().size());
+            q = VarInit.getSharedCodeListInstance().get(random);
 
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(context)
