@@ -39,12 +39,9 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.chernyee.cssquare.Utility.AwsUtil;
 import com.chernyee.cssquare.Utility.DatabaseHelper;
-import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
-import com.github.ksoichiro.android.observablescrollview.ScrollState;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, TransferListener
-                        , ObservableScrollViewCallbacks{
+        implements NavigationView.OnNavigationItemSelectedListener, TransferListener {
 
     private SharedPreferences sharedPreferences;
     private AmazonS3Client s3;
@@ -415,37 +412,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onError(int i, Exception e) {
-
-    }
-
-    @Override
-    public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
-
-    }
-
-    @Override
-    public void onDownMotionEvent() {
-
-    }
-
-    @Override
-    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
-
-        ActionBar ab = getSupportActionBar();
-        if (ab == null) {
-            return;
+        if(progressDialog.isShowing()){
+            progressDialog.dismiss();
         }
-        if (scrollState == ScrollState.UP) {
-            if (ab.isShowing()) {
-                ab.hide();
-            }
-        } else if (scrollState == ScrollState.DOWN) {
-            if (!ab.isShowing()) {
-                ab.show();
-            }
-        }
+        Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+
     }
-
-
 
 }

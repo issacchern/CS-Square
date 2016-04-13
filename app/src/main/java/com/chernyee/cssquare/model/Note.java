@@ -11,6 +11,7 @@ public class Note {
     private String text;
     private String desc;
     private String color;
+    private Boolean check;
 
     public Note() {
     }
@@ -19,11 +20,12 @@ public class Note {
         this.id = id;
     }
 
-    public Note(Long id, String text, String desc, String color) {
+    public Note(Long id, String text, String desc, String color, Boolean check) {
         this.id = id;
         this.text = text;
         this.desc = desc;
         this.color = color;
+        this.check = check;
     }
 
     public Long getId() {
@@ -58,6 +60,14 @@ public class Note {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public Boolean getCheck() {
+        return check;
+    }
+
+    public void setCheck(Boolean check) {
+        this.check = check;
     }
 
 }

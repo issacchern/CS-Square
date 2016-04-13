@@ -19,6 +19,14 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteAssetHelper {
 
     private static final String DATABASE_NAME = "Questions.db";
+    private static DatabaseHelper mInstance = null;
+
+    public static DatabaseHelper getInstance(Context context, int databaseVersion){
+        if (mInstance == null){
+            mInstance = new DatabaseHelper(context.getApplicationContext(), databaseVersion);
+        }
+        return mInstance;
+    }
 
 
     public DatabaseHelper(Context context, int databaseVersion) {

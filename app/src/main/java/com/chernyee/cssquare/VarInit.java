@@ -2,6 +2,7 @@ package com.chernyee.cssquare;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
@@ -9,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Shader;
+import android.util.DisplayMetrics;
 import android.widget.Toast;
 
 import com.chernyee.cssquare.Utility.DatabaseHelper;
@@ -48,7 +50,7 @@ public class VarInit {
     public void initializeVariable(){
 
         try{
-            db = new DatabaseHelper(context, databaseVersion);
+            db = DatabaseHelper.getInstance(context, databaseVersion);
             sharedCodeList = db.getCodingQuestions();
             sharedQAList = db.getInterviewQuestions();
 
@@ -91,5 +93,33 @@ public class VarInit {
         paint.setStrokeWidth(borderWidth);
         canvas.drawCircle(width / 2, height / 2, radius - borderWidth / 2, paint);
         return canvasBitmap;
+    }
+
+    /**
+     * This method converts dp unit to equivalent pixels, depending on device density.
+     *
+     * @param dp A value in dp (density independent pixels) unit. Which we need to convert into pixels
+     * @param context Context to get resources and device specific display metrics
+     * @return A float value to represent px equivalent to dp depending on device density
+     */
+    public static float convertDpToPixel(float dp, Context context){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float px = dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        return px;
+    }
+
+    /**
+     * This method converts device specific pixels to density independent pixels.
+     *
+     * @param px A value in px (pixels) unit. Which we need to convert into db
+     * @param context Context to get resources and device specific display metrics
+     * @return A float value to represent dp equivalent to px value
+     */
+    public static float convertPixelsToDp(float px, Context context){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float dp = px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        return dp;
     }
 }

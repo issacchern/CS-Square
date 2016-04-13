@@ -6,9 +6,7 @@ package com.chernyee.cssquare;
 
 import com.chernyee.cssquare.UI.CustomAdapter;
 import com.chernyee.cssquare.UI.SlidingTabLayout;
-import com.github.ksoichiro.android.observablescrollview.ObservableListView;
-import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
-import com.github.ksoichiro.android.observablescrollview.ScrollState;
+
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -53,7 +51,7 @@ public class SlidingTabFragment extends Fragment{
     private ViewPager mViewPager;
     private CustomAdapter customAdapter;
     private SharedPreferences sharedPreferences;
-    private ObservableListView lv;
+    private ListView lv;
     private String difficulty;
     private String sortBy;
     private HashMap<Integer,List<Question>> hashMap;
@@ -226,8 +224,7 @@ public class SlidingTabFragment extends Fragment{
             container.addView(view);
             List<Question> qList = QuestionList.getViewPosition(position, difficulty, sortBy);
             hashMap.put(position, qList);
-            lv = (ObservableListView) view.findViewById(R.id.questionlist);
-            lv.setScrollViewCallbacks((MainActivity) getActivity());
+            lv = (ListView) view.findViewById(R.id.questionlist);
             customAdapter = new CustomAdapter(getActivity(), R.layout.list_item,qList);
             lv.setAdapter(customAdapter);
 

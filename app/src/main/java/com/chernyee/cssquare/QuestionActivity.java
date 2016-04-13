@@ -46,7 +46,6 @@ public class QuestionActivity extends AppCompatActivity {
     private AdView adView;
     private AdRequest adRequest;
     private TagGroup mTagGroup;
-    private TextView titleView;
     private TextView descriptionView;
     private TextView codeView;
     private TextView codeNumberView;
@@ -62,6 +61,7 @@ public class QuestionActivity extends AppCompatActivity {
     private boolean weirdToggle = false;
     private TextView noteTitle;
     private TextView note;
+    private TextView menuTitle;
     private FloatingActionButton actionA;
     private FloatingActionButton actionB;
     private FloatingActionButton actionC;
@@ -76,15 +76,8 @@ public class QuestionActivity extends AppCompatActivity {
 
         int id = item.getItemId();
         if(id == android.R.id.home){
-            ActivityManager mngr = (ActivityManager) getSystemService( ACTIVITY_SERVICE );
-            List<ActivityManager.RunningTaskInfo> taskList = mngr.getRunningTasks(10);
-            if(taskList.get(0).numActivities == 1 &&
-                    taskList.get(0).topActivity.getClassName().equals(this.getClass().getName())) {
-                Intent i = new Intent(QuestionActivity.this, MainActivity.class);
-                startActivity(i);
-            } else{
-                finish();
-            }
+            finish();
+
         }
 
         else if (id == R.id.bookmark_item) {
@@ -146,18 +139,21 @@ public class QuestionActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(null);
         sharedPref = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         tStart = System.currentTimeMillis();
         q = Parcels.unwrap(getIntent().getParcelableExtra("data"));
         mTagGroup = (TagGroup) findViewById(R.id.tag_group);
         codeButton = (Button) findViewById(R.id.codeButton);
-        titleView = (TextView) findViewById(R.id.codeTitle);
         descriptionView = (TextView) findViewById(R.id.codeDescription);
         codeView = (TextView) findViewById(R.id.code);
         codeNumberView = (TextView) findViewById(R.id.codeNumber);
         codeCheck = (CheckBox) findViewById(R.id.codeCheckBox);
         note = (TextView) findViewById(R.id.codeNotes);
         noteTitle = (TextView) findViewById(R.id.codeNotesTitle);
+        menuTitle = (TextView) findViewById(R.id.toolbar_title);
+
+        menuTitle.setText(q.getTitle());
 
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat month_date = new SimpleDateFormat("M");
@@ -189,7 +185,6 @@ public class QuestionActivity extends AppCompatActivity {
         splitHint = q.getHint().split("\n");
         cliptoBoard = q.getCode();
 
-        titleView.setText(q.getTitle());
         descriptionView.setText(q.getDescription());
         updateCodeAndNumber(q.getCode());
 

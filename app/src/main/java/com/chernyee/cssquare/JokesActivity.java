@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -50,7 +49,6 @@ public class JokesActivity extends AppCompatActivity {
     private FloatingActionButton fab;
     private String tempHoldStr = "";
     private int spanCount = 1; // 1 column
-    private int spacing = 50; // 50px
 
 
 
@@ -154,6 +152,7 @@ public class JokesActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
+        int spacing = (int) VarInit.convertPixelsToDp(50, getApplicationContext()); // 50px
 
         mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, true));
 

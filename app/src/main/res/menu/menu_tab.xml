@@ -8,4 +8,8 @@
         android:title="Shuffle list" />
     <item android:id="@+id/reset"
         android:title="Reset list" />
+    <item android:id="@+id/load"
+        android:title="Load sample data"/>
+    <item android:id="@+id/deleteAll"
+        android:title="Delete all" />
 </menu>

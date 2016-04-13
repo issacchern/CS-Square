@@ -42,14 +42,14 @@ public class QuestionList {
             Collections.sort(newQuestionList, new Comparator<Question>() {
                 @Override
                 public int compare(Question lhs, Question rhs) {
-                    return lhs.title.compareTo(rhs.title);
+                    return lhs.title.substring(lhs.title.indexOf("]") + 1).compareTo(rhs.title.substring(rhs.title.indexOf("]") + 1));
                 }
             });
         } else if(sortBy.equals("titleDescending")){
             Collections.sort(newQuestionList, new Comparator<Question>() {
                 @Override
                 public int compare(Question lhs, Question rhs) {
-                    return rhs.title.compareTo(lhs.title);
+                    return rhs.title.substring(rhs.title.indexOf("]") + 1).compareTo(lhs.title.substring(lhs.title.indexOf("]") + 1));
                 }
             });
         } else{
@@ -57,7 +57,7 @@ public class QuestionList {
             Collections.sort(newQuestionList, new Comparator<Question>() {
                 @Override
                 public int compare(Question lhs, Question rhs) {
-                    return lhs.title.compareTo(rhs.title);
+                    return lhs.title.substring(lhs.title.indexOf("]") + 1).compareTo(rhs.title.substring(rhs.title.indexOf("]") + 1));
                 }
             });
         }
@@ -121,7 +121,7 @@ public class QuestionList {
         Collections.sort(newQuestionList, new Comparator<Question>() {
             @Override
             public int compare(Question lhs, Question rhs) {
-                return lhs.title.compareTo(rhs.title);
+                return lhs.title.substring(lhs.title.indexOf("]") + 1).compareTo(rhs.title.substring(rhs.title.indexOf("]") + 1));
             }
         });
 

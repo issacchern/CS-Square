@@ -336,6 +336,7 @@ public class HomeFragment extends Fragment {
             @Override
             public boolean onLongClick(View v) {
 
+                v.playSoundEffect(android.view.SoundEffectConstants.CLICK);
                 String names[] ={"Share the quote","Download background image"};
 
                 LayoutInflater inflater = getActivity().getLayoutInflater();

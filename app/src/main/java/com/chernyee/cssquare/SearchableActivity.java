@@ -61,7 +61,7 @@ public class SearchableActivity extends ListActivity {
         if(customList.get(position).getDifficulty().contains("Medium")){
 
             int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
-            int sizemedium = sharedPreferences.getInt("csmedium", 0);
+            int sizemedium = sharedPreferences.getInt("cslockmedium", 0);
             int remaining = sizemedium - sizeComplete;
             if(remaining > 0){
                 Toast.makeText(this, "You need to at least complete " + remaining + " questions to unlock Medium level.", Toast.LENGTH_SHORT).show();
@@ -77,8 +77,8 @@ public class SearchableActivity extends ListActivity {
         } else if(customList.get(position).getDifficulty().contains("Hard")){
 
             int sizeComplete = sharedPreferences.getInt("cscomplete", 0);
-            int sizemedium = sharedPreferences.getInt("cshard", 0);
-            int remaining = sizemedium - sizeComplete;
+            int sizehard = sharedPreferences.getInt("cslockhard", 0);
+            int remaining = sizehard - sizeComplete;
 
             if(remaining > 0){
                 Toast.makeText(this, "You need to at least complete " + remaining + " questions to unlock Hard level.", Toast.LENGTH_SHORT).show();

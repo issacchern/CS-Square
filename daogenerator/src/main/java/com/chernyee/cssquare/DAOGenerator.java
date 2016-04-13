@@ -18,10 +18,11 @@ public class DAOGenerator {
 
     private static void addNote(Schema schema) {
         Entity note = schema.addEntity("Note");
-        note.addIdProperty();
+        note.addIdProperty().primaryKeyAsc().autoincrement();
         note.addStringProperty("text").notNull();
         note.addStringProperty("desc");
         note.addStringProperty("color");
+        note.addBooleanProperty("check");
     }
 
 

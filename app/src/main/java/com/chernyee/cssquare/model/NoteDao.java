@@ -27,6 +27,7 @@ public class NoteDao extends AbstractDao<Note, Long> {
         public final static Property Text = new Property(1, String.class, "text", false, "TEXT");
         public final static Property Desc = new Property(2, String.class, "desc", false, "DESC");
         public final static Property Color = new Property(3, String.class, "color", false, "COLOR");
+        public final static Property Check = new Property(4, Boolean.class, "check", false, "CHECK");
     };
 
 
@@ -42,10 +43,11 @@ public class NoteDao extends AbstractDao<Note, Long> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"NOTE\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
+                "\"_id\" INTEGER PRIMARY KEY ASC AUTOINCREMENT ," + // 0: id
                 "\"TEXT\" TEXT NOT NULL ," + // 1: text
                 "\"DESC\" TEXT," + // 2: desc
-                "\"COLOR\" TEXT);"); // 3: color
+                "\"COLOR\" TEXT," + // 3: color
+                "\"CHECK\" INTEGER);"); // 4: check
     }
 
     /** Drops the underlying database table. */
@@ -74,6 +76,11 @@ public class NoteDao extends AbstractDao<Note, Long> {
         if (color != null) {
             stmt.bindString(4, color);
         }
+ 
+        Boolean check = entity.getCheck();
+        if (check != null) {
+            stmt.bindLong(5, check ? 1L: 0L);
+        }
     }
 
     /** @inheritdoc */
@@ -89,7 +96,8 @@ public class NoteDao extends AbstractDao<Note, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getString(offset + 1), // text
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // desc
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // color
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // color
+            cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0 // check
         );
         return entity;
     }
@@ -101,6 +109,7 @@ public class NoteDao extends AbstractDao<Note, Long> {
         entity.setText(cursor.getString(offset + 1));
         entity.setDesc(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setColor(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setCheck(cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0);
      }
     
     /** @inheritdoc */
